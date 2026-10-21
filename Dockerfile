@@ -9,7 +9,13 @@ COPY web/public ./public
 RUN mkdir -p dist/css && elm make src/Main.elm --optimize --output=dist/main.js && cp public/index.html public/bootstrap.js dist/ && cp public/css/app.css dist/css/
 
 FROM ${HASKELL_IMAGE} AS backend
-RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends libsqlite3-dev pkg-config && rm -rf /var/lib/apt/lists/*
+# Refresh indexes over HTTPS to avoid stale HTTP mirror/proxy responses.
+RUN find /etc/apt -type f \( -name '*.list' -o -name '*.sources' \) -exec sed -i 's|http://deb.debian.org|https://deb.debian.org|g; s|http://security.debian.org|https://security.debian.org|g' {} + \
+ && rm -rf /var/lib/apt/lists/* \
+ && apt-get -o Acquire::Retries=3 -o APT::Update::Error-Mode=any update \
+ && apt-get upgrade -y \
+ && apt-get install -y --no-install-recommends libsqlite3-dev libpq-dev pkg-config \
+ && rm -rf /var/lib/apt/lists/*
 WORKDIR /src/api
 COPY api/ecc-crm-api.cabal api/cabal.project api/cabal.project.freeze ./
 RUN cabal update && cabal build --only-dependencies
@@ -18,7 +24,7 @@ COPY api/src ./src
 RUN cabal build && cp "$(cabal list-bin exe:ecc-crm-api)" /usr/local/bin/ecc-crm-api
 
 FROM debian:bookworm-slim@sha256:7c7b2c966bc9ee8cedfeef67e0e279108992c77681fa595db4a9d65c06ccc587
-RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends libsqlite3-0 libgmp10 ca-certificates curl python3 && rm -rf /var/lib/apt/lists/* && useradd --system --uid 10001 app && mkdir -p /data && chown app /data
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends libsqlite3-0 libpq5 libgmp10 ca-certificates curl python3 && rm -rf /var/lib/apt/lists/* && useradd --system --uid 10001 app && mkdir -p /data && chown app /data
 WORKDIR /app
 COPY --from=backend /usr/local/bin/ecc-crm-api /usr/local/bin/
 COPY --from=frontend /src/web/dist ./web
