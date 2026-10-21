@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-module ECC.Logging (LogSink, writeLog, logEvent, requestFields, safeRoute, exceptionFields, catchSync, requestId) where
+module ECC.Logging (LogSink, writeLog, logEvent, requestFields, safeRoute, exceptionFields, catchSync, startupCheck, requestId) where
 
 import Control.Exception (SomeException(..), SomeAsyncException, IOException, catch, fromException, throwIO)
 import qualified Data.Aeson as A
@@ -67,3 +67,9 @@ catchSync action handler = action `catch` \err ->
   case fromException err :: Maybe SomeAsyncException of
     Just _ -> throwIO err
     Nothing -> handler err
+
+-- Stage names are application literals, never configuration values or exception text.
+startupCheck :: LogSink -> T.Text -> IO a -> IO a
+startupCheck sink stage action = catchSync action $ \err -> do
+  logEvent sink "ERROR" "startup_check_failed" (["stage" .= stage] ++ exceptionFields err)
+  throwIO err

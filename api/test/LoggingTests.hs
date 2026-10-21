@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module LoggingTests (run) where
 
-import Control.Exception (bracket, throwIO, try, AsyncException(ThreadKilled))
+import Control.Exception (bracket, throwIO, try, IOException, AsyncException(ThreadKilled))
 import Control.Monad (unless)
 import qualified Data.Aeson as A
 import Data.Aeson ((.:))
@@ -67,6 +67,21 @@ run = do
   assert "Database errors include safe error code and correlation"
     (any (\value -> field "databaseCode" value == Just ("ErrorBusy"::T.Text) && field "operation" value == Just ("database_transaction"::T.Text)) databaseLogs)
   assert "Database messages do not leak" (not (secret `B.isInfixOf` BL.toStrict (A.encode databaseLogs)))
+  writeIORef records []
+  startup <- try (startupCheck sink "configuration" (ioError (userError (T.unpack (TE.decodeUtf8 secret))))) :: IO (Either IOException ())
+  assert "Startup failures are rethrown" (case startup of Left _ -> True; _ -> False)
+  startupLogs <- readIORef records
+  assert "Startup diagnostics identify the failed stage without leaking exception text"
+    (length startupLogs == 1 && field "stage" (head startupLogs) == Just ("configuration" :: T.Text)
+      && field "event" (head startupLogs) == Just ("startup_check_failed" :: T.Text)
+      && not (secret `B.isInfixOf` BL.toStrict (A.encode startupLogs)))
+  writeIORef records []
+  completed <- startupCheck sink "configuration" (pure True)
+  assert "Successful startup checks preserve their result" completed
+  cancelledStartup <- try (startupCheck sink "configuration" (throwIO ThreadKilled)) :: IO (Either AsyncException ())
+  assert "Startup cancellation is never swallowed" (case cancelledStartup of Left ThreadKilled -> True; _ -> False)
+  quiet <- readIORef records
+  assert "Successful checks and cancellation do not log startup failures" (null quiet)
   cancelled <- try (catchSync (throwIO ThreadKilled) (\_ -> pure ())) :: IO (Either AsyncException ())
   assert "Cancellation is never swallowed by request error handling" (case cancelled of Left ThreadKilled -> True; _ -> False)
   putStrLn "Logging regression checks passed"

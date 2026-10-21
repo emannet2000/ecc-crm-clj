@@ -40,7 +40,7 @@ runMain :: IO ()
 runMain = do
   hSetBuffering stdout LineBuffering
   hSetBuffering stderr LineBuffering
-  cfg <- loadConfig
+  cfg <- startupCheck writeLog "configuration" loadConfig
   args <- getArgs
   let valid = case args of
         [] -> True
@@ -54,11 +54,11 @@ runMain = do
   if valid then pure () else fail "Unknown command; no database changes were made"
   localWeb <- doesFileExist "web/dist/index.html"
   distDir <- fromMaybe (if localWeb then "web/dist" else "../web/dist") <$> lookupEnv "WEB_DIST"
-  whenProduction cfg args $ getExecutablePath >>= validateRelease distDir "migrations"
+  whenProduction cfg args $ startupCheck writeLog "release_verification" (getExecutablePath >>= validateRelease distDir "migrations")
   if args==["verify-release"] then getExecutablePath >>= validateRelease distDir "migrations" >> putStrLn "Verified compatible release" >> exitSuccess else pure ()
-  conn <- Store.openDatabase (cfgDatabase cfg)
-  if cfgProduction cfg && args/=["migrate"] then requireCurrentSchema conn "migrations" else pure ()
-  runMigrations conn "migrations"
+  conn <- startupCheck writeLog "database_connection" (Store.openDatabase (cfgDatabase cfg))
+  if cfgProduction cfg && args/=["migrate"] then startupCheck writeLog "database_schema" (requireCurrentSchema conn "migrations") else pure ()
+  startupCheck writeLog "database_migrations" (runMigrations conn "migrations")
   case args of
     ["create-user-env"] -> createUserFromEnvironment conn
     ["adduser",email,name,role,pw] -> do
@@ -78,7 +78,7 @@ runMain = do
           putStrLn "Authenticator reset; account sessions revoked"
         _ -> fail "User not found"
     ["migrate"] -> pure ()
-    [] -> serve cfg conn
+    [] -> startupCheck writeLog "server_initialization" (serve cfg conn)
     _ -> fail "Usage: ecc-crm-api [verify-release | migrate | create-user-env | adduser EMAIL NAME ROLE PASSWORD | reset-password EMAIL PASSWORD | reset-mfa EMAIL]"
 
 -- One-time operator setup: no passwords in process arguments and no upsert that
