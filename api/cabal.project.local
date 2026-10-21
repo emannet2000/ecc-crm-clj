@@ -1,0 +1,9 @@
+package *
+  -- The system Haskell packages provide dynamic interfaces only.
+  shared: True
+  executable-dynamic: True
+  library-vanilla: False
+
+package ecc-crm-api
+  -- gold fails to resolve symbols from the installed shared libraries.
+  ghc-options: -optl-fuse-ld=bfd

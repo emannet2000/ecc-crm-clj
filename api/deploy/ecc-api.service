@@ -1,0 +1,24 @@
+[Unit]
+Description=ECC CRM API with persistent logs and runtime monitoring
+After=network-online.target
+Wants=network-online.target
+[Service]
+User=ecc
+Group=ecc
+WorkingDirectory=/opt/ecc/api
+EnvironmentFile=/etc/ecc/api.env
+Environment=API_LOG_DIR=/var/log/ecc
+LogsDirectory=ecc
+LogsDirectoryMode=0700
+ExecStart=/usr/bin/python3 /opt/ecc/api/scripts/log_runtime.py -- /opt/ecc/bin/ecc-crm-api
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/ecc /var/log/ecc
+[Install]
+WantedBy=multi-user.target

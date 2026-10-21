@@ -1,0 +1,63 @@
+# Build context: the api directory. A failed quality gate stops the image build.
+FROM node:24-bookworm-slim AS node-tools
+RUN npm install --global elm@0.19.1-6
+
+FROM haskell:9.6.6-slim-bookworm AS tested
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends ca-certificates curl pkg-config libsqlite3-dev libpq-dev python3 python3-venv chromium \
+ && install -d /usr/share/postgresql-common/pgdg \
+ && curl --fail --silent --show-error https://www.postgresql.org/media/keys/ACCC4CF8.asc -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc \
+ && echo 'deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt bookworm-pgdg main' > /etc/apt/sources.list.d/pgdg.list \
+ && apt-get update && apt-get install -y --no-install-recommends postgresql-17 \
+ && rm -rf /var/lib/apt/lists/*
+COPY --from=node-tools /usr/local/bin/node /usr/local/bin/node
+COPY --from=node-tools /usr/local/lib/node_modules /usr/local/lib/node_modules
+RUN ln -s /usr/local/lib/node_modules/elm/bin/elm /usr/local/bin/elm
+WORKDIR /src/api
+COPY ecc-crm-api.cabal cabal.project cabal.project.freeze ./
+RUN cabal update && cabal build all --only-dependencies
+COPY app ./app
+COPY src ./src
+COPY migrations ./migrations
+COPY test ./test
+COPY scripts/*.py scripts/*.cjs scripts/*.sh scripts/*.txt ./scripts/
+COPY deploy ./deploy
+COPY docs ./docs
+COPY web/elm.json ./web/elm.json
+COPY web/src ./web/src
+COPY web/public ./web/public
+RUN python3 -m venv /opt/ecc-tests \
+ && /opt/ecc-tests/bin/pip install --no-cache-dir -r scripts/requirements.txt
+ENV PATH="/opt/ecc-tests/bin:${PATH}" \
+    CHROME_PATH=/usr/bin/chromium \
+    ELM_BIN=/usr/local/bin/elm \
+    PG_DUMP_BIN=/usr/lib/postgresql/17/bin/pg_dump \
+    PG_RESTORE_BIN=/usr/lib/postgresql/17/bin/pg_restore
+# A disposable database exists only inside the build container. Runtime secrets
+# are never read as build arguments, and the hosted database is never contacted.
+RUN set -eu; \
+    install -d -o postgres -g postgres /tmp/ecc-quality-pg /tmp/ecc-quality-socket; \
+    runuser -u postgres -- /usr/lib/postgresql/17/bin/initdb -D /tmp/ecc-quality-pg --auth=trust --no-locale --encoding=UTF8 --username=ecc_test; \
+    runuser -u postgres -- /usr/lib/postgresql/17/bin/pg_ctl -D /tmp/ecc-quality-pg -l /tmp/ecc-quality-postgres.log -o '-h 127.0.0.1 -p 55432 -k /tmp/ecc-quality-socket' -w start; \
+    trap 'runuser -u postgres -- /usr/lib/postgresql/17/bin/pg_ctl -D /tmp/ecc-quality-pg -m fast -w stop' EXIT; \
+    /usr/lib/postgresql/17/bin/createdb -h 127.0.0.1 -p 55432 -U ecc_test ecc_test; \
+    export ECC_TEST_DATABASE_URL='postgresql://ecc_test@127.0.0.1:55432/ecc_test?sslmode=disable'; \
+    bash scripts/check.sh; \
+    cp "$(cabal list-bin exe:ecc-crm-api)" /usr/local/bin/ecc-crm-api
+
+FROM debian:bookworm-slim
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends libsqlite3-0 libpq5 libgmp10 libffi8 zlib1g ca-certificates curl python3 \
+ && rm -rf /var/lib/apt/lists/* \
+ && useradd --system --uid 10001 app \
+ && install -d -o app -g app -m 0700 /var/log/ecc
+WORKDIR /app
+COPY --from=tested /usr/local/bin/ecc-crm-api /usr/local/bin/ecc-crm-api
+COPY --from=tested /src/api/web/dist ./web/dist
+COPY --from=tested /src/api/migrations ./migrations
+COPY scripts/log_runtime.py scripts/alerting.py ./scripts/
+ENV APP_ENV=production SEED_DEMO=false WEB_DIST=/app/web/dist API_LOG_DIR=/var/log/ecc
+USER app
+EXPOSE 4000
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s CMD curl --fail http://127.0.0.1:${PORT:-4000}/api/ready || exit 1
+CMD ["python3", "scripts/log_runtime.py", "--", "ecc-crm-api"]

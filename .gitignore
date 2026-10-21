@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.example
+api/dist-newstyle/
+web/elm-stuff/
+node_modules/
+__pycache__/
+*.dump
+*.dump.tmp
+
+*.sqlite3
+*.sqlite3-*
+*.sqlite3.bak
+*.db
+*.db-*
+
+release-images.json

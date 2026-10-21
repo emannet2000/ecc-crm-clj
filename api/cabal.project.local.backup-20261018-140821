@@ -1,0 +1,4 @@
+package *
+  shared: True
+  executable-dynamic: True
+  library-vanilla: False

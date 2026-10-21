@@ -1,0 +1,7 @@
+{$SITE_HOST} {
+    encode zstd gzip
+    reverse_proxy api:4000 {
+        header_up X-ECC-Client-IP {remote_host}
+        header_up X-ECC-Proxy-Token {$PROXY_TOKEN}
+    }
+}

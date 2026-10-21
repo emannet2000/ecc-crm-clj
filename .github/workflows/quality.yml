@@ -1,0 +1,104 @@
+name: Quality gate
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: haskell-actions/setup@v2
+        with:
+          ghc-version: '9.6.6'
+          cabal-version: '3.10.3.0'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev
+      - run: npm install -g elm@0.19.1-6
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cabal/store
+            ~/.elm
+          key: dependencies-${{ runner.os }}-${{ hashFiles('api/*.cabal', 'api/cabal.project.freeze', 'web/elm.json') }}
+      - run: cabal update
+        working-directory: api
+      - run: ./scripts/build.sh
+      - uses: actions/checkout@v4
+        with:
+          repository: haskell/security-advisories
+          path: .security-advisories
+      - run: python3 scripts/audit_haskell.py api/dist-newstyle/cache/plan.json .security-advisories/advisories
+      - run: cabal test all
+        working-directory: api
+      - run: echo "ECC_API_BINARY=$(cd api && cabal list-bin exe:ecc-crm-api)" >> "$GITHUB_ENV"
+      - run: python3 -m unittest discover -s tests -p 'test_*.py' -v
+        env:
+          ECC_RUN_HTTP_TESTS: 1
+      - run: node --test tests/state.test.cjs
+      - run: node --test tests/ui.test.cjs
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ui-previews
+          path: /tmp/ecc-*.png
+          if-no-files-found: ignore
+  image:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 scripts/build_release.py
+      - run: docker compose --env-file .env.example config --quiet
+      - run: docker compose --env-file .env.example -f compose.yaml -f compose.release.yaml -f compose.offhost.yaml config --quiet
+        env:
+          RESTIC_REPOSITORY: s3:https://backup.example/test
+          RESTIC_PASSWORD_PATH: /tmp/example-restic-password
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-image-identities
+          path: release-images.json
+      - name: Scan api image
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ecc-crm-api:release
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+          scanners: vuln
+          ignore-unfixed: false
+      - name: Scan mail image
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ecc-crm-mail:release
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+          scanners: vuln
+          ignore-unfixed: false
+      - name: Scan backup image
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ecc-crm-backup:release
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+          scanners: vuln
+          ignore-unfixed: false
+      - name: Scan antivirus image
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ecc-crm-clamav:release
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+          scanners: vuln
+          ignore-unfixed: false
+      - name: Scan proxy image
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: caddy:2-alpine@sha256:d8542f48d34a9cf4e4c11a478865229840e87e4c96ea3f439101f31a5d35f75f
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+          scanners: vuln
+          ignore-unfixed: false

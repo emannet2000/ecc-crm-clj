@@ -1,0 +1,2 @@
+# Credentials removed. Configure DATABASE_URL and JWT_SECRET in Render.
+# Rotate any credentials previously stored in this file.

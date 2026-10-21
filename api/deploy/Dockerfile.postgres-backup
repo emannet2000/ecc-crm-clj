@@ -1,0 +1,24 @@
+FROM debian:bookworm-slim
+# Set this to the Render database's major version. Never use an older pg_dump.
+ARG POSTGRES_VERSION=17
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends ca-certificates curl python3 python3-venv restic \
+ && install -d /usr/share/postgresql-common/pgdg \
+ && curl --fail --silent --show-error https://www.postgresql.org/media/keys/ACCC4CF8.asc -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc \
+ && echo 'deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt bookworm-pgdg main' > /etc/apt/sources.list.d/pgdg.list \
+ && apt-get update \
+ && apt-get install -y --no-install-recommends postgresql-client-${POSTGRES_VERSION} \
+ && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+COPY scripts/requirements.txt /app/scripts/requirements.txt
+RUN python3 -m venv /opt/ecc-worker \
+ && /opt/ecc-worker/bin/pip install --no-cache-dir -r scripts/requirements.txt
+COPY scripts/*.py /app/scripts/
+# Used by the readiness contract check; no application credentials are built in.
+COPY src/ECC/Release.hs /app/src/ECC/Release.hs
+COPY web/src/Release.elm /app/web/src/Release.elm
+COPY migrations /app/migrations
+ENV PATH="/opt/ecc-worker/bin:${PATH}" \
+    BACKUP_DIR=/var/backups/ecc \
+    RESTIC_CACHE_DIR=/var/backups/ecc/restic-cache
+CMD ["python3", "scripts/render_backup_worker.py", "run"]

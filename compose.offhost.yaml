@@ -1,0 +1,17 @@
+# Enable with: docker compose -f compose.yaml -f compose.offhost.yaml up -d
+# Initialize the remote repository once before starting the worker (see runbook).
+services:
+  backup:
+    environment:
+      RESTIC_REPOSITORY: ${RESTIC_REPOSITORY:?Set an off-host restic repository}
+      RESTIC_PASSWORD_FILE: /run/secrets/restic_password
+      AWS_ACCESS_KEY_ID: ${BACKUP_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${BACKUP_SECRET_ACCESS_KEY:-}
+      AWS_DEFAULT_REGION: ${BACKUP_REGION:-}
+    secrets: [restic_password]
+  monitor:
+    environment:
+      REQUIRE_OFFHOST_BACKUP: 'true'
+secrets:
+  restic_password:
+    file: ${RESTIC_PASSWORD_PATH:?Set the path to the restic password file}

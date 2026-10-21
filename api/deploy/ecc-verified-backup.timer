@@ -1,0 +1,9 @@
+[Unit]
+Description=Hourly ECC backups (catch up after downtime)
+[Timer]
+OnCalendar=hourly
+Persistent=true
+RandomizedDelaySec=60
+Unit=ecc-verified-backup.service
+[Install]
+WantedBy=timers.target

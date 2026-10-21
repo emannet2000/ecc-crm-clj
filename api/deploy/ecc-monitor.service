@@ -1,0 +1,16 @@
+[Unit]
+Description=ECC backup, email and malware scanning health alerts
+After=network-online.target
+[Service]
+Type=oneshot
+User=ecc
+Group=ecc
+WorkingDirectory=/opt/ecc/api
+EnvironmentFile=/etc/ecc/recovery.env
+ExecStart=/usr/bin/python3 /opt/ecc/api/scripts/operations.py monitor
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/ecc /var/backups/ecc

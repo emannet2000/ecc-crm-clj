@@ -1,0 +1,133 @@
+services:
+  api:
+    build: .
+    restart: unless-stopped
+    init: true
+    read_only: true
+    tmpfs: [/tmp]
+    environment:
+      DATABASE_PATH: /data/ecc-crm.sqlite3
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET}
+      PROXY_TOKEN: ${PROXY_TOKEN:?Set PROXY_TOKEN}
+      PUBLIC_URL: ${PUBLIC_URL:?Set PUBLIC_URL}
+      ASSIGNED_ONLY: ${ASSIGNED_ONLY:-false}
+      DB_POOL_SIZE: 2
+      REQUIRE_ADMIN_MFA: ${REQUIRE_ADMIN_MFA:-true}
+    volumes:
+      - sqlite_data:/data
+    expose: ['4000']
+  mail:
+    build:
+      context: .
+      dockerfile: deploy/mail.Dockerfile
+    restart: unless-stopped
+    init: true
+    environment:
+      DATABASE_PATH: /data/ecc-crm.sqlite3
+      SMTP_HOST: ${SMTP_HOST:?Set SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:?Set SMTP_FROM}
+      SMTP_TLS: ${SMTP_TLS:-starttls}
+    volumes:
+      - sqlite_data:/data
+    depends_on:
+      api: {condition: service_healthy}
+  scheduler:
+    build:
+      context: .
+      dockerfile: deploy/mail.Dockerfile
+    command: [python, -u, workflow_worker.py]
+    restart: unless-stopped
+    init: true
+    environment:
+      DATABASE_PATH: /data/ecc-crm.sqlite3
+    volumes:
+      - sqlite_data:/data
+    depends_on:
+      api: {condition: service_healthy}
+  scanner:
+    build:
+      context: .
+      dockerfile: deploy/mail.Dockerfile
+    command: [python, -u, scan_worker.py]
+    restart: unless-stopped
+    init: true
+    environment:
+      DATABASE_PATH: /data/ecc-crm.sqlite3
+      CLAMD_HOST: clamav
+      CLAMD_PORT: 3310
+    volumes:
+      - sqlite_data:/data
+    depends_on:
+      api: {condition: service_healthy}
+      clamav: {condition: service_healthy}
+  clamav:
+    build:
+      context: .
+      dockerfile: deploy/clamav.Dockerfile
+    restart: unless-stopped
+    init: true
+    volumes:
+      - clamav_signatures:/var/lib/clamav
+  backup:
+    build:
+      context: .
+      dockerfile: deploy/backup.Dockerfile
+    restart: unless-stopped
+    init: true
+    environment:
+      DATABASE_PATH: /data/ecc-crm.sqlite3
+      BACKUP_DIR: /backups
+      BACKUP_INTERVAL_SECONDS: ${BACKUP_INTERVAL_SECONDS:-3600}
+      BACKUP_KEEP_LOCAL: ${BACKUP_KEEP_LOCAL:-24}
+    volumes:
+      - sqlite_data:/data
+      - sqlite_backups:/backups
+    depends_on:
+      api: {condition: service_healthy}
+  monitor:
+    profiles: [monitoring]
+    build:
+      context: .
+      dockerfile: deploy/mail.Dockerfile
+    command: [python, -u, monitor.py]
+    restart: unless-stopped
+    init: true
+    environment:
+      DATABASE_PATH: /data/ecc-crm.sqlite3
+      MONITOR_URL: http://api:4000/api/ready
+      MAX_BACKUP_AGE_SECONDS: ${MAX_BACKUP_AGE_SECONDS:-7200}
+      BACKUP_DIR: /backups
+      ALERT_TO: ${ALERT_TO:-}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM}
+      SMTP_TLS: ${SMTP_TLS:-starttls}
+    volumes:
+      - sqlite_data:/data
+      - sqlite_backups:/backups:ro
+    depends_on:
+      api: {condition: service_healthy}
+  proxy:
+    image: caddy:2-alpine@sha256:d8542f48d34a9cf4e4c11a478865229840e87e4c96ea3f439101f31a5d35f75f
+    restart: unless-stopped
+    environment:
+      SITE_HOST: ${SITE_HOST:?Set SITE_HOST}
+      PROXY_TOKEN: ${PROXY_TOKEN:?Set PROXY_TOKEN}
+    ports: ['80:80', '443:443']
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      api: {condition: service_healthy}
+volumes:
+  clamav_signatures:
+  sqlite_data:
+  sqlite_backups:
+  caddy_data:
+  caddy_config:

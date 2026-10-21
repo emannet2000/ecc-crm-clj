@@ -1,0 +1,7 @@
+.git
+.env
+.env.*
+api/dist-newstyle
+web/elm-stuff
+node_modules
+*.dump

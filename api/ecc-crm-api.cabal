@@ -1,0 +1,81 @@
+cabal-version:      2.4
+name:               ecc-crm-api
+version:            0.1.0
+synopsis:           ECC CRM REST API (Haskell + Scotty + PostgreSQL + SQLite)
+build-type:         Simple
+
+executable ecc-crm-api
+    main-is:          Main.hs
+    hs-source-dirs:   app, src
+    other-modules: ECC.Logging, ECC.StudentWorkflows, ECC.DailyWork, ECC.PostgresSQL, ECC.Postgres, ECC.Release, ECC.Clock, ECC.FinanceCommon, ECC.FinanceControls, ECC.Finance, ECC.Money, ECC.Access,    ECC.ProfilePhotos, ECC.Applications, ECC.Operations, ECC.MFA, ECC.WorkflowSupport, ECC.Workflows, ECC.Portal
+                    , ECC.Server
+                    , ECC.Store
+                    , ECC.Security
+                    , ECC.Auth
+                    , ECC.Config
+                    , ECC.Csv
+                    , ECC.DB
+                    , ECC.Migrations
+                    , ECC.Models
+                    , ECC.Routes
+                    , ECC.Seed
+    default-language: GHC2021
+    default-extensions: DeriveAnyClass
+    ghc-options:      -Wall -O1 -threaded -rtsopts "-with-rtsopts=-N2"
+    build-depends:    base >=4.17 && <5
+                    , aeson >=2
+                    , bcrypt
+                    , base64-bytestring
+                    , bytestring
+                    , case-insensitive
+                    , containers
+                    , cryptohash-sha256
+                    , directory
+                    , filepath
+                    , http-types
+                    , network
+                    , network-uri
+                    , mtl
+                    , sqlite-simple
+                    , direct-sqlite
+                    , postgresql-libpq >=0.11 && <0.12
+                    , scotty >=0.30 && <0.31
+                    , text
+                    , time
+                    , transformers
+                    , wai
+                    , wai-cors
+                    , wai-extra
+                    , warp
+
+test-suite regression
+    type: exitcode-stdio-1.0
+    main-is: Main.hs
+    hs-source-dirs: test, src
+    other-modules: ECC.Logging, ECC.StudentWorkflows, ECC.DailyWork, ECC.PostgresSQL, ECC.Postgres, ECC.Release, LoggingTests, ReleaseTests, ConcurrencyTests, ClockTests, ECC.Clock, HardeningTests, ControlsTests, ECC.FinanceCommon, ECC.FinanceControls, FinanceTests, ECC.Finance, ECC.Money, AccessTests, ECC.Access, GeneratedTests, ECC.ProfilePhotos, ECC.Applications, ClientApplicationTests, ECC.Operations, FeatureTests, ECC.MFA, ECC.WorkflowSupport, ECC.Workflows, ECC.Portal, ECC.Auth, ECC.Csv, ECC.Models, ECC.DB, ECC.Store, ECC.Config,
+                   ECC.Migrations, ECC.Security, ECC.Routes, ECC.Server, ECC.Seed
+    default-language: GHC2021
+    default-extensions: DeriveAnyClass
+    ghc-options: -Wall -threaded -O0
+    build-depends: base >=4.17 && <5, aeson >=2, bcrypt, base64-bytestring,
+                   bytestring, case-insensitive, containers, cryptohash-sha256,
+                   directory, filepath, http-types, mtl, network, network-uri,
+                   sqlite-simple, direct-sqlite
+                    , postgresql-libpq >=0.11 && <0.12, scotty >=0.30 && <0.31,
+                   text, time, transformers, wai, wai-cors, wai-extra, warp
+
+test-suite postgres-regression
+    type: exitcode-stdio-1.0
+    main-is: PostgresMain.hs
+    hs-source-dirs: test, src
+    other-modules: ECC.Logging, ECC.StudentWorkflows, ECC.DailyWork, ECC.PostgresSQL, ECC.Postgres, ECC.Release, LoggingTests, ReleaseTests, ConcurrencyTests, ClockTests, ECC.Clock, HardeningTests, ControlsTests, ECC.FinanceCommon, ECC.FinanceControls, FinanceTests, ECC.Finance, ECC.Money, AccessTests, ECC.Access, GeneratedTests, ECC.ProfilePhotos, ECC.Applications, ClientApplicationTests, ECC.Operations, FeatureTests, ECC.MFA, ECC.WorkflowSupport, ECC.Workflows, ECC.Portal, ECC.Auth, ECC.Csv, ECC.Models, ECC.DB, ECC.Store, ECC.Config,
+                   ECC.Migrations, ECC.Security, ECC.Routes, ECC.Server, ECC.Seed
+    default-language: GHC2021
+    default-extensions: DeriveAnyClass
+    ghc-options: -Wall -threaded -O0
+    build-depends: base >=4.17 && <5, aeson >=2, bcrypt, base64-bytestring,
+                   bytestring, case-insensitive, containers, cryptohash-sha256,
+                   directory, filepath, http-types, mtl, network, network-uri,
+                   sqlite-simple, direct-sqlite
+                    , postgresql-libpq >=0.11 && <0.12, scotty >=0.30 && <0.31,
+                   text, time, transformers, wai, wai-cors, wai-extra, warp
