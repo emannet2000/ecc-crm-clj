@@ -12,7 +12,7 @@ def output(*args):
 
 
 def main():
-    backend = 'haskell:9.6.6-slim-bookworm'
+    backend = 'haskell:9.6.6-slim-bullseye'
     subprocess.run(['docker', 'pull', backend], cwd=ROOT, check=True)
     immutable = json.loads(output('docker', 'image', 'inspect', backend))[0]['RepoDigests'][0]
     if '@sha256:' not in immutable:

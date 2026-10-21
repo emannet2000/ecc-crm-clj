@@ -1,4 +1,6 @@
-ARG HASKELL_IMAGE=haskell:9.6.7-slim-bullseye
+ARG HASKELL_IMAGE=haskell:9.6.6-slim-bullseye@sha256:d7e9bf8afe0474eaeeceb0dd723f6e33f2bd34d8c999a8b56ad521381ad0e161
+FROM ${HASKELL_IMAGE} AS haskell-tools
+
 FROM node:22-bookworm-slim@sha256:83f487e0a63425e5b4d146fb5e5be574bcbe1b7b843d3ebafdd95eaf7767a7e5 AS frontend
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && update-ca-certificates && rm -rf /var/lib/apt/lists/*
 RUN npm install -g elm@0.19.1-6
@@ -8,14 +10,17 @@ COPY web/src ./src
 COPY web/public ./public
 RUN mkdir -p dist/css && elm make src/Main.elm --optimize --output=dist/main.js && cp public/index.html public/bootstrap.js dist/ && cp public/css/app.css dist/css/
 
-FROM ${HASKELL_IMAGE} AS backend
-# Refresh indexes over HTTPS to avoid stale HTTP mirror/proxy responses.
-RUN find /etc/apt -type f \( -name '*.list' -o -name '*.sources' \) -exec sed -i 's|http://deb.debian.org|https://deb.debian.org|g; s|http://security.debian.org|https://security.debian.org|g' {} + \
- && rm -rf /var/lib/apt/lists/* \
+FROM debian:bookworm-slim@sha256:7c7b2c966bc9ee8cedfeef67e0e279108992c77681fa595db4a9d65c06ccc587 AS backend
+# Use the existing compiler without installing packages from Bullseye repositories.
+COPY --from=haskell-tools /opt/ghc /opt/ghc
+COPY --from=haskell-tools /usr/local/bin/cabal /usr/local/bin/cabal
+ENV LANG=C.UTF-8 PATH=/opt/ghc/9.6.6/bin:${PATH}
+RUN rm -rf /var/lib/apt/lists/* \
  && apt-get -o Acquire::Retries=3 -o APT::Update::Error-Mode=any update \
  && apt-get upgrade -y \
- && apt-get install -y --no-install-recommends libsqlite3-dev libpq-dev pkg-config \
+ && apt-get install -y --no-install-recommends build-essential ca-certificates curl git libffi-dev libgmp-dev libnuma-dev libtinfo-dev zlib1g-dev libsqlite3-dev libpq-dev pkg-config \
  && rm -rf /var/lib/apt/lists/*
+RUN ghc --version && cabal --version && ghc -e 'putStrLn "Compiler ready"'
 WORKDIR /src/api
 COPY api/ecc-crm-api.cabal api/cabal.project api/cabal.project.freeze ./
 RUN cabal update && cabal build --only-dependencies
