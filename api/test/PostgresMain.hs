@@ -42,7 +42,8 @@ main = do
    range<-query cn "SELECT ? BETWEEN ? AND ?" ("2026-01-02"::T.Text,"2026-01-01"::T.Text,"2026-01-03"::T.Text) :: IO [Only Bool]
    unless (range==[Only True]) $ fail "PostgreSQL date range failed"
    withTransaction cn $ DB.addUser cn "admin@example.com" "Admin" "admin" "correct-password-123"
-   application<-S.scottyApp(Routes.app(DB.Env cn "postgres-integration-secret-32-bytes" False "http://localhost:4000" False))
+   -- Shared workflow tests exercise assigned-only access, just like the SQLite suite.
+   application<-S.scottyApp(Routes.app(DB.Env cn "postgres-integration-secret-32-bytes" False "http://localhost:4000" True))
    let api=transactionalApplication cn application
    FeatureTests.run cn api
    ClientApplicationTests.run cn api

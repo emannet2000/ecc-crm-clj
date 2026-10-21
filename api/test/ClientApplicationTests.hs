@@ -177,9 +177,13 @@ run conn api = do
  -- A case-insert failure rolls the entire lead conversion back.
  failedLead<-DB.insertLead conn ((NewLead "Blocked conversion" Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing){nlService=Just "Student Visa",nlDestination=Just "Canada"}) 1
  [Only beforeFailure]<-query_ conn "SELECT count(*) FROM clients"::IO[Only Int]
- void $ execute_ conn "CREATE TRIGGER test_conversion_failure BEFORE INSERT ON cases BEGIN SELECT RAISE(ABORT,'forced case insert failure'); END"
+ if isPostgres conn
+  then execScript conn "CREATE FUNCTION test_conversion_failure_fn() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'forced case insert failure' USING ERRCODE='23514'; END $$; CREATE TRIGGER test_conversion_failure BEFORE INSERT ON cases FOR EACH ROW EXECUTE FUNCTION test_conversion_failure_fn()"
+  else void $ execute_ conn "CREATE TRIGGER test_conversion_failure BEFORE INSERT ON cases BEGIN SELECT RAISE(ABORT,'forced case insert failure'); END"
  admin "POST" ("/api/leads/"<>BC.pack(show(leadId failedLead))<>"/convert") A.Null>>=expect 409
- void $ execute_ conn "DROP TRIGGER test_conversion_failure"
+ if isPostgres conn
+  then execScript conn "DROP TRIGGER test_conversion_failure ON cases; DROP FUNCTION test_conversion_failure_fn()"
+  else void $ execute_ conn "DROP TRIGGER test_conversion_failure"
  [Only rolledBack]<-query conn "SELECT converted_client_id IS NULL FROM leads WHERE id=?" (Only(leadId failedLead))::IO[Only Bool]
  [Only afterFailure]<-query_ conn "SELECT count(*) FROM clients"::IO[Only Int]
  assert "Failed conversion leaves no orphan client" (rolledBack && beforeFailure==afterFailure)
