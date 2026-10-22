@@ -28,8 +28,10 @@ COPY web/src ./web/src
 COPY web/public ./web/public
 RUN python3 -m venv /opt/ecc-tests \
  && /opt/ecc-tests/bin/pip install --no-cache-dir -r scripts/requirements.txt
+# Avoid Chromium network subprocess FD ownership crashes during container checks.
 ENV PATH="/opt/ecc-tests/bin:${PATH}" \
     CHROME_PATH=/usr/bin/chromium \
+    CHROME_SINGLE_PROCESS=1 \
     ELM_BIN=/usr/local/bin/elm \
     PG_DUMP_BIN=/usr/lib/postgresql/17/bin/pg_dump \
     PG_RESTORE_BIN=/usr/lib/postgresql/17/bin/pg_restore
