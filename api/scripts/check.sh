@@ -41,7 +41,7 @@ if [[ -z "${CHROME_PATH:-}" ]]; then
   CHROME_PATH=$(command -v chromium || command -v chromium-browser || command -v google-chrome)
   export CHROME_PATH
 fi
-node --test --test-concurrency=1 test/browser-acceptance.test.cjs scripts/mobile.browser.cjs test/finance-live.browser.cjs
+node --test --test-concurrency=1 test/browser-transport.test.cjs test/browser-acceptance.test.cjs scripts/mobile.browser.cjs test/finance-live.browser.cjs
 
 # Reached only after backend, real HTTP, browser and mobile checks succeed.
 python3 scripts/release.py seal --binary "$ECC_API_BIN"
