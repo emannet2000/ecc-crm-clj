@@ -37,7 +37,8 @@ COPY api/web/elm.json ./web/elm.json
 COPY api/web/src ./web/src
 COPY api/web/public ./web/public
 RUN python3 -m venv /opt/ecc-tests \
- && /opt/ecc-tests/bin/pip install --no-cache-dir -r scripts/requirements.txt
+ && /opt/ecc-tests/bin/pip install --no-cache-dir -r scripts/requirements.txt \
+ && chmod 755 scripts/chromium-ci.sh
 ENV PATH="/opt/ecc-tests/bin:${PATH}" \
     CHROME_PATH=/src/api/scripts/chromium-ci.sh \
     ELM_BIN=/usr/local/bin/elm \
