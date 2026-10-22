@@ -28,6 +28,11 @@ open url = do
  state<-P.status cn
  unless (state==P.ConnectionOk) $ P.finish cn >> fail "Cannot connect to PostgreSQL; check DATABASE_URL and network access"
  _<-script cn "SET TIME ZONE 'UTC'; SET statement_timeout='60s'; SET lock_timeout='10s'; SET client_encoding='UTF8'"
+ -- A Render PostgreSQL service may be shared with another application. Keep
+ -- ECC-CRM tables, functions, migration history, and triggers in their own
+ -- namespace so an existing public.schema_migrations or application tables
+ -- cannot collide with this release.
+ _<-script cn "CREATE SCHEMA IF NOT EXISTS ecc_crm; SET search_path TO ecc_crm, public"
  pure cn
 
 close :: P.Connection -> IO ()
