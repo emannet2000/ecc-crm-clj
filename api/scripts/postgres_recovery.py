@@ -41,15 +41,25 @@ def connect(url, timeout=900):
 
 
 def child_environment(url):
-    # An empty --dbname argument in pg_restore makes libpq use PGDATABASE.
-    # Never inherit PGOPTIONS/PGSERVICE or put the URL in argv or error output.
-    return {key: value for key, value in {
+    from psycopg.conninfo import conninfo_to_dict
+    from psycopg.pq import Conninfo
+    # PGDATABASE is a database name, not a URI: libpq does not expand a URI
+    # supplied through the environment. Split it using libpq's own parser.
+    # Never inherit PGOPTIONS/PGSERVICE or put credentials in argv/error output.
+    environment = {key: value for key, value in {
         'PATH': os.environ.get('PATH', os.defpath),
         'LD_LIBRARY_PATH': os.environ.get('LD_LIBRARY_PATH'),
-        'LANG': 'C.UTF-8', 'PGDATABASE': secure_url(url),
+        'LANG': 'C.UTF-8',
         'PGCONNECT_TIMEOUT': '10', 'PGAPPNAME': 'ecc-recovery',
         'PGPASSFILE': '/dev/null',
     }.items() if value is not None}
+    variables = {option.keyword.decode(): option.envvar.decode()
+                 for option in Conninfo.get_defaults() if option.envvar}
+    for key, value in conninfo_to_dict(secure_url(url)).items():
+        if key not in variables:
+            raise recovery.RecoveryError('Unsupported PostgreSQL connection option for recovery tools')
+        environment[variables[key]] = value
+    return environment
 
 
 def run_tool(tool, arguments, url=None, timeout=900):

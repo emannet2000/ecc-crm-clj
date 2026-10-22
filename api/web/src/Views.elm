@@ -886,7 +886,7 @@ clientsView model =
                 Ui.emptyState "clients" "No students to show" "Try another search, add a student, or convert a qualified lead."
 
               else
-                table [ class "data-table students-table" ]
+                table [ class "data-table students-table clients-table" ]
                     [ thead []
                         [ tr []
                             [ th [ Html.Attributes.scope "col" ] [ text "Record" ]
@@ -1045,6 +1045,7 @@ clientDetailView model cid =
                     , div [ class "card" ] [ h3 [] [ text "Journey history" ], if List.isEmpty cd.activities then Ui.emptyNote "Activity will appear here as the relationship grows." else div [] (List.map (\activity -> div [ class "activity-item" ] [ span [ class "activity-date" ] [ text activity.date ], text (Maybe.withDefault "" activity.description) ]) cd.activities) ]
                     ]
                 , Features.embedded model cid
+                , if model.showClientForm then clientFormModal model else text ""
                 , case model.caseForm of
                     Just cf ->
                         caseModal model cf cd

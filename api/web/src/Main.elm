@@ -901,47 +901,51 @@ updateHelp msg model =
                     ( model, Nav.load href )
 
         UrlChanged url ->
-            ( { model
-                | url = url
-                , formDirty = False
-                , editingTask = False
-                , clientProfile = E.null
-                , clientPhotoFile = Nothing
-                , clientPhotoBusy = False
-                , clientPhotoNotice = ""
-                , clientPhotoError = ""
-                , featureErrors = Dict.empty
-                , applicationFilters = State.applicationFiltersForUrl url
-                , featureSearch = ""
-                , featureForm = featureDefaultsForUrl url
-                , featureResult = E.null
-                , pageOffset = 0
-                , selected = Set.empty
-                , pageLoading = True
-                , pageError = ""
-                , opsData = []
-                , inlineOwner = ownerForUrl url
-                , featureBaseline = Dict.empty
-                , conflictCurrent = E.null
-                , checklistFile = Nothing
-                , featureBusy = False
-                , featureError = ""
-                , notifOpen = False
-                , detail = Nothing
-                , clientDetail = Nothing
-                , pendingDoc = Nothing
-                , pendingImport = Nothing
-              }
+            let
+                next =
+                    { model
+                        | url = url
+                        , formDirty = False
+                        , editingTask = False
+                        , clientProfile = E.null
+                        , clientPhotoFile = Nothing
+                        , clientPhotoBusy = False
+                        , clientPhotoNotice = ""
+                        , clientPhotoError = ""
+                        , featureErrors = Dict.empty
+                        , applicationFilters = State.applicationFiltersForUrl url
+                        , featureSearch = ""
+                        , featureForm = featureDefaultsForUrl url
+                        , featureResult = E.null
+                        , pageOffset = 0
+                        , selected = Set.empty
+                        , pageLoading = True
+                        , pageError = ""
+                        , opsData = []
+                        , inlineOwner = ownerForUrl url
+                        , featureBaseline = Dict.empty
+                        , conflictCurrent = E.null
+                        , checklistFile = Nothing
+                        , featureBusy = False
+                        , featureError = ""
+                        , notifOpen = False
+                        , detail = Nothing
+                        , clientDetail = Nothing
+                        , pendingDoc = Nothing
+                        , pendingImport = Nothing
+                    }
+            in
+            ( next
             , if url.path == "/portal" then
                 case url.fragment of
                     Just fragment -> Task.perform (always (PortalExchange (String.dropLeft 6 fragment))) (Task.succeed ())
-                    Nothing -> Api.portalGet ctx (acceptLoad { model | url = url, featureSearch = "", pageOffset = 0 } PortalLoaded)
+                    Nothing -> Api.portalGet ctx (acceptLoad next PortalLoaded)
 
               else if model.user == Nothing then
                 Cmd.none
 
               else
-                routeCmd { model | url = url, applicationFilters = State.applicationFiltersForUrl url, pageOffset = 0, featureSearch = "" } (State.routeOf url)
+                routeCmd next (State.routeOf url)
             )
 
         GotStoredToken t ->

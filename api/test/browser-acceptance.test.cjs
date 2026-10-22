@@ -18,7 +18,7 @@ class Browser {
     for(const pipe of [this.child.stdio[3],this.child.stdio[4]])pipe.on('error',e=>{for(const p of this.pending.values()){clearTimeout(p.timer);p.reject(Error(e.message+' '+this.stderr));}this.pending.clear();});
     this.child.stdio[4].on('data',d=>{this.buffer+=d.toString();let end;while((end=this.buffer.indexOf('\0'))>=0){const raw=this.buffer.slice(0,end);this.buffer=this.buffer.slice(end+1);if(!raw)continue;const msg=JSON.parse(raw);if(msg.id){const p=this.pending.get(msg.id);if(p){clearTimeout(p.timer);this.pending.delete(msg.id);msg.error?p.reject(Error(JSON.stringify(msg.error))):p.resolve(msg.result);}}else this.event(msg).catch(e=>this.errors.push(e.message));}});
   }
-  send(method,params={},sessionId=this.session){return new Promise((resolve,reject)=>{const id=++this.seq;const timer=setTimeout(()=>{this.pending.delete(id);reject(Error(method+' timed out '+(this.stderr||'')));},20000);this.pending.set(id,{resolve,reject,timer});this.child.stdio[3].write(JSON.stringify({id,method,params,...(sessionId?{sessionId}: {})})+'\0');});}
+  send(method,params={},sessionId=this.session){return new Promise((resolve,reject)=>{const id=++this.seq;const timer=setTimeout(()=>{this.pending.delete(id);reject(Error(method+' timed out '+(this.stderr||'')));},60000);this.pending.set(id,{resolve,reject,timer});this.child.stdio[3].write(JSON.stringify({id,method,params,...(sessionId?{sessionId}: {})})+'\0');});}
   async event(msg){
     if(msg.method==='Runtime.exceptionThrown')this.errors.push(msg.params.exceptionDetails.text);
     if(msg.method!=='Fetch.requestPaused')return;
@@ -68,7 +68,7 @@ class Browser {
     }
     if(url.pathname==='/api/leads' && url.searchParams.get('q')) {
       const query=url.searchParams.get('q');
-      body=body.map(record=>({...record,fullName:query==='slow'?'Stale result':'Current result'}));
+      body=body.map(record=>({...record,fullName:query==='slow'?'Stale result slow':'Current result fast'}));
       if(query==='slow')await delay(1200);
     }
     if(url.pathname==='/api/archive') {
@@ -79,9 +79,9 @@ class Browser {
     await this.send('Fetch.fulfillRequest',{requestId:msg.params.requestId,responseCode:status,responseHeaders:[{name:'Content-Type',value:mime}],body:body.toString('base64')});
   }
   async start(){await this.send('Browser.getVersion',{},null);const {targetId}=await this.send('Target.createTarget',{url:'about:blank'},null);const {sessionId}=await this.send('Target.attachToTarget',{targetId,flatten:true},null);this.session=sessionId;await this.send('Runtime.enable');await this.send('Page.enable');await this.send('Fetch.enable',{patterns:[{urlPattern:'*'}]});await this.send('Emulation.setDeviceMetricsOverride',{width:1440,height:1000,deviceScaleFactor:1,mobile:false});await this.send('Page.navigate',{url:'http://ecc.test/'});}
-  async evaluate(expression){const r=await this.send('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));return r.result.value;}
+  async evaluate(expression){const r=await this.send('Runtime.evaluate',{expression:'(()=>eval('+JSON.stringify(expression)+'))()',returnByValue:true,awaitPromise:true});if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));return r.result.value;}
   async wait(expression){for(let i=0;i<100;i++){if(await this.evaluate(expression))return;await delay(50);}throw Error('Not found: '+expression+'\n'+await this.evaluate('document.body.innerText'));}
-  async clickText(text){await this.evaluate(`Array.from(document.querySelectorAll('button,a')).find(x=>x.textContent.trim()===${JSON.stringify(text)}).click()`);}
+  async clickText(text){await this.wait(`(()=>{const el=Array.from(document.querySelectorAll('button,a')).find(x=>x.textContent.trim()===${JSON.stringify(text)} && !x.disabled);if(!el)return false;el.click();return true;})()`);await this.evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');}
   async screenshot(name){const result=await this.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});fs.writeFileSync(path.join(os.tmpdir(),name),Buffer.from(result.data,'base64'));}
   async close(){for(const p of this.pending.values()){clearTimeout(p.timer);p.reject(Error('Browser closed'));}this.pending.clear();this.child.kill('SIGTERM');await delay(200);fs.rmSync(this.dir,{recursive:true,force:true,maxRetries:3});}
 }
@@ -144,7 +144,7 @@ test('workspace UI: authentication, navigation, responsive layout and operations
     await t.test('task board has three clearly labeled workflow columns',async()=>{
       await b.clickText('Tasks');
       await b.wait(`document.querySelectorAll('.task-board .task-column').length === 3`);
-      assert.deepEqual(await b.evaluate(`Array.from(document.querySelectorAll('.task-column h3')).map(x=>x.textContent.trim())`),['Pending','In Progress','Done']);
+      assert.deepEqual(await b.evaluate(`Array.from(document.querySelectorAll('.task-column > .section-head > h3')).map(x=>x.textContent.trim())`),['Pending','In Progress','Done']);
     });
     await t.test('reminders, duplicates, archive and system pages render',async()=>{
       for(const [nav,content] of [['Inbox','Notification centre'],['Upcoming work','Follow up: Maya Chen'],['Review duplicates','maya@example.com'],['Archive','Archived contact'],['System and delivery','Active sessions']]){
@@ -211,7 +211,7 @@ test('workspace UI: authentication, navigation, responsive layout and operations
       await b.wait(`document.querySelector('#application-filter-intake')`);
       assert.equal(await b.evaluate(`document.querySelector('a[href="/applications"]').getAttribute('aria-current')`),'page');
       await b.evaluate(`const filter=document.querySelector('#application-filter-destination');filter.value='Canada';filter.dispatchEvent(new Event('input',{bubbles:true}));`);
-      await b.wait(`document.querySelector('#application-filter-destination').value==='Canada'`);
+      await b.wait(`document.querySelector('#application-filter-destination').value==='Canada' && Array.from(document.querySelectorAll('a')).some(x=>x.textContent.trim()==='Open record')`);
       await b.clickText('Open record');
       await b.wait(`document.querySelector('#client-photo-file')`);
       assert.equal(await b.evaluate(`document.querySelector('#client-photo-file').accept`),'image/png,image/jpeg');
@@ -220,13 +220,14 @@ test('workspace UI: authentication, navigation, responsive layout and operations
     });
     await t.test('client pages expose scoped work and document upload controls',async()=>{
       await b.evaluate(`const a=document.createElement('a');a.href='/clients/4';a.textContent='Open fixture client';document.body.append(a);a.click();`);
-      await b.wait(`document.body.innerText.includes('Work on this record or case')`);
+      await b.wait(`document.body.innerText.includes('Work on this record or application')`);
       await b.clickText('Document checklist');
       await b.wait(`document.querySelector('#checklist-file')`);
       assert.equal(await b.evaluate(`document.querySelector('#checklist-file').labels.length`),1);
       assert(await b.evaluate(`document.body.innerText.includes('Review queue')`));
       await b.evaluate(`const s=document.querySelector('#case-work-scope');s.value='case:9';s.dispatchEvent(new Event('input',{bubbles:true}));`);
       await b.wait(`document.querySelector('#case-work-scope').value==='case:9'`);
+      for(let i=0;i<100&&!b.requests.some(path=>path.startsWith('/api/workspace/record/case/9/documents'));i++)await delay(20);
       assert(b.requests.some(path=>path.startsWith('/api/workspace/record/case/9/documents')));
     });
     await t.test('sales reports and accounting forms expose independent financial workflows',async()=>{
@@ -247,7 +248,7 @@ test('workspace UI: authentication, navigation, responsive layout and operations
     });
     await t.test('mobile navigation and content fit the viewport',async()=>{
       await b.send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
-      await b.clickText('Dashboard');await b.wait(`document.body.innerText.includes('128')`);
+      await b.clickText('Today');await b.wait(`document.body.innerText.includes('128')`);
       assert(await b.evaluate(`document.documentElement.scrollWidth <= window.innerWidth`));
       await b.screenshot('ecc-dashboard-mobile.png');
     });

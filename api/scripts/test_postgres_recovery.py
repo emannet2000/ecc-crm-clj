@@ -113,7 +113,23 @@ class PostgresRecoveryTests(unittest.TestCase):
         self.assertNotIn('PGOPTIONS', kwargs['env'])
         self.assertNotIn('PGSERVICE', kwargs['env'])
         self.assertNotIn('JWT_SECRET', kwargs['env'])
-        self.assertIn('sslmode=require', kwargs['env']['PGDATABASE'])
+        self.assertEqual(kwargs['env']['PGDATABASE'], 'crm')
+        self.assertEqual(kwargs['env']['PGHOST'], 'example.invalid')
+        self.assertEqual(kwargs['env']['PGUSER'], 'fixture-user')
+        self.assertEqual(kwargs['env']['PGPASSWORD'], 'private-test-password')
+        self.assertEqual(kwargs['env']['PGSSLMODE'], 'require')
+
+    def test_tool_connection_decodes_url_fields_and_preserves_explicit_options(self):
+        url = 'postgresql://fixture%40user:private%3Apass%40word@example.invalid:55432/crm%20test?sslmode=verify-full&sslrootcert=%2Ftmp%2Froot.crt'
+        with mock.patch.dict(os.environ, {'PGHOST': 'wrong.invalid', 'PGUSER': 'wrong-user', 'PGPASSWORD': 'wrong-password', 'PGSSLMODE': 'disable'}):
+            environment = pg.child_environment(url)
+        self.assertEqual(environment['PGHOST'], 'example.invalid')
+        self.assertEqual(environment['PGPORT'], '55432')
+        self.assertEqual(environment['PGDATABASE'], 'crm test')
+        self.assertEqual(environment['PGUSER'], 'fixture@user')
+        self.assertEqual(environment['PGPASSWORD'], 'private:pass@word')
+        self.assertEqual(environment['PGSSLMODE'], 'verify-full')
+        self.assertEqual(environment['PGSSLROOTCERT'], '/tmp/root.crt')
 
     def test_tool_errors_do_not_expose_server_stderr(self):
         with mock.patch.object(subprocess, 'run', return_value=mock.Mock(returncode=1, stdout=b'', stderr=b'private-user password')):

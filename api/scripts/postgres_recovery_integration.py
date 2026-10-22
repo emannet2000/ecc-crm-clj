@@ -112,7 +112,7 @@ class PostgresRecoveryIntegration(unittest.TestCase):
         def tool(name, args, *rest, **kwargs):
             if name == 'pg_dump' and not changed:
                 with pg.connect(self.source) as conn:
-                    conn.execute("INSERT INTO clients(client_number,full_name) VALUES(%s,'After exported snapshot')", ('CONCURRENT-' + uuid.uuid4().hex,))
+                    conn.execute("INSERT INTO clients(client_number,full_name) VALUES(%s,'After exported snapshot')", ('CONCURRENT-' + uuid.uuid4().hex[:16],))
                 changed.append(True)
             return original(name, args, *rest, **kwargs)
         with mock.patch.object(pg, 'run_tool', side_effect=tool):

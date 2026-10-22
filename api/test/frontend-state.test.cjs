@@ -15,7 +15,7 @@ try {
   });
   const expose=`scope.stateTests={A2,A3,A4,list:_List_fromArray,initial:$author$project$State$initialModel,
     url:$elm$url$Url$fromString,update:$author$project$Main$update,accept:$author$project$Main$acceptLoad,
-    ok:$elm$core$Result$Ok,err:$elm$core$Result$Err,badStatus:$elm$http$Http$BadStatus,networkError:$elm$http$Http$NetworkError,loginDone:$author$project$State$LoginDone,
+    ok:$elm$core$Result$Ok,err:$elm$core$Result$Err,badStatus:$elm$http$Http$BadStatus,networkError:$elm$http$Http$NetworkError,networkResponse:$elm$http$Http$NetworkError_,loginDone:$author$project$State$LoginDone,
     leads:$author$project$State$LeadsLoaded,users:$author$project$State$UsersLoaded,
     search:$author$project$State$SearchChanged,navigate:$author$project$State$UrlChanged,
     taskDone:$author$project$State$TaskStatusDone,page:$author$project$State$PageStep,
@@ -59,6 +59,26 @@ try {
     for(let items=bag.m;items&&items.b;items=items.b)urls.push(...httpUrls(items.a));
     return urls;
   };
+  test('navigation requests use the new record scope when accepting responses',()=>{
+    const requests=bag=>{
+      if(bag.$===1)return bag.k==='Http'?[bag.l.a]:[];
+      if(bag.$===3)return requests(bag.o);
+      const all=[];
+      for(let items=bag.m;items&&items.b;items=items.b)all.push(...requests(items.a));
+      return all;
+    };
+    let model={...initial('/clients'),user:{$:'Just',a:{id:1}},token:{$:'Just',a:'test-session'}};
+    for(const route of ['/clients/7','/work/sales']){
+      const changed=e.A2(e.update,e.navigate(e.url('http://ecc.test'+route).a),model);
+      assert.equal(changed.a.pageLoading,true);
+      const pending=requests(changed.b);
+      assert(pending.length>0);
+      const message=pending[0].expect.a(e.networkResponse);
+      model=update(message,changed.a);
+      assert.equal(model.pageLoading,false,'the current response must be accepted for '+route);
+      assert.notEqual(model.pageError,'');
+    }
+  });
   test('client header loads first and panel navigation fetches only the selected panel',()=>{
     const empty=initial('/clients/7');
     assert.deepEqual(httpUrls(e.A2(e.routeCmd,empty,e.clientRoute(7))),['/api/clients/7']);

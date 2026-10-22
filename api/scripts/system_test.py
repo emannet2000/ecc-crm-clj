@@ -105,7 +105,8 @@ class LiveTests(unittest.TestCase):
         cls.addClassCleanup(cls.log.close)
         cls.process = subprocess.Popen([BINARY], cwd=ROOT, stdout=cls.log, stderr=cls.log,
             env=environment(Path(cls.directory.name) / 'live.sqlite3', APP_ENV='development',
-                            PORT=str(cls.port), SEED_DEMO='true', ASSIGNED_ONLY='true'))
+                            PORT=str(cls.port), SEED_DEMO='true', ASSIGNED_ONLY='true',
+                            DB_POOL_SIZE='4'))  # Admit the eight concurrent read-test requests.
         def stop():
             cls.process.terminate()
             try:
@@ -127,7 +128,7 @@ class LiveTests(unittest.TestCase):
         else:
             raise RuntimeError('Server did not become healthy')
         status, _, body = cls.request('POST', '/api/auth/login',
-                                     {'email': 'admin@ecc.com', 'password': 'password123'})
+                                     {'lrEmail': 'admin@ecc.com', 'lrPassword': 'password123'})
         if status != 200:
             raise RuntimeError(f'Fixture login failed: {status}: {body}')
         cls.token = json.loads(body)['token']

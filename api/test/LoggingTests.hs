@@ -15,6 +15,7 @@ import Data.IORef
 import qualified Network.Wai as W
 import qualified Network.Wai.Test as WT
 import Network.HTTP.Types
+import System.Exit (ExitCode(..))
 import ECC.Config (Config(..))
 import ECC.Logging
 import ECC.Server
@@ -84,4 +85,8 @@ run = do
   assert "Successful checks and cancellation do not log startup failures" (null quiet)
   cancelled <- try (catchSync (throwIO ThreadKilled) (\_ -> pure ())) :: IO (Either AsyncException ())
   assert "Cancellation is never swallowed by request error handling" (case cancelled of Left ThreadKilled -> True; _ -> False)
+  succeeded <- try (catchSync (throwIO ExitSuccess) (\_ -> pure ())) :: IO (Either ExitCode ())
+  assert "Successful CLI exits retain their status" (case succeeded of Left ExitSuccess -> True; _ -> False)
+  failed <- try (catchSync (throwIO (ExitFailure 7)) (\_ -> pure ())) :: IO (Either ExitCode ())
+  assert "Failed CLI exits retain their status" (case failed of Left (ExitFailure 7) -> True; _ -> False)
   putStrLn "Logging regression checks passed"

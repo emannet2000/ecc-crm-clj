@@ -16,6 +16,7 @@ import Data.Typeable (typeOf)
 import qualified Network.Wai as Wai
 import System.IO (stdout, hFlush)
 import System.IO.Error (ioeGetErrorType)
+import System.Exit (ExitCode)
 import ECC.Release (releaseContract)
 import qualified ECC.Store as Store
 
@@ -66,7 +67,9 @@ catchSync :: IO a -> (SomeException -> IO a) -> IO a
 catchSync action handler = action `catch` \err ->
   case fromException err :: Maybe SomeAsyncException of
     Just _ -> throwIO err
-    Nothing -> handler err
+    Nothing -> case fromException err :: Maybe ExitCode of
+      Just _ -> throwIO err
+      Nothing -> handler err
 
 -- Stage names are application literals, never configuration values or exception text.
 startupCheck :: LogSink -> T.Text -> IO a -> IO a

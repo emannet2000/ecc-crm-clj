@@ -33,7 +33,7 @@ test('live financial workflows, permissions and mobile layout',{timeout:180000},
   await api('/api/workspace/invoices/save','POST',invoice,token);
   await api('/api/workspace/invoices/save','POST',{...invoice,id:1,status:'Issued',expectedRevision:1},token);
   async function fill(values){for(const [key,value] of Object.entries(values))await b.evaluate(`const f=document.querySelector(${JSON.stringify(key.startsWith('#')?key:'#work-'+key)});if(!f)throw Error('Missing field');f.value=${JSON.stringify(value)};f.dispatchEvent(new Event('input',{bubbles:true}));`);}
-  async function navigate(route,wait){await b.send('Page.navigate',{url:base+route});await b.wait(wait);}
+  async function navigate(route,wait){await b.send('Page.navigate',{url:base+route});await b.wait(`document.body && (${wait})`);}
   async function confirm(text){await b.clickText(text);await b.wait(`document.body.innerText.includes('Confirm this action')`);await b.clickText('Confirm');await b.wait(`document.body.innerText.includes('Financial entry saved') && !Array.from(document.querySelectorAll('button')).some(x=>x.textContent.includes('Working'))`);}
   async function login(email,password){await b.wait(`document.querySelector('input[type="email"]')`);await b.evaluate(`for(const [selector,value] of ${JSON.stringify([['input[type="email"]',email],['input[type="password"]',password]])}){const f=document.querySelector(selector);f.value=value;f.dispatchEvent(new Event('input',{bubbles:true}));}`);await b.clickText('Sign in →');await b.wait(`document.querySelector('.header')`);}
   await b.start(base+'/');await login('admin@browser.test',adminPassword);
