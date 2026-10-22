@@ -26,6 +26,7 @@ import ECC.Server
 import qualified Data.ByteString.Char8 as B
 import qualified Data.Text as T
 import ECC.Auth
+import qualified ConfigTests
 import qualified LoggingTests
 import qualified ReleaseTests
 import qualified ConcurrencyTests
@@ -79,6 +80,7 @@ main = do
   assert "CSV empty rows are ignored" (parseCsv "\n,\nName,Email\n" == [["Name","Email"]])
   assert "hashes do not contain raw tokens" (not (T.isInfixOf (T.pack (B.unpack random)) (tokenHash random)))
   putStrLn "Auth and CSV regression checks passed"
+  ConfigTests.run
   LoggingTests.run
   leadNumberTests
   integrationTests

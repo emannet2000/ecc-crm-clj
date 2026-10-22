@@ -16,7 +16,7 @@ import qualified Network.Wai as W
 import qualified Network.Wai.Test as WT
 import Network.HTTP.Types
 import System.Exit (ExitCode(..))
-import ECC.Config (Config(..))
+import ECC.Config (Config(..), ConfigurationError(..))
 import ECC.Logging
 import ECC.Server
 import qualified ECC.Store as Store
@@ -76,6 +76,14 @@ run = do
     (length startupLogs == 1 && field "stage" (head startupLogs) == Just ("configuration" :: T.Text)
       && field "event" (head startupLogs) == Just ("startup_check_failed" :: T.Text)
       && not (secret `B.isInfixOf` BL.toStrict (A.encode startupLogs)))
+  writeIORef records []
+  invalid <- try (startupCheck sink "configuration" (throwIO InvalidJwtSecret)) :: IO (Either ConfigurationError ())
+  assert "Typed configuration failures are rethrown" (case invalid of Left InvalidJwtSecret -> True; _ -> False)
+  configLogs <- readIORef records
+  assert "Configuration logs name the setting and safe reason"
+    (length configLogs == 1 && field "setting" (head configLogs) == Just ("JWT_SECRET" :: T.Text)
+      && field "configurationProblem" (head configLogs) == Just ("InvalidJwtSecret" :: T.Text)
+      && not (secret `B.isInfixOf` BL.toStrict (A.encode configLogs)))
   writeIORef records []
   completed <- startupCheck sink "configuration" (pure True)
   assert "Successful startup checks preserve their result" completed

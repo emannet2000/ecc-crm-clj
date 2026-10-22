@@ -18,6 +18,7 @@ import System.IO (stdout, hFlush)
 import System.IO.Error (ioeGetErrorType)
 import System.Exit (ExitCode)
 import ECC.Release (releaseContract)
+import ECC.Config (ConfigurationError, configurationSetting)
 import qualified ECC.Store as Store
 
 type LogSink = A.Value -> IO ()
@@ -57,7 +58,11 @@ safeRoute _ = "/:asset"
 exceptionFields :: SomeException -> [Pair]
 exceptionFields exception@(SomeException inner) =
   ["errorType" .= T.pack (show (typeOf inner))] ++
-  case fromException exception :: Maybe Store.SQLError of
+  case fromException exception :: Maybe ConfigurationError of
+    Just issue -> ["setting" .= configurationSetting issue, "configurationProblem" .= show issue]
+    Nothing -> databaseFields
+ where
+  databaseFields = case fromException exception :: Maybe Store.SQLError of
     Just err -> ["databaseCode" .= show (Store.sqlError err), "operation" .= ("database_transaction" :: T.Text)]
     Nothing -> case fromException exception :: Maybe IOException of
       Just err -> ["errorCategory" .= show (ioeGetErrorType err)]

@@ -52,7 +52,7 @@ test-suite regression
     type: exitcode-stdio-1.0
     main-is: Main.hs
     hs-source-dirs: test, src
-    other-modules: ECC.Logging, ECC.StudentWorkflows, ECC.DailyWork, ECC.PostgresSQL, ECC.Postgres, ECC.Release, LoggingTests, ReleaseTests, ConcurrencyTests, ClockTests, ECC.Clock, HardeningTests, ControlsTests, ECC.FinanceCommon, ECC.FinanceControls, FinanceTests, ECC.Finance, ECC.Money, AccessTests, ECC.Access, GeneratedTests, ECC.ProfilePhotos, ECC.Applications, ClientApplicationTests, ECC.Operations, FeatureTests, ECC.MFA, ECC.WorkflowSupport, ECC.Workflows, ECC.Portal, ECC.Auth, ECC.Csv, ECC.Models, ECC.DB, ECC.Store, ECC.Config,
+    other-modules: ECC.Logging, ECC.StudentWorkflows, ECC.DailyWork, ECC.PostgresSQL, ECC.Postgres, ECC.Release, LoggingTests, ConfigTests, ReleaseTests, ConcurrencyTests, ClockTests, ECC.Clock, HardeningTests, ControlsTests, ECC.FinanceCommon, ECC.FinanceControls, FinanceTests, ECC.Finance, ECC.Money, AccessTests, ECC.Access, GeneratedTests, ECC.ProfilePhotos, ECC.Applications, ClientApplicationTests, ECC.Operations, FeatureTests, ECC.MFA, ECC.WorkflowSupport, ECC.Workflows, ECC.Portal, ECC.Auth, ECC.Csv, ECC.Models, ECC.DB, ECC.Store, ECC.Config,
                    ECC.Migrations, ECC.Security, ECC.Routes, ECC.Server, ECC.Seed
     default-language: GHC2021
     default-extensions: DeriveAnyClass
@@ -68,7 +68,7 @@ test-suite postgres-regression
     type: exitcode-stdio-1.0
     main-is: PostgresMain.hs
     hs-source-dirs: test, src
-    other-modules: ECC.Logging, ECC.StudentWorkflows, ECC.DailyWork, ECC.PostgresSQL, ECC.Postgres, ECC.Release, LoggingTests, ReleaseTests, ConcurrencyTests, ClockTests, ECC.Clock, HardeningTests, ControlsTests, ECC.FinanceCommon, ECC.FinanceControls, FinanceTests, ECC.Finance, ECC.Money, AccessTests, ECC.Access, GeneratedTests, ECC.ProfilePhotos, ECC.Applications, ClientApplicationTests, ECC.Operations, FeatureTests, ECC.MFA, ECC.WorkflowSupport, ECC.Workflows, ECC.Portal, ECC.Auth, ECC.Csv, ECC.Models, ECC.DB, ECC.Store, ECC.Config,
+    other-modules: ECC.Logging, ECC.StudentWorkflows, ECC.DailyWork, ECC.PostgresSQL, ECC.Postgres, ECC.Release, LoggingTests, ConfigTests, ReleaseTests, ConcurrencyTests, ClockTests, ECC.Clock, HardeningTests, ControlsTests, ECC.FinanceCommon, ECC.FinanceControls, FinanceTests, ECC.Finance, ECC.Money, AccessTests, ECC.Access, GeneratedTests, ECC.ProfilePhotos, ECC.Applications, ClientApplicationTests, ECC.Operations, FeatureTests, ECC.MFA, ECC.WorkflowSupport, ECC.Workflows, ECC.Portal, ECC.Auth, ECC.Csv, ECC.Models, ECC.DB, ECC.Store, ECC.Config,
                    ECC.Migrations, ECC.Security, ECC.Routes, ECC.Server, ECC.Seed
     default-language: GHC2021
     default-extensions: DeriveAnyClass

@@ -1,5 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
-module ECC.Config (Config(..), loadConfig, normalizePublicUrl, normalizeDatabaseUrl) where
+module ECC.Config (Config(..), ConfigurationError(..), configurationSetting, loadConfig, normalizePublicUrl, normalizeDatabaseUrl) where
+import Control.Exception (Exception, throwIO)
+import Control.Monad (when)
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as B
 import Data.Text.Encoding (encodeUtf8)
@@ -12,31 +14,54 @@ data Config = Config
   { cfgPort :: Int, cfgDatabase :: FilePath, cfgJwtSecret :: ByteString
   , cfgSeedDemo :: Bool, cfgProduction :: Bool, cfgPoolSize :: Int
   , cfgPublicUrl :: T.Text, cfgAssignedOnly :: Bool }
+-- Enumerated diagnostics contain no environment values or credentials.
+data ConfigurationError
+  = InvalidPort | InvalidPoolSize | InvalidDatabaseUrl | InvalidDatabaseTls
+  | InvalidPublicUrl | MissingProductionDatabase | InvalidJwtSecret
+  | DemoSeedingEnabled | HttpsPublicUrlRequired
+  deriving (Eq, Show)
+instance Exception ConfigurationError
+
+configurationSetting :: ConfigurationError -> T.Text
+configurationSetting issue = case issue of
+  InvalidPort -> "PORT"
+  InvalidPoolSize -> "DB_POOL_SIZE"
+  InvalidDatabaseUrl -> "DATABASE_URL"
+  InvalidDatabaseTls -> "DATABASE_URL"
+  InvalidPublicUrl -> "PUBLIC_URL"
+  MissingProductionDatabase -> "DATABASE_URL or DATABASE_PATH"
+  InvalidJwtSecret -> "JWT_SECRET"
+  DemoSeedingEnabled -> "SEED_DEMO"
+  HttpsPublicUrlRequired -> "PUBLIC_URL"
+
 loadConfig :: IO Config
 loadConfig = do
   prod <- (== Just "production") <$> lookupEnv "APP_ENV"
-  port <- number "PORT" 4000 1 65535
-  pool <- number "DB_POOL_SIZE" 2 1 16
+  port <- number "PORT" InvalidPort 4000 1 65535
+  pool <- number "DB_POOL_SIZE" InvalidPoolSize 2 1 16
   url <- lookupEnv "DATABASE_URL"
   local <- lookupEnv "DATABASE_PATH"
   db <- case url of
-    Just value -> Just . T.unpack <$> either (fail . T.unpack) pure (normalizeDatabaseUrl prod (T.pack value))
+    Just value -> Just . T.unpack <$> either (\problem -> throwIO (if problem == "DATABASE_URL must require TLS in production (sslmode=require, verify-ca or verify-full)" then InvalidDatabaseTls else InvalidDatabaseUrl)) pure (normalizeDatabaseUrl prod (T.pack value))
     Nothing -> pure local
   secret <- lookupEnv "JWT_SECRET"
   seed <- (== Just "true") <$> lookupEnv "SEED_DEMO"
   assigned <- (== Just "true") <$> lookupEnv "ASSIGNED_ONLY"
   rawPublic <- maybe "http://localhost:4000" T.pack <$> lookupEnv "PUBLIC_URL"
-  public <- either (fail . T.unpack) pure (normalizePublicUrl rawPublic)
+  public <- either (const (throwIO InvalidPublicUrl)) pure (normalizePublicUrl rawPublic)
   let key = encodeUtf8 (maybe "local-development-secret-only-0000" T.pack secret)
-  if prod && (maybe True null db || B.length key < 32 || secret == Nothing || key == "local-development-secret-only-0000" || db == Just ":memory:" || seed || not ("https://" `T.isPrefixOf` public))
-    then fail "Production requires DATABASE_URL (PostgreSQL) or DATABASE_PATH (SQLite), JWT_SECRET (32+ bytes), PUBLIC_URL=https://..., and SEED_DEMO disabled"
-    else pure (Config port (maybe "ecc-crm.sqlite3" id db) key seed prod pool public assigned)
+  when prod $ do
+    when (maybe True null db || db == Just ":memory:") (throwIO MissingProductionDatabase)
+    when (B.length key < 32 || secret == Nothing || key == "local-development-secret-only-0000") (throwIO InvalidJwtSecret)
+    when seed (throwIO DemoSeedingEnabled)
+    when (not ("https://" `T.isPrefixOf` public)) (throwIO HttpsPublicUrlRequired)
+  pure (Config port (maybe "ecc-crm.sqlite3" id db) key seed prod pool public assigned)
   where
-    number name fallback lo hi = do
+    number name issue fallback lo hi = do
       value <- lookupEnv name
       case maybe (Just fallback) readMaybe value of
         Just n | n >= lo && n <= hi -> pure n
-        _ -> fail (name ++ " is outside the allowed range")
+        _ -> throwIO issue
 
 -- The frontend is served at the origin root; URL prefixes are unsupported.
 normalizePublicUrl :: T.Text -> Either T.Text T.Text
