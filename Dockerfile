@@ -60,10 +60,12 @@ RUN set -eu; \
 FROM debian:bookworm-slim@sha256:7c7b2c966bc9ee8cedfeef67e0e279108992c77681fa595db4a9d65c06ccc587
 RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends libsqlite3-0 libpq5 libgmp10 libffi8 zlib1g ca-certificates curl python3 && rm -rf /var/lib/apt/lists/* && useradd --system --uid 10001 app && mkdir -p /data && chown app /data
 WORKDIR /app
-COPY --from=backend /usr/local/bin/ecc-crm-api /usr/local/bin/
-COPY --from=backend /src/api/web/dist ./web
-COPY api/migrations ./migrations
-COPY scripts/backup.sh scripts/restore.sh scripts/sqlite_backup.py ./scripts/
+COPY --from=backend --chown=app:app /usr/local/bin/ecc-crm-api /usr/local/bin/ecc-crm-api
+COPY --from=backend --chown=app:app /src/api/web/dist ./web
+COPY --chown=app:app api/migrations ./migrations
+COPY --chown=app:app scripts/backup.sh scripts/restore.sh scripts/sqlite_backup.py ./scripts/
+RUN chmod 755 /usr/local/bin/ecc-crm-api \
+ && chmod -R u+rwX,go+rX /app/web /app/migrations /app/scripts
 ENV APP_ENV=production PORT=4000 WEB_DIST=/app/web SEED_DEMO=false DATABASE_PATH=/data/ecc-crm.sqlite3
 VOLUME ["/data"]
 USER app
