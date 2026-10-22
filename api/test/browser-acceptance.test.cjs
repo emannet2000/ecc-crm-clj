@@ -20,7 +20,7 @@ class Browser {
   }
   send(method,params={},sessionId=this.session){return new Promise((resolve,reject)=>{const id=++this.seq;const timer=setTimeout(()=>{this.pending.delete(id);reject(Error(method+' timed out '+(this.stderr||'')));},60000);this.pending.set(id,{resolve,reject,timer});this.child.stdio[3].write(JSON.stringify({id,method,params,...(sessionId?{sessionId}: {})})+'\0');});}
   async event(msg){
-    if(msg.method==='Runtime.exceptionThrown')this.errors.push(msg.params.exceptionDetails.text);
+    if(msg.method==='Runtime.exceptionThrown')this.errors.push(msg.params.exceptionDetails.exception?.description || msg.params.exceptionDetails.text);
     if(msg.method!=='Fetch.requestPaused')return;
     const req=msg.params.request,url=new URL(req.url);this.requests.push(url.pathname+url.search);
     let status=200,mime='application/json',body;
@@ -80,7 +80,7 @@ class Browser {
   }
   async start(){await this.send('Browser.getVersion',{},null);const {targetId}=await this.send('Target.createTarget',{url:'about:blank'},null);const {sessionId}=await this.send('Target.attachToTarget',{targetId,flatten:true},null);this.session=sessionId;await this.send('Runtime.enable');await this.send('Page.enable');await this.send('Fetch.enable',{patterns:[{urlPattern:'*'}]});await this.send('Emulation.setDeviceMetricsOverride',{width:1440,height:1000,deviceScaleFactor:1,mobile:false});await this.send('Page.navigate',{url:'http://ecc.test/'});}
   async evaluate(expression){const r=await this.send('Runtime.evaluate',{expression:'(()=>eval('+JSON.stringify(expression)+'))()',returnByValue:true,awaitPromise:true});if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));return r.result.value;}
-  async wait(expression){for(let i=0;i<100;i++){if(await this.evaluate(expression))return;await delay(50);}throw Error('Not found: '+expression+'\n'+await this.evaluate('document.body.innerText'));}
+  async wait(expression){for(let i=0;i<100;i++){if(await this.evaluate(expression))return;await delay(50);}throw Error('Not found: '+expression+'\n'+JSON.stringify(await this.evaluate('({url:location.href,readyState:document.readyState,body:document.body?.innerText})'))+'\nJavaScript errors: '+JSON.stringify(this.errors)+'\nChromium: '+(this.stderr||''));}
   async clickText(text){await this.wait(`(()=>{const el=Array.from(document.querySelectorAll('button,a')).find(x=>x.textContent.trim()===${JSON.stringify(text)} && !x.disabled);if(!el)return false;el.click();return true;})()`);await this.evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');}
   async screenshot(name){const result=await this.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});fs.writeFileSync(path.join(os.tmpdir(),name),Buffer.from(result.data,'base64'));}
   async close(){for(const p of this.pending.values()){clearTimeout(p.timer);p.reject(Error('Browser closed'));}this.pending.clear();this.child.kill('SIGTERM');await delay(200);fs.rmSync(this.dir,{recursive:true,force:true,maxRetries:3});}
