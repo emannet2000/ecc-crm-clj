@@ -10,7 +10,9 @@ const delay=ms=>new Promise(r=>setTimeout(r,ms));
 class Browser {
   constructor(){
     this.dir=fs.mkdtempSync(path.join(os.tmpdir(),'ecc-ui-'));
-    this.child=spawn(process.env.CHROME_PATH||'/usr/lib/chromium/chromium',['--headless',...(process.env.CHROME_SINGLE_PROCESS==='1'?['--no-zygote','--single-process']:[]),'--disable-breakpad','--disable-crash-reporter','--disable-crashpad-for-testing','--no-sandbox','--disable-dev-shm-usage','--disable-gpu','--no-first-run','--disable-background-networking','--remote-debugging-pipe','--user-data-dir='+this.dir],{stdio:['ignore','ignore','pipe','pipe','pipe']});
+    // Network subprocesses can crash with FD ownership violations in container builds.
+    // Set CHROME_SINGLE_PROCESS=0 explicitly to exercise a multiprocess browser.
+    this.child=spawn(process.env.CHROME_PATH||'/usr/lib/chromium/chromium',['--headless',...(process.env.CHROME_SINGLE_PROCESS!=='0'?['--no-zygote','--single-process']:[]),'--disable-breakpad','--disable-crash-reporter','--disable-crashpad-for-testing','--no-sandbox','--disable-dev-shm-usage','--disable-gpu','--no-first-run','--disable-background-networking','--remote-debugging-pipe','--user-data-dir='+this.dir],{stdio:['ignore','ignore','pipe','pipe','pipe']});
     this.seq=0;this.pending=new Map();this.buffer='';this.errors=[];this.requests=[];this.signedIn=false;
     this.child.on('error',e=>{for(const p of this.pending.values())p.reject(e);});
     this.child.on('exit',(code,signal)=>{for(const p of this.pending.values()){clearTimeout(p.timer);p.reject(Error('Chromium exited '+code+' '+signal+' '+this.stderr));}this.pending.clear();});
