@@ -19,6 +19,21 @@ run :: IO ()
 run = withEnvironment baseline $ do
   good <- loadConfig
   unless (cfgProduction good) (fail "Valid production configuration loads")
+  unless (cfgDatabase good == "/tmp/ecc-config-test.sqlite3")
+    (fail "DATABASE_PATH selects the SQLite database")
+  forM_ ["postgresql://user@localhost/ecc", "postgres://user@localhost/ecc"] $ \url ->
+    withEnvironment [("DATABASE_URL", Just url)] $ do
+      postgres <- loadConfig
+      unless (cfgDatabase postgres == url ++ "?sslmode=require")
+        (fail "PostgreSQL URL takes precedence over SQLite path and defaults to TLS")
+  withEnvironment [("APP_ENV", Just "development"), ("DATABASE_PATH", Nothing)] $ do
+    defaults <- loadConfig
+    unless (cfgDatabase defaults == "ecc-crm.sqlite3")
+      (fail "Development defaults to SQLite when neither database setting is present")
+  withEnvironment [("APP_ENV", Just "development"), ("DATABASE_URL", Just "postgresql://user@localhost/ecc?sslmode=disable")] $ do
+    localPostgres <- loadConfig
+    unless (cfgDatabase localPostgres == "postgresql://user@localhost/ecc?sslmode=disable")
+      (fail "Development supports PostgreSQL without TLS when explicitly configured")
   forM_ cases $ \(key, value, expected) -> withEnvironment [(key, value)] $ do
     result <- try loadConfig :: IO (Either ConfigurationError Config)
     unless (case result of Left actual -> actual == expected; Right _ -> False)

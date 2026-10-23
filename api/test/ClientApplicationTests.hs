@@ -37,8 +37,19 @@ run conn api = do
  token<-TE.encodeUtf8 <$> (field "token" logged::IO T.Text)
  let headers=[("Authorization","Bearer "<>token)]
      admin=call headers
- lead<-DB.insertLead conn (NewLead "Student conversion" (Just "student-conversion@example.com") Nothing (Just "Website") (Just "Hot") (Just "Qualified") (Just "Canada") (Just "Student Visa") Nothing Nothing Nothing) 1
- let lid=leadId lead
+ admin "GET" "/api/ready" A.Null>>=expect 200
+ call [] "GET" "/api/clients" A.Null>>=expect 401
+ createdLead<-admin "POST" "/api/leads" (A.object
+   ["nlFullName".=("Student conversion"::T.Text),"nlEmail".=("student-conversion@example.com"::T.Text)
+   ,"nlSource".=("Website"::T.Text),"nlQuality".=("Hot"::T.Text),"nlStage".=("Qualified"::T.Text)
+   ,"nlDestination".=("Canada"::T.Text),"nlService".=("Student Visa"::T.Text)])
+ expect 200 createdLead
+ lid<-field "leadId" createdLead::IO Int
+ searched<-admin "GET" "/api/leads?q=student-conversion%40example.com" A.Null
+ expect 200 searched
+ matches<-either fail pure (A.eitherDecode(WT.simpleBody searched))::IO[A.Value]
+ assert "HTTP lead entry persists and is searchable on either database"
+   (any (\row -> (parseMaybe(A.withObject "lead" (.: "leadId")) row::Maybe Int)==Just lid) matches)
  task<-DB.insertTask conn (NewTask (Just lid) Nothing "Student task" Nothing Nothing (Just "High")) 1
  document<-DB.insertDocument conn (Just lid) Nothing "transcript.pdf" "application/pdf" "retained transcript" (Just 1)
  let convertPath="/api/leads/"<>BC.pack(show lid)<>"/convert"

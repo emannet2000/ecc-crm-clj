@@ -61,6 +61,11 @@ on process restart. A nonzero process exit triggers a separate alert attempt.
 An independent external uptime monitor remains necessary: a dead host, stopped
 wrapper or broken network cannot reliably alert about itself.
 
+Backup monitoring also compares the latest snapshot name and checksum with the
+restore-drill and off-site evidence. Fresh evidence for an older snapshot is
+reported as `snapshot-mismatch`, rather than marking a newer backup healthy.
+PostgreSQL drills must explicitly report `logicalRecoveryVerified=true`.
+
 ## Diagnose an incident
 
 1. Copy the reference from the error message or browser response `X-Request-ID`.

@@ -31,7 +31,7 @@ validateRelease web migrations binary = do
   pgExists <- doesDirectoryExist (migrations </> "postgresql")
   pgSchemas <- if pgExists then map ("postgresql/"++) . sort . filter (".sql" `isSuffixOf`) <$> listDirectory (migrations </> "postgresql") else pure []
   let diskSchemas=sort(legacySchemas++pgSchemas)
-  unless (Map.keys schemas==diskSchemas && not (null legacySchemas) && last legacySchemas=="0016_lead_number_prefix.sql" && pgSchemas==["postgresql/0001_postgresql.sql","postgresql/0002_student_workflows.sql","postgresql/0003_lead_number_prefix.sql"]) $ fail "Migration files are incompatible with this API release"
+  unless (Map.keys schemas==diskSchemas && not (null legacySchemas) && last legacySchemas=="0018_provider_integrations.sql" && pgSchemas==["postgresql/0001_postgresql.sql","postgresql/0002_student_workflows.sql","postgresql/0003_lead_number_prefix.sql","postgresql/0004_client_journey.sql","postgresql/0005_provider_integrations.sql"]) $ fail "Migration files are incompatible with this API release"
   forM_ [(web,assets),(migrations,schemas)] $ \(root,files) ->
     forM_ (Map.toList (files :: Map.Map FilePath T.Text)) $ \(name,expected) -> do
       -- Only enumerated assets/migration filenames reach the filesystem.

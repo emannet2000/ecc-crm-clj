@@ -411,6 +411,7 @@ type alias Model =
     , pendingImport : Maybe File
 
     -- chrome
+    , notifications : List D.Value
     , notifOpen : Bool
     , toasts : List Toast
     , toastSeq : Int
@@ -529,6 +530,7 @@ initialModel key url =
 
     , pendingImport = Nothing
 
+    , notifications = []
     , notifOpen = False
     , toasts = []
     , toastSeq = 0
@@ -583,6 +585,7 @@ type Msg
     | ReportSettingsLoaded D.Value
     | FeatureField String String
     | FeatureSearch String
+    | FeatureSearchReady String
     | FeatureEdit D.Value
     | DiscardChanges Msg
     | EditTask Task
@@ -598,6 +601,8 @@ type Msg
     | PortalFile File
     | PortalUpload Int
     | PortalUploaded (Result Http.Error D.Value)
+    | PortalRespond String String
+    | PortalResponded (Result Http.Error D.Value)
     | PortalRefresh
     | PortalLogout
     | PortalLogoutDone (Result Http.Error D.Value)
@@ -723,6 +728,9 @@ type Msg
     | SubmitPasswordChange
     | PasswordChangeDone (Result Http.Error ())
       -- chrome
+    | NotificationsLoaded (Result Http.Error D.Value)
+    | NotificationAction String String
+    | NotificationUpdated (Result Http.Error D.Value)
     | NotifBellClicked
     | NavigateTo String
     | TodayChanged String

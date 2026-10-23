@@ -76,7 +76,7 @@ routes env reader writer admin = do
   cid<-maybe (reject status400 "Choose a client") pure mc
   category<-bounded "category" 100 input
   destination<-bounded "destination" 100 input
-  stage<-choice "stage" ["Documents Under Review","Submitted","Decision Pending","Approved","Rejected"] input
+  stage<-choice "stage" ["New Client", "Initial Consultation", "Proposal", "Contract", "Awaiting Payment", "Document Collection", "Document Review", "Application Preparation", "Ready for Submission", "Submitted", "Processing", "Additional Requirements", "Decision Received", "Completed", "Cancelled", "On Hold", "Rejected", "Documents Under Review", "Decision Pending", "Approved"] input
   deadline<-dateField "deadline" False input
   intake<-dateField "intakeDate" False input
   let rid=number "id" input

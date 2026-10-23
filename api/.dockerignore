@@ -1,0 +1,14 @@
+.git
+.env
+.env.*
+*.env
+**/docusign-refresh-token
+dist-newstyle
+web/elm-stuff
+**/__pycache__
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
+*.dump
+*.pgdump

@@ -103,12 +103,31 @@ test('phone layouts keep navigation and records accessible', {timeout:120000}, a
    assert(await b.evaluate(`document.querySelector('.header').getBoundingClientRect().height < 180`),'compact phone header');
    assert(await b.evaluate(`getComputedStyle(document.querySelector('.mobile-bottom-nav')).display==='grid'`),'bottom navigation is visible');
    assert(await b.evaluate(`Array.from(document.querySelectorAll('.mobile-bottom-nav > a,.mobile-more > summary')).every(el=>el.getBoundingClientRect().height>=44)`),'navigation has touch targets');
+   assert(await b.evaluate(`(()=>{
+    const button=document.querySelector('.dark-toggle');
+    const rgb=value=>(value.match(/[\\d.]+/g)||[]).map(Number);
+    const luminance=values=>values.slice(0,3).map(v=>{v/=255;return v<=0.04045?v/12.92:((v+0.055)/1.055)**2.4}).reduce((sum,v,i)=>sum+v*[0.2126,0.7152,0.0722][i],0);
+    let parent=button,background;
+    while(parent){background=rgb(getComputedStyle(parent).backgroundColor);if(background.length===3||background[3]>0)break;parent=parent.parentElement;}
+    const a=luminance(rgb(getComputedStyle(button).color)),b=luminance(background);
+    return (Math.max(a,b)+0.05)/(Math.min(a,b)+0.05)>=4.5;
+   })()`),'theme control text remains readable');
    await b.screenshot('ecc-pwa-dashboard-'+width+'.png');
   }
   await b.clickText('Leads'); await b.wait(`document.querySelector('.leads-table')`);
   await b.send('Emulation.setDeviceMetricsOverride',{width:320,height:844,deviceScaleFactor:1,mobile:true});
   assert(await b.evaluate(`document.documentElement.scrollWidth <= innerWidth`),'lead page must fit phone');
   assert(await b.evaluate(`getComputedStyle(document.querySelector('.leads-table td:nth-child(6)')).display !== 'none'`),'columns remain accessible');
+  await b.clickText('+ Add Lead');
+  await b.wait(`document.querySelector('.modal-content form')`);
+  assert(await b.evaluate(`document.documentElement.scrollWidth <= innerWidth`),'lead form fits a narrow phone');
+  assert.equal(await b.evaluate(`Array.from(document.querySelectorAll('.modal-content button')).find(x=>x.textContent==='Save Lead').type`),'submit','lead entry supports keyboard submission');
+  const writes=b.requests.filter(url=>url==='/api/contacts/check').length;
+  await b.evaluate(`document.querySelector('.modal-content form').requestSubmit()`);
+  await b.wait(`document.querySelector('.modal-content').innerText.includes('required')`);
+  assert.equal(b.requests.filter(url=>url==='/api/contacts/check').length,writes,'invalid lead stays local for correction');
+  await b.clickText('Cancel');
+  await b.wait(`!document.querySelector('.modal-content')`);
   await b.evaluate(`document.querySelector('.mobile-more summary').click()`);
   assert(await b.evaluate(`const r=document.querySelector('.mobile-menu-panel').getBoundingClientRect(); r.left>=0 && r.right<=innerWidth && r.bottom<=document.querySelector('.mobile-bottom-nav').getBoundingClientRect().top`),'more menu fits above navigation');
   await b.evaluate(`document.querySelector('.mobile-more summary').dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))`);

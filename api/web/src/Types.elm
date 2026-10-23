@@ -113,7 +113,7 @@ taskStatuses =
 
 caseStages : List String
 caseStages =
-    [ "Documents Under Review", "Submitted", "Decision Pending", "Approved", "Rejected" ]
+    [ "New Client", "Initial Consultation", "Proposal", "Contract", "Awaiting Payment", "Document Collection", "Document Review", "Application Preparation", "Ready for Submission", "Submitted", "Processing", "Additional Requirements", "Decision Received", "Completed", "Cancelled", "On Hold", "Rejected", "Documents Under Review", "Decision Pending", "Approved" ]
 
 
 roles : List String

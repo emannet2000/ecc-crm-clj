@@ -1,9 +1,2 @@
-package *
-  -- The system Haskell packages provide dynamic interfaces only.
-  shared: True
-  executable-dynamic: True
-  library-vanilla: False
-
-package ecc-crm-api
-  -- gold fails to resolve symbols from the installed shared libraries.
-  ghc-options: -optl-fuse-ld=bfd
+-- Keep workstation-specific compiler and linker overrides out of the default
+-- build. Cabal builds dependencies using the installed GHC's normal settings.

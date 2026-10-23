@@ -31,7 +31,7 @@ feature section action inlineOwner values =
                 Nothing -> Just (key, "Enter a whole number.")
         range = [date "from", date "to", if (get "from" == "") /= (get "to" == "") then Just (if get "from" == "" then "from" else "to", "Choose both dates, or clear both to use the default range.") else Nothing, if get "from" /= "" && get "to" /= "" && get "from" > get "to" then Just ("to", "End date must be on or after the start date.") else Nothing]
         checks =
-            if action == "range" then range else
+            if action == "range" then range else if List.member action ["zoom","calendar","checkout","sign"] || section == "integrations" then [selected "id"] else
             case (section, action) of
                 ("tasks", "save") -> [selected "id", required "title" "Title", required "assignee" "Staff member", date "dueDate", integer "recurrenceDays" 1 366, if get "recurrenceDays" /= "" then required "dueDate" "A deadline for repeating tasks" else Nothing]
                 ("tasks", "create") -> [owner, required "title" "Title", required "assignee" "Staff member", date "dueDate", integer "recurrenceDays" 1 366, if get "recurrenceDays" /= "" then required "dueDate" "A deadline for repeating tasks" else Nothing]

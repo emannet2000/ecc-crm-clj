@@ -247,6 +247,7 @@ updateNormal msg model =
         busyRequest =
             case msg of
                 PortalUpload _ -> model.portalBusy
+                PortalRespond _ _ -> model.portalBusy
                 PortalRefresh -> model.portalBusy
                 FeatureRun _ -> model.featureBusy
                 ChecklistUpload _ _ -> model.featureBusy
@@ -615,7 +616,7 @@ updateHelp msg model =
             case result of
                 Ok value ->
                     let pref = D.decodeValue (D.field "security" D.value) value |> Result.withDefault E.null |> Features.rowForm |> Dict.map (\key v -> if List.member key ["assignments","deadlines","documents","escalations","emailEnabled"] then (if v=="1" || v=="true" then "true" else "false") else v) in
-                    ( { model | featureForm = if featureSection model=="notifications" && not model.formDirty then Dict.union pref model.featureForm else if model.inlineOwner/="" && Dict.get "owner" model.featureForm==Nothing then Dict.insert "owner" model.inlineOwner model.featureForm else if featureSection model=="expenses" && (Dict.get "submissionKey" model.featureForm |> Maybe.withDefault "")=="" then Dict.insert "submissionKey" (Features.str "submissionKey" value) model.featureForm else model.featureForm, featureData = value, opsData = D.decodeValue (D.field "rows" (D.list D.value)) value |> Result.withDefault [], pageLoading = False, pageError = "" }, Cmd.none )
+                    ( { model | featureForm = if featureSection model=="notifications" && not model.formDirty then Dict.union pref model.featureForm else if model.inlineOwner/="" && Dict.get "owner" model.featureForm==Nothing then Dict.insert "owner" model.inlineOwner model.featureForm else if List.member (featureSection model) ["expenses","payments"] && (Dict.get "submissionKey" model.featureForm |> Maybe.withDefault "")=="" then Dict.insert "submissionKey" (Features.str "submissionKey" value) model.featureForm else model.featureForm, featureData = value, opsData = D.decodeValue (D.field "rows" (D.list D.value)) value |> Result.withDefault [], pageLoading = False, pageError = "" }, Cmd.none )
                 Err err -> ( { model | pageLoading = False, pageError = httpError err }, Cmd.none )
 
         InlineSection section ->
@@ -691,7 +692,13 @@ updateHelp msg model =
 
         FeatureSearch query ->
             let next = { model | featureSearch = query, pageOffset = 0, pageLoading = True } in
-            ( next, reloadPanel next )
+            ( next, Task.perform (always (FeatureSearchReady (loadKey next))) (Process.sleep 250) )
+
+        FeatureSearchReady key ->
+            if key == loadKey model then
+                ( model, reloadPanel model )
+            else
+                ( model, Cmd.none )
 
         FeatureEdit row ->
             let
@@ -822,6 +829,15 @@ updateHelp msg model =
             case result of
                 Ok _ -> ( { model | portalBusy = False, portalFile = Nothing, portalNotice = "File received. It will be scanned before your case officer reviews it." }, Api.portalGet ctx (acceptLoad model PortalLoaded) )
                 Err err -> ( { model | portalBusy = False, portalError = httpError err }, Cmd.none )
+
+        PortalRespond ident action ->
+            if model.portalBusy then ( model, Cmd.none ) else
+            ( { model | portalBusy = True, portalError = "", portalNotice = "" }, Api.portalPost ctx ("commercial/" ++ ident ++ "/" ++ action) (E.object []) PortalResponded )
+
+        PortalResponded result ->
+            case result of
+                Ok _ -> ( { model | portalBusy = False, portalNotice = "Your response was recorded." }, Api.portalGet ctx (acceptLoad model PortalLoaded) )
+                Err e -> ( { model | portalBusy = False, portalError = httpError e }, Cmd.none )
 
         PortalRefresh ->
             if model.portalBusy then ( model, Cmd.none ) else
@@ -977,7 +993,7 @@ updateHelp msg model =
                 next = updateClock instant model
                 summary = if next.today == model.today && dateSummaryIsStale next then fetchDateSummary next else refreshDateSummaries model next
             in
-            ( next, Cmd.batch [ Api.clock ctx ClockLoaded, summary ] )
+            ( next, Cmd.batch [ Api.clock ctx ClockLoaded, summary, if model.user /= Nothing then Api.featureGet ctx "notifications" "" 0 (acceptLoad model NotificationsLoaded) else Cmd.none ] )
 
         ClockRefreshRequested ->
             ( model, Cmd.batch [ Task.perform ClockTick Time.now, Api.clock ctx ClockLoaded ] )
@@ -1017,11 +1033,12 @@ updateHelp msg model =
         LoginDone (Ok resp) ->
             let
                 authenticated = restoreSessionDraft resp.user.id
-                    { model | token = Just resp.token, user = Just resp.user, authChecked = True, loginBusy = False, loginPassword = "", loginOtp = "", loginError = "", loginNotice = "" }
+                    { model | token = Just resp.token, user = Just resp.user, authChecked = True, notifications = [], loginBusy = False, loginPassword = "", loginOtp = "", loginError = "", loginNotice = "" }
             in
             ( authenticated
             , Cmd.batch
                 [ saveToken (Just resp.token)
+                , Api.featureGet { base=model.apiBase,token=Just resp.token } "notifications" "" 0 (acceptLoad authenticated NotificationsLoaded)
                 , toast "success" ("Welcome back, " ++ resp.user.name)
                 , if resp.user.mfaRequired then Nav.pushUrl model.key "/work/security" else routeCmd authenticated (State.routeOf model.url)
                 ]
@@ -1032,7 +1049,7 @@ updateHelp msg model =
 
         MeDone (Ok u) ->
             ( { model | user = Just u, authChecked = True }
-            , if u.mfaRequired then Nav.pushUrl model.key "/work/security" else routeCmd model (State.routeOf model.url)
+            , Cmd.batch [Api.featureGet ctx "notifications" "" 0 (acceptLoad model NotificationsLoaded), if u.mfaRequired then Nav.pushUrl model.key "/work/security" else routeCmd model (State.routeOf model.url)]
             )
 
         MeDone (Err e) ->
@@ -1751,8 +1768,24 @@ updateHelp msg model =
             ( model, toast "error" (httpError e) )
 
         -- ----- chrome -----
+        NotificationsLoaded result ->
+            case result of
+                Ok value ->
+                    let
+                        entries = Features.items "rows" value
+                        fresh = List.filter (\item -> Features.str "status" item=="Unread" && Features.str "kind" item=="escalations" && not (List.any (\old -> Features.str "id" old==Features.str "id" item) model.notifications)) entries
+                    in
+                    ( { model | notifications = entries }, List.head fresh |> Maybe.map (Features.str "title" >> toast "error") |> Maybe.withDefault Cmd.none )
+                Err _ -> ( model, Cmd.none )
+
+        NotificationAction ident action ->
+            ( model, Api.featurePost ctx ("notifications/" ++ action) (E.object [("id",E.string ident)]) (acceptLoad model NotificationUpdated) )
+
+        NotificationUpdated _ ->
+            ( model, Api.featureGet ctx "notifications" "" 0 (acceptLoad model NotificationsLoaded) )
+
         NotifBellClicked ->
-            ( { model | notifOpen = not model.notifOpen }, Cmd.none )
+            ( { model | notifOpen = not model.notifOpen }, Api.featureGet ctx "notifications" "" 0 (acceptLoad model NotificationsLoaded) )
 
         NavigateTo path ->
             ( { model | notifOpen = False, pageError = "" }, if path == model.url.path then reloadCurrent model else Nav.pushUrl model.key path )
@@ -1851,10 +1884,10 @@ httpError err =
             "Bad URL: " ++ url
 
         Http.Timeout ->
-            "Request timed out"
+            "The request timed out. Your changes are still here. Check the record before retrying a save."
 
         Http.NetworkError ->
-            "Network error — is the API running?"
+            "Connection lost. Check your internet connection. Your changes are still here; check the record before retrying a save."
 
         Http.BadStatus code ->
             case code of

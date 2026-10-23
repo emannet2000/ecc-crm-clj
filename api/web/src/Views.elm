@@ -471,7 +471,7 @@ addLeadModal model =
             model.addLead
     in
     Ui.modal "Add Lead"
-        (div []
+        (Html.form [ Html.Events.onSubmit SubmitAddLead ]
             [ checkedInputField model "fullName" "Full Name *" f.fullName "text" (\v -> UpdateAddLead (\g -> { g | fullName = v }))
             , checkedInputField model "email" "Email" f.email "email" (\v -> UpdateAddLead (\g -> { g | email = v }))
             , checkedInputField model "phone" "Phone" f.phone "tel" (\v -> UpdateAddLead (\g -> { g | phone = v }))
@@ -483,8 +483,8 @@ addLeadModal model =
             , checkedInputField model "nextFollowup" "Next Follow-up" f.nextFollowup "date" (\v -> UpdateAddLead (\g -> { g | nextFollowup = v }))
             , inputField "Notes" f.notes "text" (\v -> UpdateAddLead (\g -> { g | notes = v }))
             , div [ class "flex", Html.Attributes.style "margin-top" "14px" ]
-                [ button [ Html.Attributes.disabled (isReadOnly model || model.featureBusy),  class "btn btn-primary", onClick SubmitAddLead ] [ text "Save Lead" ]
-                , button [ class "btn btn-outline", onClick CloseAddLead ] [ text "Cancel" ]
+                [ button [ Html.Attributes.disabled (isReadOnly model || model.featureBusy), type_ "submit", class "btn btn-primary" ] [ text "Save Lead" ]
+                , button [ type_ "button", class "btn btn-outline", onClick CloseAddLead ] [ text "Cancel" ]
                 ]
             ]
         )
@@ -548,7 +548,7 @@ leadDetailView model id =
                                 )
                             ]
                         , button [ Html.Attributes.disabled (isReadOnly model),  class "btn", onClick (AdvanceClicked l.id) ] [ text "Advance ▸" ]
-                        , button [ Html.Attributes.disabled (isReadOnly model || model.featureBusy), class "btn btn-primary", onClick (ConfirmRequested "Convert this lead to a student? Documents, tasks and history will be preserved." (ConvertClicked l.id)) ] [ text (if model.featureBusy then "Converting…" else "Convert to student") ]
+                        , button [ Html.Attributes.disabled (isReadOnly model || model.featureBusy), class "btn btn-primary", onClick (ConfirmRequested "Convert this lead to a client? Documents, tasks and history will be preserved." (ConvertClicked l.id)) ] [ text (if model.featureBusy then "Converting…" else "Convert to Client") ]
                         , button [ Html.Attributes.disabled (isReadOnly model),  class "btn btn-danger", onClick (ConfirmRequested "Move this lead to the archive? Its history will be preserved." (DeleteLeadConfirmed l.id)) ] [ text "Delete" ]
                         ]
                     ]
@@ -1619,72 +1619,25 @@ addDaysStr iso days =
 notificationsDropdown : Model -> Html Msg
 notificationsDropdown model =
     let
-        overdue =
-            overdueTasks model
-
-        dueSoon =
-            dueSoonTasks model
-
-        item t suffix =
-            div
-                [ class "notification-item unread"
-                , onClick (NavigateTo (Maybe.map (\id -> "/clients/" ++ String.fromInt id) t.clientId |> Maybe.withDefault ("/leads/" ++ String.fromInt t.leadId)))
-                ]
-                [ span [ class "notification-icon" ] [ text "⏰" ]
-                , div [ class "notification-content" ]
-                    [ div [ class "notification-title" ] [ text t.title ]
-                    , div [ class "notification-subtitle" ]
-                        [ text
-                            (suffix
-                                ++ " · "
-                                ++ Maybe.withDefault "" t.leadName
-                            )
-                        ]
+        unread = List.filter (\entry -> Features.str "status" entry=="Unread") model.notifications
+        item entry =
+            div [class "notification-item"]
+                [ div [class "notification-content"]
+                    [ div [class "notification-title"] [text (Features.str "title" entry)]
+                    , Html.p [] [text (Features.str "date" entry ++ " · " ++ Features.str "status" entry)]
+                    , a [class "btn btn-outline",href (Features.str "path" entry)] [text "Open record"]
+                    , button [class "btn btn-outline",onClick (NotificationAction (Features.str "id" entry) "read")] [text "Mark read"]
+                    , button [class "btn btn-outline",onClick (NotificationAction (Features.str "id" entry) "archive")] [text "Dismiss"]
                     ]
-                , span [ class "notification-dot" ] []
                 ]
     in
-    div [ class "notification-wrapper" ]
-        [ button
-            [ class
-                ("notification-bell "
-                    ++ (if not (List.isEmpty overdue) || not (List.isEmpty dueSoon) then
-                            "has-notifications"
-
-                        else
-                            ""
-                       )
-                )
-            , onClick NotifBellClicked
-            ]
-            [ text "🔔"
-            , if not (List.isEmpty overdue) then
-                span [ class "notification-badge" ]
-                    [ text (String.fromInt (List.length overdue)) ]
-
-              else
-                span [] []
-            ]
-        , if model.notifOpen then
-            div [ class "notification-dropdown" ]
-                [ div [ class "notification-header" ]
-                    [ text "Notifications" ]
-                , div [ class "notification-list" ]
-                    (List.map (\t -> item t "Overdue") overdue
-                        ++ List.map (\t -> item t "Due soon") dueSoon
-                        ++ (if List.isEmpty overdue && List.isEmpty dueSoon then
-                                [ div [ class "notification-empty" ]
-                                    [ text "Nothing needs your attention 🎉" ]
-                                ]
-
-                            else
-                                []
-                           )
-                    )
-                ]
-
-          else
-            span [] []
+    div [class "notification-wrapper"]
+        [ button [class "notification-bell",onClick NotifBellClicked,Html.Attributes.attribute "aria-label" ("Notifications (" ++ String.fromInt (List.length unread) ++ ")")]
+            [text "🔔",span [class "notification-badge"] [text (String.fromInt (List.length unread))]]
+        , if model.notifOpen then div [class "notification-dropdown"]
+            [ div [class "notification-header"] [text "Notifications",a [href "/work/notifications",class "btn btn-outline"] [text "Notification Center"]]
+            , div [class "notification-list"] (if List.isEmpty model.notifications then [Html.p [] [text "No notifications."]] else List.map item model.notifications)
+            ] else text ""
         ]
 
 

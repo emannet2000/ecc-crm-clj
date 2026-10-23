@@ -16,3 +16,7 @@ __pycache__/
 
 release-images.json
 ecc-crm-final/
+
+/integrations.env
+/api/integrations.env
+docusign-refresh-token

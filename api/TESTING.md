@@ -63,9 +63,10 @@ uses dependency caches and uploads logs/screenshots. It does not deploy the app.
 Action setup follows the upstream [Haskell setup](https://github.com/haskell-actions/setup)
 and [Chrome setup](https://github.com/browser-actions/setup-chrome) documentation.
 
-Local validation in this workspace: the API build, existing regression suite,
-all 1,000 generated cases, frontend state/report/offline checks, query-plan checks,
-production configuration guards and backup/restore checks pass. Local sockets and
-Chromium's sandbox process startup are denied by this execution environment, so
-live HTTP and browser execution require the CI runner. No hosted CI run has been
-triggered from this checkout.
+The restricted sandbox requires additional execution permission for local
+sockets, subprocesses, and Chromium. The validation review in
+[docs/IMPROVEMENT_VALIDATION.md](docs/IMPROVEMENT_VALIDATION.md) records the local
+database, recovery, HTTP, and browser coverage and remaining hosted checks.
+The `render-image` CI job additionally builds the actual Docker runtime image
+and runs `python3 scripts/render_image_smoke.py --image ecc-render:test` against
+it. No hosted CI run has been triggered from this checkout.

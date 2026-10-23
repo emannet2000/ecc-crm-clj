@@ -38,6 +38,7 @@ import qualified HardeningTests
 import qualified FinanceTests
 import qualified AccessTests
 import qualified ClientApplicationTests
+import qualified JourneyTests
 import qualified GeneratedTests
 import qualified FeatureTests
 import ECC.Release (releaseContract)
@@ -324,6 +325,7 @@ integrationTests = do
     assert "Concurrent references are unique" (length (nub numbers)==8)
     FeatureTests.run conn api
     ClientApplicationTests.run conn api
+    JourneyTests.run conn api
     putStrLn "SQLite/WAI integration checks passed"
 
 removeIfPresent :: FilePath -> IO ()

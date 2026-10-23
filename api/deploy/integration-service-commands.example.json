@@ -1,0 +1,5 @@
+{
+  "stop": ["systemctl", "stop", "ecc-api.service", "ecc-mail.service", "ecc-scheduler.service", "ecc-scan.service", "ecc-integrations.service"],
+  "start": ["systemctl", "start", "ecc-api.service", "ecc-mail.service", "ecc-scheduler.service", "ecc-scan.service", "ecc-integrations.service"],
+  "health": ["python3", "/opt/ecc/api/scripts/production_health.py"]
+}

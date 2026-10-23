@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.bL.a2 === region.b1.a2)
+	if (region.bM.a2 === region.b2.a2)
 	{
-		return 'on line ' + region.bL.a2;
+		return 'on line ' + region.bM.a2;
 	}
-	return 'on lines ' + region.bL.a2 + ' through ' + region.b1.a2;
+	return 'on lines ' + region.bM.a2 + ' through ' + region.b2.a2;
 }
 
 
@@ -1861,9 +1861,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.dt,
-		impl.d_,
-		impl.dV,
+		impl.du,
+		impl.d$,
+		impl.dW,
 		function() { return function() {} }
 	);
 });
@@ -2728,8 +2728,8 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
 		ag: func(record.ag),
-		bN: record.bN,
-		bJ: record.bJ
+		bO: record.bO,
+		bK: record.bK
 	}
 });
 
@@ -2998,10 +2998,10 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 
 		var value = result.a;
 		var message = !tag ? value : tag < 3 ? value.a : value.ag;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.bN;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.bO;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.bJ) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.bK) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3951,11 +3951,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.dt,
-		impl.d_,
-		impl.dV,
+		impl.du,
+		impl.d$,
+		impl.dW,
 		function(sendToApp, initialModel) {
-			var view = impl.d1;
+			var view = impl.d2;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3987,12 +3987,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.dt,
-		impl.d_,
-		impl.dV,
+		impl.du,
+		impl.d$,
+		impl.dW,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.bK && impl.bK(sendToApp)
-			var view = impl.d1;
+			var divertHrefToApp = impl.bL && impl.bL(sendToApp)
+			var view = impl.d2;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -4061,12 +4061,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.dz;
-	var onUrlRequest = impl.dA;
+	var onUrlChange = impl.dA;
+	var onUrlRequest = impl.dB;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		bK: function(sendToApp)
+		bL: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4082,9 +4082,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.cv === next.cv
-							&& curr.ca === next.ca
-							&& curr.co.a === next.co.a
+							&& curr.cw === next.cw
+							&& curr.cb === next.cb
+							&& curr.cp.a === next.cp.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4092,13 +4092,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		dt: function(flags)
+		du: function(flags)
 		{
-			return A3(impl.dt, flags, _Browser_getUrl(), key);
+			return A3(impl.du, flags, _Browser_getUrl(), key);
 		},
-		d1: impl.d1,
-		d_: impl.d_,
-		dV: impl.dV
+		d2: impl.d2,
+		d$: impl.d$,
+		dW: impl.dW
 	});
 }
 
@@ -4164,17 +4164,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { dq: 'hidden', c0: 'visibilitychange' }
+		? { dr: 'hidden', c1: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { dq: 'mozHidden', c0: 'mozvisibilitychange' }
+		? { dr: 'mozHidden', c1: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { dq: 'msHidden', c0: 'msvisibilitychange' }
+		? { dr: 'msHidden', c1: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { dq: 'webkitHidden', c0: 'webkitvisibilitychange' }
-		: { dq: 'hidden', c0: 'visibilitychange' };
+		? { dr: 'webkitHidden', c1: 'webkitvisibilitychange' }
+		: { dr: 'hidden', c1: 'visibilitychange' };
 }
 
 
@@ -4255,12 +4255,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		cB: _Browser_getScene(),
-		cJ: {
-			cN: _Browser_window.pageXOffset,
-			cO: _Browser_window.pageYOffset,
-			cM: _Browser_doc.documentElement.clientWidth,
-			b8: _Browser_doc.documentElement.clientHeight
+		cC: _Browser_getScene(),
+		cK: {
+			cO: _Browser_window.pageXOffset,
+			cP: _Browser_window.pageYOffset,
+			cN: _Browser_doc.documentElement.clientWidth,
+			b9: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4270,8 +4270,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		cM: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		b8: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		cN: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		b9: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4294,15 +4294,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			cB: {
-				cM: node.scrollWidth,
-				b8: node.scrollHeight
+			cC: {
+				cN: node.scrollWidth,
+				b9: node.scrollHeight
 			},
-			cJ: {
-				cN: node.scrollLeft,
-				cO: node.scrollTop,
-				cM: node.clientWidth,
-				b8: node.clientHeight
+			cK: {
+				cO: node.scrollLeft,
+				cP: node.scrollTop,
+				cN: node.clientWidth,
+				b9: node.clientHeight
 			}
 		};
 	});
@@ -4332,18 +4332,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			cB: _Browser_getScene(),
-			cJ: {
-				cN: x,
-				cO: y,
-				cM: _Browser_doc.documentElement.clientWidth,
-				b8: _Browser_doc.documentElement.clientHeight
+			cC: _Browser_getScene(),
+			cK: {
+				cO: x,
+				cP: y,
+				cN: _Browser_doc.documentElement.clientWidth,
+				b9: _Browser_doc.documentElement.clientHeight
 			},
-			db: {
-				cN: x + rect.left,
-				cO: y + rect.top,
-				cM: rect.width,
-				b8: rect.height
+			dc: {
+				cO: x + rect.left,
+				cP: y + rect.top,
+				cN: rect.width,
+				b9: rect.height
 			}
 		};
 	});
@@ -4417,13 +4417,13 @@ var _Http_toTask = F3(function(router, toTask, request)
 
 function _Http_configureRequest(xhr, request)
 {
-	for (var headers = request.aF; headers.b; headers = headers.b) // WHILE_CONS
+	for (var headers = request.aG; headers.b; headers = headers.b) // WHILE_CONS
 	{
 		xhr.setRequestHeader(headers.a.a, headers.a.b);
 	}
 	xhr.timeout = request.bt.a || 0;
 	xhr.responseType = request.bk.d;
-	xhr.withCredentials = request.cS;
+	xhr.withCredentials = request.cT;
 }
 
 
@@ -4446,8 +4446,8 @@ function _Http_toMetadata(xhr)
 	return {
 		bw: xhr.responseURL,
 		aR: xhr.status,
-		dU: xhr.statusText,
-		aF: _Http_parseHeaders(xhr.getAllResponseHeaders())
+		dV: xhr.statusText,
+		aG: _Http_parseHeaders(xhr.getAllResponseHeaders())
 	};
 }
 
@@ -4542,15 +4542,15 @@ function _Http_track(router, xhr, tracker)
 	xhr.upload.addEventListener('progress', function(event) {
 		if (xhr.c) { return; }
 		_Scheduler_rawSpawn(A2($elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, $elm$http$Http$Sending({
-			dM: event.loaded,
-			dN: event.total
+			dN: event.loaded,
+			dO: event.total
 		}))));
 	});
 	xhr.addEventListener('progress', function(event) {
 		if (xhr.c) { return; }
 		_Scheduler_rawSpawn(A2($elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, $elm$http$Http$Receiving({
-			dG: event.loaded,
-			dN: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
+			dH: event.loaded,
+			dO: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
 		}))));
 	});
 }
@@ -4962,10 +4962,10 @@ var _Bitwise_shiftRightZfBy = F2(function(offset, a)
 	return a >>> offset;
 });
 var $author$project$State$LinkClicked = function (a) {
-	return {$: 56, a: a};
+	return {$: 59, a: a};
 };
 var $author$project$State$UrlChanged = function (a) {
-	return {$: 57, a: a};
+	return {$: 60, a: a};
 };
 var $elm$core$Basics$EQ = 1;
 var $elm$core$Basics$GT = 2;
@@ -5471,7 +5471,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {bm: fragment, ca: host, t: path, co: port_, cv: protocol, ak: query};
+		return {bm: fragment, cb: host, t: path, cp: port_, cw: protocol, al: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5751,16 +5751,16 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$application = _Browser_application;
 var $author$project$State$ClockLoaded = function (a) {
-	return {$: 173, a: a};
+	return {$: 179, a: a};
 };
 var $author$project$State$ClockTick = function (a) {
-	return {$: 170, a: a};
+	return {$: 176, a: a};
 };
 var $author$project$State$PortalExchange = function (a) {
-	return {$: 46, a: a};
+	return {$: 47, a: a};
 };
 var $author$project$State$PortalLoaded = function (a) {
-	return {$: 48, a: a};
+	return {$: 49, a: a};
 };
 var $author$project$State$AcceptLoad = F2(
 	function (a, b) {
@@ -5816,14 +5816,14 @@ var $author$project$Main$loadKey = function (model) {
 			_List_fromArray(
 				[
 					model.bw.t,
-					A2($elm$core$Maybe$withDefault, '', model.dW),
+					A2($elm$core$Maybe$withDefault, '', model.dX),
 					$elm$core$String$fromInt(model.a3),
-					$elm$core$String$fromInt(model.dE),
-					model.dF,
+					$elm$core$String$fromInt(model.dF),
+					model.dG,
 					model.bf,
-					model.dj,
-					model.dh,
+					model.dk,
 					model.di,
+					model.dj,
 					A2(
 					$elm$json$Json$Encode$encode,
 					0,
@@ -5831,17 +5831,17 @@ var $author$project$Main$loadKey = function (model) {
 						A2(
 							$elm$core$List$map,
 							$elm$core$Tuple$mapSecond($elm$json$Json$Encode$string),
-							$elm$core$Dict$toList(model.cT)))),
-					model.dP,
+							$elm$core$Dict$toList(model.cU)))),
+					model.dQ,
 					model.bn,
 					model.af,
-					model.ar,
-					model.dO ? 'asc' : 'desc'
+					model.as,
+					model.dP ? 'asc' : 'desc'
 				])));
 };
 var $author$project$Main$loadKeyFor = F2(
 	function (msg, model) {
-		if (msg.$ === 68) {
+		if (msg.$ === 71) {
 			return A2(
 				$elm$json$Json$Encode$encode,
 				0,
@@ -5850,7 +5850,7 @@ var $author$project$Main$loadKeyFor = F2(
 					$elm$json$Json$Encode$string,
 					_List_fromArray(
 						[
-							A2($elm$core$Maybe$withDefault, '', model.dW),
+							A2($elm$core$Maybe$withDefault, '', model.dX),
 							$elm$core$String$fromInt(model.bb)
 						])));
 		} else {
@@ -6547,7 +6547,7 @@ var $author$project$Api$responseError = F3(
 			140,
 			A2(
 				$elm$core$Result$withDefault,
-				'Request failed (' + ($elm$core$String$fromInt(status) + ')'),
+				(status >= 500) ? 'The service is temporarily unavailable. Check the record before retrying a save.' : ('Request failed (' + ($elm$core$String$fromInt(status) + ')')),
 				A2(
 					$elm$json$Json$Decode$decodeString,
 					A2($elm$json$Json$Decode$field, 'error', $elm$json$Json$Decode$string),
@@ -6575,7 +6575,7 @@ var $author$project$Api$decodeResponse = F2(
 						[401, 409])) ? $elm$core$Result$Err(
 					$elm$http$Http$BadStatus(metadata.aR)) : $elm$core$Result$Err(
 					$elm$http$Http$BadBody(
-						A3($author$project$Api$responseError, metadata.aR, metadata.aF, body)));
+						A3($author$project$Api$responseError, metadata.aR, metadata.aG, body)));
 			default:
 				var body = response.b;
 				return A2(
@@ -6609,7 +6609,7 @@ var $elm$http$Http$Request = function (a) {
 };
 var $elm$http$Http$State = F2(
 	function (reqs, subs) {
-		return {cx: reqs, cE: subs};
+		return {cy: reqs, cF: subs};
 	});
 var $elm$http$Http$init = $elm$core$Task$succeed(
 	A2($elm$http$Http$State, $elm$core$Dict$empty, _List_Nil));
@@ -6683,7 +6683,7 @@ var $elm$http$Http$onEffects = F4(
 				return $elm$core$Task$succeed(
 					A2($elm$http$Http$State, reqs, subs));
 			},
-			A3($elm$http$Http$updateReqs, router, cmds, state.cx));
+			A3($elm$http$Http$updateReqs, router, cmds, state.cy));
 	});
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
@@ -6726,7 +6726,7 @@ var $elm$http$Http$onSelfMsg = F3(
 				A2(
 					$elm$core$List$filterMap,
 					A3($elm$http$Http$maybeSend, router, tracker, progress),
-					state.cE)));
+					state.cF)));
 	});
 var $elm$http$Http$Cancel = function (a) {
 	return {$: 0, a: a};
@@ -6740,10 +6740,10 @@ var $elm$http$Http$cmdMap = F2(
 			var r = cmd.a;
 			return $elm$http$Http$Request(
 				{
-					cS: r.cS,
+					cT: r.cT,
 					bd: r.bd,
 					bk: A2(_Http_mapExpect, func, r.bk),
-					aF: r.aF,
+					aG: r.aG,
 					bo: r.bo,
 					bt: r.bt,
 					bv: r.bv,
@@ -6770,7 +6770,7 @@ var $elm$http$Http$subscription = _Platform_leaf('Http');
 var $elm$http$Http$request = function (r) {
 	return $elm$http$Http$command(
 		$elm$http$Http$Request(
-			{cS: false, bd: r.bd, bk: r.bk, aF: r.aF, bo: r.bo, bt: r.bt, bv: r.bv, bw: r.bw}));
+			{cT: false, bd: r.bd, bk: r.bk, aG: r.aG, bo: r.bo, bt: r.bt, bv: r.bv, bw: r.bw}));
 };
 var $author$project$Api$authedRequest = F6(
 	function (ctx, method, path, body, decoder, toMsg) {
@@ -6778,14 +6778,14 @@ var $author$project$Api$authedRequest = F6(
 			{
 				bd: A2($elm$core$Maybe$withDefault, $elm$http$Http$emptyBody, body),
 				bk: A2($author$project$Api$expectJson, toMsg, decoder),
-				aF: _List_fromArray(
+				aG: _List_fromArray(
 					[
 						A2($elm$http$Http$header, 'X-ECC-Contract', $author$project$Release$contract)
 					]),
 				bo: method,
 				bt: $elm$core$Maybe$Just(30000),
 				bv: $elm$core$Maybe$Nothing,
-				bw: _Utils_ap(ctx.aq, path)
+				bw: _Utils_ap(ctx.ar, path)
 			});
 	});
 var $elm$json$Json$Decode$value = _Json_decodeValue;
@@ -6837,7 +6837,7 @@ var $author$project$State$applicationFiltersForUrl = function (url) {
 			A2(
 				$elm$core$String$split,
 				'&',
-				A2($elm$core$Maybe$withDefault, '', url.ak))));
+				A2($elm$core$Maybe$withDefault, '', url.al))));
 };
 var $author$project$Features$defaults = function (section) {
 	return $elm$core$Dict$fromList(
@@ -6870,7 +6870,8 @@ var $author$project$Features$defaults = function (section) {
 				_Utils_Tuple2('outcome', 'Completed'),
 				_Utils_Tuple2('category', 'Student Visa'),
 				_Utils_Tuple2('destination', 'Canada'),
-				_Utils_Tuple2('stage', 'Documents Under Review'),
+				_Utils_Tuple2('stage', 'New Client'),
+				_Utils_Tuple2('clientVisible', 'false'),
 				_Utils_Tuple2('required', 'true'),
 				_Utils_Tuple2('enabled', 'true'),
 				_Utils_Tuple2('priority', 'Medium'),
@@ -6893,7 +6894,7 @@ var $author$project$Features$defaults = function (section) {
 var $author$project$State$Dashboard = {$: 0};
 var $elm$url$Url$Parser$State = F5(
 	function (visited, unvisited, params, frag, value) {
-		return {as: frag, au: params, ao: unvisited, ad: value, az: visited};
+		return {at: frag, av: params, ap: unvisited, ad: value, aA: visited};
 	});
 var $elm$url$Url$Parser$getFirstMatch = function (states) {
 	getFirstMatch:
@@ -6903,7 +6904,7 @@ var $elm$url$Url$Parser$getFirstMatch = function (states) {
 		} else {
 			var state = states.a;
 			var rest = states.b;
-			var _v1 = state.ao;
+			var _v1 = state.ap;
 			if (!_v1.b) {
 				return $elm$core$Maybe$Just(state.ad);
 			} else {
@@ -7005,7 +7006,7 @@ var $elm$url$Url$Parser$parse = F2(
 					$elm$url$Url$Parser$State,
 					_List_Nil,
 					$elm$url$Url$Parser$preparePath(url.t),
-					$elm$url$Url$Parser$prepareQuery(url.ak),
+					$elm$url$Url$Parser$prepareQuery(url.al),
 					url.bm,
 					$elm$core$Basics$identity)));
 	});
@@ -7027,10 +7028,10 @@ var $elm$url$Url$Parser$Parser = $elm$core$Basics$identity;
 var $elm$url$Url$Parser$custom = F2(
 	function (tipe, stringToSomething) {
 		return function (_v0) {
-			var visited = _v0.az;
-			var unvisited = _v0.ao;
-			var params = _v0.au;
-			var frag = _v0.as;
+			var visited = _v0.aA;
+			var unvisited = _v0.ap;
+			var params = _v0.av;
+			var frag = _v0.at;
 			var value = _v0.ad;
 			if (!unvisited.b) {
 				return _List_Nil;
@@ -7059,10 +7060,10 @@ var $elm$url$Url$Parser$custom = F2(
 var $elm$url$Url$Parser$int = A2($elm$url$Url$Parser$custom, 'NUMBER', $elm$core$String$toInt);
 var $elm$url$Url$Parser$mapState = F2(
 	function (func, _v0) {
-		var visited = _v0.az;
-		var unvisited = _v0.ao;
-		var params = _v0.au;
-		var frag = _v0.as;
+		var visited = _v0.aA;
+		var unvisited = _v0.ap;
+		var params = _v0.av;
+		var frag = _v0.at;
 		var value = _v0.ad;
 		return A5(
 			$elm$url$Url$Parser$State,
@@ -7076,10 +7077,10 @@ var $elm$url$Url$Parser$map = F2(
 	function (subValue, _v0) {
 		var parseArg = _v0;
 		return function (_v1) {
-			var visited = _v1.az;
-			var unvisited = _v1.ao;
-			var params = _v1.au;
-			var frag = _v1.as;
+			var visited = _v1.aA;
+			var unvisited = _v1.ap;
+			var params = _v1.av;
+			var frag = _v1.at;
 			var value = _v1.ad;
 			return A2(
 				$elm$core$List$map,
@@ -7117,10 +7118,10 @@ var $elm$url$Url$Parser$oneOf = function (parsers) {
 };
 var $elm$url$Url$Parser$s = function (str) {
 	return function (_v0) {
-		var visited = _v0.az;
-		var unvisited = _v0.ao;
-		var params = _v0.au;
-		var frag = _v0.as;
+		var visited = _v0.aA;
+		var unvisited = _v0.ap;
+		var params = _v0.av;
+		var frag = _v0.at;
 		var value = _v0.ad;
 		if (!unvisited.b) {
 			return _List_Nil;
@@ -7257,64 +7258,64 @@ var $author$project$Main$featureDefaultsForUrl = function (url) {
 };
 var $elm$core$Set$Set_elm_builtin = $elm$core$Basics$identity;
 var $elm$core$Set$empty = $elm$core$Dict$empty;
-var $author$project$State$emptyAddLead = {bj: 'Canada', i: '', a$: '', ci: '', aI: '', F: '', aL: 'Warm', aO: 'Student Visa', aQ: 'Website', dR: 'New Lead'};
-var $author$project$State$emptyAddTask = {cW: '', a_: '', aD: '', a1: '', a6: 'Medium', dI: '', ac: ''};
-var $author$project$State$emptyClientForm = {i: '', a$: '', cl: '', F: '', v: 1};
-var $author$project$State$emptyEditLeadFrom = {by: $elm$core$Maybe$Nothing, bj: 'Canada', i: '', a$: '', dv: '', ci: '', aI: '', F: '', aL: 'Warm', v: 1, aO: 'Student Visa', aQ: 'Website', dR: 'New Lead'};
-var $author$project$State$emptyUserForm = {i: '', z: '', ah: '', v: 1, G: 'consultant', cI: $elm$core$Maybe$Nothing};
+var $author$project$State$emptyAddLead = {bj: 'Canada', i: '', a$: '', cj: '', aJ: '', H: '', aL: 'Warm', aO: 'Student Visa', aQ: 'Website', dS: 'New Lead'};
+var $author$project$State$emptyAddTask = {cX: '', a_: '', aE: '', a1: '', a6: 'Medium', dJ: '', ac: ''};
+var $author$project$State$emptyClientForm = {i: '', a$: '', cm: '', H: '', v: 1};
+var $author$project$State$emptyEditLeadFrom = {by: $elm$core$Maybe$Nothing, bj: 'Canada', i: '', a$: '', dw: '', cj: '', aJ: '', H: '', aL: 'Warm', v: 1, aO: 'Student Visa', aQ: 'Website', dS: 'New Lead'};
+var $author$project$State$emptyUserForm = {i: '', z: '', ah: '', v: 1, A: 'consultant', cJ: $elm$core$Maybe$Nothing};
 var $elm$json$Json$Encode$null = _Json_encodeNull;
 var $author$project$State$initialModel = F2(
 	function (key, url) {
 		return {
 			q: $author$project$State$emptyAddLead,
 			g: $author$project$State$emptyAddTask,
-			_: '',
-			cT: $author$project$State$applicationFiltersForUrl(url),
+			V: '',
+			cU: $author$project$State$applicationFiltersForUrl(url),
 			bc: _List_Nil,
 			aa: false,
 			m: $elm$core$Maybe$Nothing,
-			c2: $elm$core$Maybe$Nothing,
-			bT: $elm$core$Maybe$Nothing,
+			c3: $elm$core$Maybe$Nothing,
+			bU: $elm$core$Maybe$Nothing,
 			N: $elm$core$Maybe$Nothing,
 			f: $author$project$State$emptyClientForm,
 			aV: false,
 			be: '',
-			bU: $elm$core$Maybe$Nothing,
-			bV: '',
+			bV: $elm$core$Maybe$Nothing,
+			bW: '',
 			aW: $elm$json$Json$Encode$null,
 			bf: '',
 			aX: _List_Nil,
 			bg: 480,
-			bW: 0,
+			bX: 0,
 			aY: false,
-			bX: 'Asia/Manila',
-			V: $elm$core$Maybe$Nothing,
-			bZ: $elm$json$Json$Encode$null,
-			c4: $elm$core$Dict$empty,
-			c5: '',
-			b_: $elm$core$Dict$empty,
+			bY: 'Asia/Manila',
+			W: $elm$core$Maybe$Nothing,
+			b_: $elm$json$Json$Encode$null,
+			c5: $elm$core$Dict$empty,
+			c6: '',
+			b$: $elm$core$Dict$empty,
 			bi: '',
-			aC: false,
+			aD: false,
 			O: $elm$core$Maybe$Nothing,
-			B: false,
+			D: false,
 			h: $author$project$State$emptyEditLeadFrom,
 			P: false,
-			C: false,
-			dh: 'All',
+			E: false,
 			di: 'All',
 			dj: 'All',
-			D: $elm$core$Dict$empty,
+			dk: 'All',
+			F: $elm$core$Dict$empty,
 			w: false,
 			r: $elm$json$Json$Encode$null,
-			b5: '',
-			dk: $elm$core$Dict$empty,
+			b6: '',
 			dl: $elm$core$Dict$empty,
+			dm: $elm$core$Dict$empty,
 			bl: $elm$json$Json$Encode$null,
-			ar: '',
-			dn: 0,
-			$7: '',
-			b6: _List_Nil,
-			dp: $elm$core$Maybe$Nothing,
+			as: '',
+			$7: 0,
+			dp: '',
+			b7: _List_Nil,
+			dq: $elm$core$Maybe$Nothing,
 			b: false,
 			af: function () {
 				var _v0 = $author$project$State$routeOf(url);
@@ -7327,57 +7328,58 @@ var $author$project$State$initialModel = F2(
 			}(),
 			bn: 'tasks',
 			x: key,
-			at: _List_Nil,
+			au: _List_Nil,
 			a3: 0,
 			K: false,
 			a4: '',
 			y: '',
-			cg: A2(
+			ch: A2(
 				$elm$core$String$startsWith,
 				'reset=',
-				A2($elm$core$Maybe$withDefault, '', url.ak)) ? 'reset' : 'login',
-			aH: '',
+				A2($elm$core$Maybe$withDefault, '', url.al)) ? 'reset' : 'login',
+			aI: '',
 			a5: '',
 			R: '',
 			L: '',
 			br: false,
+			bE: _List_Nil,
 			bs: _List_Nil,
 			s: '',
-			bH: true,
-			dE: 0,
+			bI: true,
+			dF: 0,
 			S: $elm$core$Maybe$Nothing,
 			ai: $elm$core$Maybe$Nothing,
-			aK: url.t === '/portal',
-			bI: $elm$json$Json$Encode$null,
-			cp: '',
-			cq: $elm$core$Maybe$Nothing,
-			cr: '',
-			av: '',
+			ak: url.t === '/portal',
+			bJ: $elm$json$Json$Encode$null,
+			cq: '',
+			cr: $elm$core$Maybe$Nothing,
+			cs: '',
 			aw: '',
-			Y: '',
-			dF: '',
+			ax: '',
+			Z: '',
+			dG: '',
 			o: $elm$json$Json$Encode$null,
 			aN: $elm$core$Dict$empty,
 			T: $elm$core$Set$empty,
-			al: $elm$core$Maybe$Nothing,
-			Z: false,
+			am: $elm$core$Maybe$Nothing,
+			_: false,
 			M: false,
 			U: false,
-			ay: false,
-			am: false,
-			dO: true,
-			dP: 'name',
-			bM: $elm$core$Maybe$Nothing,
-			an: _List_Nil,
-			cG: 0,
+			az: false,
+			an: false,
+			dP: true,
+			dQ: 'name',
+			bN: $elm$core$Maybe$Nothing,
+			ao: _List_Nil,
+			cH: 0,
 			bu: _List_Nil,
-			A: '',
-			dW: $elm$core$Maybe$Nothing,
+			B: '',
+			dX: $elm$core$Maybe$Nothing,
 			bw: url,
-			H: $elm$core$Maybe$Nothing,
+			C: $elm$core$Maybe$Nothing,
 			bb: 0,
 			p: $author$project$State$emptyUserForm,
-			ap: _List_Nil
+			aq: _List_Nil
 		};
 	});
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -7401,7 +7403,7 @@ var $author$project$Api$portalGet = function (ctx) {
 var $author$project$Main$init = F3(
 	function (_v0, url, key) {
 		var proto = function () {
-			var _v2 = url.cv;
+			var _v2 = url.cw;
 			if (!_v2) {
 				return 'http';
 			} else {
@@ -7409,14 +7411,14 @@ var $author$project$Main$init = F3(
 			}
 		}();
 		var base = $author$project$Api$computeBase(
-			{ca: url.ca, co: url.co, cv: proto});
+			{cb: url.cb, cp: url.cp, cw: proto});
 		return _Utils_Tuple2(
 			function (m) {
 				return _Utils_update(
 					m,
 					{
-						_: base,
-						dl: $author$project$Main$featureDefaultsForUrl(url)
+						V: base,
+						dm: $author$project$Main$featureDefaultsForUrl(url)
 					});
 			}(
 				A2($author$project$State$initialModel, key, url)),
@@ -7426,7 +7428,7 @@ var $author$project$Main$init = F3(
 						A2($elm$core$Task$perform, $author$project$State$ClockTick, $elm$time$Time$now),
 						A2(
 						$author$project$Api$clock,
-						{aq: base, dW: $elm$core$Maybe$Nothing},
+						{ar: base, dX: $elm$core$Maybe$Nothing},
 						$author$project$State$ClockLoaded),
 						function () {
 						if (url.t === '/portal') {
@@ -7442,7 +7444,7 @@ var $author$project$Main$init = F3(
 							} else {
 								return A2(
 									$author$project$Api$portalGet,
-									{aq: base, dW: $elm$core$Maybe$Nothing},
+									{ar: base, dX: $elm$core$Maybe$Nothing},
 									A2(
 										$author$project$Main$acceptLoad,
 										A2($author$project$State$initialModel, key, url),
@@ -7455,14 +7457,14 @@ var $author$project$Main$init = F3(
 					])));
 	});
 var $author$project$State$ClockRefresh = function (a) {
-	return {$: 171, a: a};
+	return {$: 177, a: a};
 };
-var $author$project$State$ClockRefreshRequested = {$: 172};
+var $author$project$State$ClockRefreshRequested = {$: 178};
 var $author$project$State$GotStoredDark = function (a) {
-	return {$: 59, a: a};
+	return {$: 62, a: a};
 };
 var $author$project$State$GotStoredToken = function (a) {
-	return {$: 58, a: a};
+	return {$: 61, a: a};
 };
 var $author$project$State$ReportSettingsLoaded = function (a) {
 	return {$: 34, a: a};
@@ -7474,7 +7476,7 @@ var $elm$time$Time$Every = F2(
 	});
 var $elm$time$Time$State = F2(
 	function (taggers, processes) {
-		return {cu: processes, cF: taggers};
+		return {cv: processes, cG: taggers};
 	});
 var $elm$time$Time$init = $elm$core$Task$succeed(
 	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
@@ -7610,7 +7612,7 @@ var $elm$time$Time$spawnHelp = F3(
 	});
 var $elm$time$Time$onEffects = F3(
 	function (router, subs, _v0) {
-		var processes = _v0.cu;
+		var processes = _v0.cv;
 		var rightStep = F3(
 			function (_v6, id, _v7) {
 				var spawns = _v7.a;
@@ -7676,7 +7678,7 @@ var $elm$time$Time$onEffects = F3(
 	});
 var $elm$time$Time$onSelfMsg = F3(
 	function (router, interval, state) {
-		var _v0 = A2($elm$core$Dict$get, interval, state.cF);
+		var _v0 = A2($elm$core$Dict$get, interval, state.cG);
 		if (_v0.$ === 1) {
 			return $elm$core$Task$succeed(state);
 		} else {
@@ -7742,7 +7744,7 @@ var $elm$browser$Browser$Events$MySub = F3(
 	});
 var $elm$browser$Browser$Events$State = F2(
 	function (subs, pids) {
-		return {cn: pids, cE: subs};
+		return {co: pids, cF: subs};
 	});
 var $elm$browser$Browser$Events$init = $elm$core$Task$succeed(
 	A2($elm$browser$Browser$Events$State, _List_Nil, $elm$core$Dict$empty));
@@ -7764,7 +7766,7 @@ var $elm$browser$Browser$Events$addKey = function (sub) {
 };
 var $elm$browser$Browser$Events$Event = F2(
 	function (key, event) {
-		return {b2: event, x: key};
+		return {b3: event, x: key};
 	});
 var $elm$browser$Browser$Events$spawn = F3(
 	function (router, key, _v0) {
@@ -7838,7 +7840,7 @@ var $elm$browser$Browser$Events$onEffects = F3(
 			stepLeft,
 			stepBoth,
 			stepRight,
-			state.cn,
+			state.co,
 			$elm$core$Dict$fromList(newSubs),
 			_Utils_Tuple3(_List_Nil, $elm$core$Dict$empty, _List_Nil));
 		var deadPids = _v0.a;
@@ -7867,7 +7869,7 @@ var $elm$browser$Browser$Events$onEffects = F3(
 var $elm$browser$Browser$Events$onSelfMsg = F3(
 	function (router, _v0, state) {
 		var key = _v0.x;
-		var event = _v0.b2;
+		var event = _v0.b3;
 		var toMessage = function (_v2) {
 			var subKey = _v2.a;
 			var _v3 = _v2.b;
@@ -7876,7 +7878,7 @@ var $elm$browser$Browser$Events$onSelfMsg = F3(
 			var decoder = _v3.c;
 			return _Utils_eq(subKey, key) ? A2(_Browser_decodeEvent, decoder, event) : $elm$core$Maybe$Nothing;
 		};
-		var messages = A2($elm$core$List$filterMap, toMessage, state.cE);
+		var messages = A2($elm$core$List$filterMap, toMessage, state.cF);
 		return A2(
 			$elm$core$Task$andThen,
 			function (_v1) {
@@ -7918,14 +7920,14 @@ var $elm$browser$Browser$Events$onVisibilityChange = function (func) {
 	return A3(
 		$elm$browser$Browser$Events$on,
 		0,
-		info.c0,
+		info.c1,
 		A2(
 			$elm$json$Json$Decode$map,
 			$elm$browser$Browser$Events$withHidden(func),
 			A2(
 				$elm$json$Json$Decode$field,
 				'target',
-				A2($elm$json$Json$Decode$field, info.dq, $elm$json$Json$Decode$bool))));
+				A2($elm$json$Json$Decode$field, info.dr, $elm$json$Json$Decode$bool))));
 };
 var $author$project$Main$subscriptions = function (_v0) {
 	return $elm$core$Platform$Sub$batch(
@@ -7941,115 +7943,127 @@ var $author$project$Main$subscriptions = function (_v0) {
 			]));
 };
 var $author$project$State$AddLeadDone = function (a) {
-	return {$: 82, a: a};
+	return {$: 85, a: a};
 };
 var $author$project$State$AddTaskDone = function (a) {
-	return {$: 124, a: a};
+	return {$: 127, a: a};
 };
 var $author$project$State$AdvanceDone = function (a) {
-	return {$: 90, a: a};
+	return {$: 93, a: a};
 };
 var $author$project$State$BulkDone = function (a) {
-	return {$: 114, a: a};
+	return {$: 117, a: a};
 };
 var $author$project$State$CaseFormSaved = function (a) {
-	return {$: 138, a: a};
+	return {$: 141, a: a};
 };
 var $author$project$State$ClientDocUploaded = function (a) {
-	return {$: 146, a: a};
+	return {$: 149, a: a};
 };
 var $author$project$State$ClientFormSaved = function (a) {
-	return {$: 130, a: a};
+	return {$: 133, a: a};
 };
 var $author$project$State$ClientPhotoDone = F2(
 	function (a, b) {
-		return {$: 94, a: a, b: b};
+		return {$: 97, a: a, b: b};
 	});
 var $author$project$State$ClientProfileLoaded = function (a) {
-	return {$: 91, a: a};
+	return {$: 94, a: a};
 };
 var $author$project$State$ClientUpdated = function (a) {
-	return {$: 131, a: a};
+	return {$: 134, a: a};
 };
 var $author$project$State$ClientsLoaded = function (a) {
-	return {$: 70, a: a};
+	return {$: 73, a: a};
 };
 var $author$project$State$ClockAligned = F4(
 	function (a, b, c, d) {
-		return {$: 174, a: a, b: b, c: c, d: d};
+		return {$: 180, a: a, b: b, c: c, d: d};
 	});
 var $author$project$State$ContactSaveConfirmed = F4(
 	function (a, b, c, d) {
-		return {$: 81, a: a, b: b, c: c, d: d};
+		return {$: 84, a: a, b: b, c: c, d: d};
 	});
 var $author$project$State$ConvertDone = function (a) {
-	return {$: 98, a: a};
+	return {$: 101, a: a};
 };
 var $author$project$State$DeleteCaseDone = function (a) {
-	return {$: 140, a: a};
+	return {$: 143, a: a};
 };
 var $author$project$State$DeleteClientDone = function (a) {
-	return {$: 133, a: a};
+	return {$: 136, a: a};
 };
 var $author$project$State$DeleteLeadDone = function (a) {
-	return {$: 88, a: a};
+	return {$: 91, a: a};
 };
 var $author$project$State$DeleteUserDone = function (a) {
-	return {$: 160, a: a};
+	return {$: 163, a: a};
 };
 var $author$project$State$DiscardChanges = function (a) {
-	return {$: 38, a: a};
+	return {$: 39, a: a};
 };
 var $author$project$State$DocDeleteDone = function (a) {
-	return {$: 148, a: a};
+	return {$: 151, a: a};
 };
 var $author$project$State$EditLeadDone = function (a) {
-	return {$: 86, a: a};
+	return {$: 89, a: a};
 };
 var $author$project$State$FeatureDone = function (a) {
-	return {$: 44, a: a};
+	return {$: 45, a: a};
 };
 var $author$project$State$FeatureLoaded = function (a) {
 	return {$: 15, a: a};
 };
+var $author$project$State$FeatureSearchReady = function (a) {
+	return {$: 37, a: a};
+};
 var $author$project$State$LeadDocUploaded = function (a) {
-	return {$: 145, a: a};
+	return {$: 148, a: a};
 };
 var $author$project$State$LeadsImported = function (a) {
-	return {$: 151, a: a};
+	return {$: 154, a: a};
 };
 var $author$project$State$LeadsLoaded = function (a) {
-	return {$: 67, a: a};
+	return {$: 70, a: a};
 };
 var $author$project$State$LoginDone = function (a) {
-	return {$: 64, a: a};
+	return {$: 67, a: a};
 };
 var $author$project$State$LogoutDone = function (a) {
 	return {$: 9, a: a};
 };
 var $author$project$State$MeDone = function (a) {
-	return {$: 65, a: a};
+	return {$: 68, a: a};
 };
 var $author$project$State$NavigateTo = function (a) {
-	return {$: 168, a: a};
+	return {$: 174, a: a};
 };
 var $author$project$State$NoteDone = function (a) {
-	return {$: 101, a: a};
+	return {$: 104, a: a};
+};
+var $author$project$State$NotificationUpdated = function (a) {
+	return {$: 172, a: a};
+};
+var $author$project$State$NotificationsLoaded = function (a) {
+	return {$: 170, a: a};
 };
 var $author$project$State$OperationDone = function (a) {
 	return {$: 14, a: a};
 };
 var $author$project$State$PasswordChangeDone = function (a) {
-	return {$: 166, a: a};
+	return {$: 169, a: a};
 };
 var $author$project$State$PortalExchanged = function (a) {
-	return {$: 47, a: a};
+	return {$: 48, a: a};
 };
 var $author$project$State$PortalLogoutDone = function (a) {
+	return {$: 57, a: a};
+};
+var $author$project$State$PortalResponded = function (a) {
 	return {$: 54, a: a};
 };
 var $author$project$State$PortalUploaded = function (a) {
-	return {$: 51, a: a};
+	return {$: 52, a: a};
 };
 var $author$project$State$RecoveryDone = function (a) {
 	return {$: 7, a: a};
@@ -8062,22 +8076,22 @@ var $author$project$State$SearchReady = F2(
 		return {$: 11, a: a, b: b};
 	});
 var $author$project$State$TaskDeleteDone = function (a) {
-	return {$: 118, a: a};
+	return {$: 121, a: a};
 };
 var $author$project$State$TaskEditorLoaded = function (a) {
-	return {$: 40, a: a};
+	return {$: 41, a: a};
 };
 var $author$project$State$TaskStatusDone = function (a) {
-	return {$: 116, a: a};
+	return {$: 119, a: a};
 };
 var $author$project$State$UserSaved = function (a) {
-	return {$: 157, a: a};
+	return {$: 160, a: a};
 };
 var $author$project$State$UserUpdatedDone = function (a) {
-	return {$: 158, a: a};
+	return {$: 161, a: a};
 };
 var $author$project$State$UsersLoaded = function (a) {
-	return {$: 68, a: a};
+	return {$: 71, a: a};
 };
 var $author$project$Types$encodeNote = function (note) {
 	return $elm$json$Json$Encode$object(
@@ -8142,7 +8156,7 @@ var $author$project$Types$Lead = function (id) {
 															return function (createdAt) {
 																return function (updatedAt) {
 																	return function (revision) {
-																		return {by: consultantId, c6: consultantName, aB: createdAt, bj: destination, i: email, a$: fullName, bA: id, dv: lastContact, ci: nextFollowup, aI: notes, cj: number, F: phone, aL: quality, v: revision, aO: service, aQ: source, dR: stage, d$: updatedAt};
+																		return {by: consultantId, c7: consultantName, aC: createdAt, bj: destination, i: email, a$: fullName, bA: id, dw: lastContact, cj: nextFollowup, aJ: notes, ck: number, H: phone, aL: quality, v: revision, aO: service, aQ: source, dS: stage, d0: updatedAt};
 																	};
 																};
 															};
@@ -8418,7 +8432,7 @@ var $author$project$Features$formValues = function (row) {
 					$elm$core$List$member,
 					key,
 					_List_fromArray(
-						['required', 'enabled', 'assignments', 'deadlines', 'documents', 'escalations', 'emailEnabled'])) ? ((value_ === '1') ? 'true' : ((value_ === '0') ? 'false' : value_)) : value_;
+						['clientVisible', 'required', 'enabled', 'assignments', 'deadlines', 'documents', 'escalations', 'emailEnabled'])) ? ((value_ === '1') ? 'true' : ((value_ === '0') ? 'false' : value_)) : value_;
 			}),
 		$elm$core$Dict$fromList(
 			A2(
@@ -8446,14 +8460,14 @@ var $author$project$Main$beginConflict = F5(
 			_Utils_update(
 				model,
 				{
-					bZ: $elm$json$Json$Encode$null,
-					c4: $author$project$Features$formValues(edited),
-					c5: kind,
-					b_: $author$project$Features$formValues(original)
+					b_: $elm$json$Json$Encode$null,
+					c5: $author$project$Features$formValues(edited),
+					c6: kind,
+					b$: $author$project$Features$formValues(original)
 				}),
 			A5(
 				$author$project$Api$featureGet,
-				{aq: model._, dW: model.dW},
+				{ar: model.V, dX: model.dX},
 				'conflict/' + (kind + ('/' + $elm$core$String$fromInt(rid))),
 				'',
 				0,
@@ -8466,7 +8480,7 @@ var $author$project$Types$encodeBulkRequest = function (b) {
 			[
 				_Utils_Tuple2(
 				'brOp',
-				$elm$json$Json$Encode$string(b.bF)),
+				$elm$json$Json$Encode$string(b.bG)),
 				_Utils_Tuple2(
 				'brIds',
 				A2($elm$json$Json$Encode$list, $elm$json$Json$Encode$int, b.bB)),
@@ -8526,7 +8540,7 @@ var $author$project$Main$featureSection = function (model) {
 };
 var $elm$core$Basics$neq = _Utils_notEqual;
 var $author$project$Main$hasDraftChanges = function (model) {
-	return model.b || ((model.L !== '') || ((!_Utils_eq(model.S, $elm$core$Maybe$Nothing)) || ((!_Utils_eq(model.c2, $elm$core$Maybe$Nothing)) || ((!_Utils_eq(model.bU, $elm$core$Maybe$Nothing)) || ((!_Utils_eq(model.dp, $elm$core$Maybe$Nothing)) || (!_Utils_eq(model.ai, $elm$core$Maybe$Nothing)))))));
+	return model.b || ((model.L !== '') || ((!_Utils_eq(model.S, $elm$core$Maybe$Nothing)) || ((!_Utils_eq(model.c3, $elm$core$Maybe$Nothing)) || ((!_Utils_eq(model.bV, $elm$core$Maybe$Nothing)) || ((!_Utils_eq(model.dq, $elm$core$Maybe$Nothing)) || (!_Utils_eq(model.ai, $elm$core$Maybe$Nothing)))))));
 };
 var $elm$url$Url$addPort = F2(
 	function (maybePort, starter) {
@@ -8550,7 +8564,7 @@ var $elm$url$Url$addPrefixed = F3(
 	});
 var $elm$url$Url$toString = function (url) {
 	var http = function () {
-		var _v0 = url.cv;
+		var _v0 = url.cw;
 		if (!_v0) {
 			return 'http://';
 		} else {
@@ -8564,16 +8578,16 @@ var $elm$url$Url$toString = function (url) {
 		A3(
 			$elm$url$Url$addPrefixed,
 			'?',
-			url.ak,
+			url.al,
 			_Utils_ap(
 				A2(
 					$elm$url$Url$addPort,
-					url.co,
-					_Utils_ap(http, url.ca)),
+					url.cp,
+					_Utils_ap(http, url.cb)),
 				url.t)));
 };
 var $author$project$Main$captureSessionDraft = function (model) {
-	return (_Utils_eq(model.H, $elm$core$Maybe$Nothing) || (!$author$project$Main$hasDraftChanges(model))) ? model.al : A2(
+	return (_Utils_eq(model.C, $elm$core$Maybe$Nothing) || (!$author$project$Main$hasDraftChanges(model))) ? model.am : A2(
 		$elm$core$Maybe$map,
 		function (user) {
 			var safeFeature = A2(
@@ -8589,31 +8603,31 @@ var $author$project$Main$captureSessionDraft = function (model) {
 				f: model.f,
 				h: model.h,
 				P: model.P,
-				C: model.C,
-				D: safeFeature ? $author$project$Main$draftFields(model.D) : $elm$core$Dict$empty,
-				dl: safeFeature ? $author$project$Main$draftFields(model.dl) : $elm$core$Dict$empty,
+				E: model.E,
+				F: safeFeature ? $author$project$Main$draftFields(model.F) : $elm$core$Dict$empty,
+				dm: safeFeature ? $author$project$Main$draftFields(model.dm) : $elm$core$Dict$empty,
 				b: model.b,
 				af: model.af,
 				bn: model.bn,
 				L: model.L,
-				cm: user.bA,
+				cn: user.bA,
 				t: $elm$url$Url$toString(model.bw),
 				o: ($author$project$Main$featureSection(model) === 'security') ? $elm$json$Json$Encode$null : model.o,
-				Z: model.Z,
+				_: model._,
 				M: model.M,
 				U: model.U
 			};
 		},
-		model.H);
+		model.C);
 };
 var $author$project$State$caseFormOf = function (cr) {
 	return {
 		aU: $elm$core$Maybe$Just(cr.bA),
-		c$: A2($elm$core$Maybe$withDefault, 'Student Visa', cr.c$),
+		c0: A2($elm$core$Maybe$withDefault, 'Student Visa', cr.c0),
 		aZ: A2($elm$core$Maybe$withDefault, '', cr.aZ),
 		bj: A2($elm$core$Maybe$withDefault, 'Canada', cr.bj),
 		v: cr.v,
-		dR: cr.dR
+		dS: cr.dS
 	};
 };
 var $elm$core$String$trim = _String_trim;
@@ -8629,13 +8643,13 @@ var $author$project$Types$encodeCaseInput = function (f) {
 			[
 				_Utils_Tuple2(
 				'ciServiceCategory',
-				$author$project$Types$encodeNonEmpty(f.c$)),
+				$author$project$Types$encodeNonEmpty(f.c0)),
 				_Utils_Tuple2(
 				'ciDestination',
 				$author$project$Types$encodeNonEmpty(f.bj)),
 				_Utils_Tuple2(
 				'ciStage',
-				$author$project$Types$encodeNonEmpty(f.dR)),
+				$author$project$Types$encodeNonEmpty(f.dS)),
 				_Utils_Tuple2(
 				'ciNextDeadline',
 				$author$project$Types$maybeDate(f.aZ)),
@@ -8649,7 +8663,7 @@ var $author$project$Types$encodeCaseInput = function (f) {
 };
 var $author$project$Main$casePayload = function (cf) {
 	return $author$project$Types$encodeCaseInput(
-		{aU: cf.aU, c$: cf.c$, aZ: cf.aZ, bj: cf.bj, dR: cf.dR});
+		{aU: cf.aU, c0: cf.c0, aZ: cf.aZ, bj: cf.bj, dS: cf.dS});
 };
 var $author$project$Types$encodePasswordChange = function (f) {
 	return $elm$json$Json$Encode$object(
@@ -8657,10 +8671,10 @@ var $author$project$Types$encodePasswordChange = function (f) {
 			[
 				_Utils_Tuple2(
 				'pcCurrent',
-				$elm$json$Json$Encode$string(f.c8)),
+				$elm$json$Json$Encode$string(f.c9)),
 				_Utils_Tuple2(
 				'pcNew',
-				$elm$json$Json$Encode$string(f.dy))
+				$elm$json$Json$Encode$string(f.dz))
 			]));
 };
 var $author$project$Api$changePassword = F3(
@@ -8673,12 +8687,12 @@ var $author$project$Api$changePassword = F3(
 			$elm$core$Maybe$Just(
 				$elm$http$Http$jsonBody(
 					$author$project$Types$encodePasswordChange(
-						{c8: current, dy: _new}))),
+						{c9: current, dz: _new}))),
 			$author$project$Api$ignoreDecoder);
 	});
 var $author$project$State$ContactCheckDone = F4(
 	function (a, b, c, d) {
-		return {$: 80, a: a, b: b, c: c, d: d};
+		return {$: 83, a: a, b: b, c: c, d: d};
 	});
 var $author$project$Api$checkContact = F2(
 	function (ctx, body) {
@@ -8703,13 +8717,13 @@ var $author$project$Types$encodeNewClient = function (f) {
 				$author$project$Types$encodeNonEmpty(f.i)),
 				_Utils_Tuple2(
 				'ncPhone',
-				$author$project$Types$encodeNonEmpty(f.F)),
+				$author$project$Types$encodeNonEmpty(f.H)),
 				_Utils_Tuple2(
 				'ncCaseOfficer',
 				A2(
 					$elm$core$Maybe$withDefault,
 					$elm$json$Json$Encode$null,
-					A2($elm$core$Maybe$map, $elm$json$Json$Encode$int, f.cl)))
+					A2($elm$core$Maybe$map, $elm$json$Json$Encode$int, f.cm)))
 			]));
 };
 var $author$project$Main$withRevision = F2(
@@ -8736,8 +8750,8 @@ var $author$project$Main$clientPayload = function (model) {
 			{
 				i: model.f.i,
 				a$: model.f.a$,
-				cl: $elm$core$String$toInt(model.f.cl),
-				F: model.f.F
+				cm: $elm$core$String$toInt(model.f.cm),
+				H: model.f.H
 			}));
 };
 var $author$project$Types$encodeNewLead = function (f) {
@@ -8752,7 +8766,7 @@ var $author$project$Types$encodeNewLead = function (f) {
 				$author$project$Types$encodeNonEmpty(f.i)),
 				_Utils_Tuple2(
 				'nlPhone',
-				$author$project$Types$encodeNonEmpty(f.F)),
+				$author$project$Types$encodeNonEmpty(f.H)),
 				_Utils_Tuple2(
 				'nlSource',
 				$author$project$Types$encodeNonEmpty(f.aQ)),
@@ -8761,7 +8775,7 @@ var $author$project$Types$encodeNewLead = function (f) {
 				$author$project$Types$encodeNonEmpty(f.aL)),
 				_Utils_Tuple2(
 				'nlStage',
-				$author$project$Types$encodeNonEmpty(f.dR)),
+				$author$project$Types$encodeNonEmpty(f.dS)),
 				_Utils_Tuple2(
 				'nlDestination',
 				$author$project$Types$encodeNonEmpty(f.bj)),
@@ -8770,10 +8784,10 @@ var $author$project$Types$encodeNewLead = function (f) {
 				$author$project$Types$encodeNonEmpty(f.aO)),
 				_Utils_Tuple2(
 				'nlNotes',
-				$author$project$Types$encodeNonEmpty(f.aI)),
+				$author$project$Types$encodeNonEmpty(f.aJ)),
 				_Utils_Tuple2(
 				'nlNextFollowup',
-				$author$project$Types$maybeDate(f.ci)),
+				$author$project$Types$maybeDate(f.cj)),
 				_Utils_Tuple2('nlConsultantId', $elm$json$Json$Encode$null)
 			]));
 };
@@ -8792,7 +8806,7 @@ var $author$project$Types$encodeUpdateLead = function (f) {
 				$author$project$Types$encodeNonEmpty(f.i)),
 				_Utils_Tuple2(
 				'ulPhone',
-				$author$project$Types$encodeNonEmpty(f.F)),
+				$author$project$Types$encodeNonEmpty(f.H)),
 				_Utils_Tuple2(
 				'ulSource',
 				$author$project$Types$encodeNonEmpty(f.aQ)),
@@ -8801,7 +8815,7 @@ var $author$project$Types$encodeUpdateLead = function (f) {
 				$author$project$Types$encodeNonEmpty(f.aL)),
 				_Utils_Tuple2(
 				'ulStage',
-				$author$project$Types$encodeNonEmpty(f.dR)),
+				$author$project$Types$encodeNonEmpty(f.dS)),
 				_Utils_Tuple2(
 				'ulDestination',
 				$author$project$Types$encodeNonEmpty(f.bj)),
@@ -8810,13 +8824,13 @@ var $author$project$Types$encodeUpdateLead = function (f) {
 				$author$project$Types$encodeNonEmpty(f.aO)),
 				_Utils_Tuple2(
 				'ulNotes',
-				$author$project$Types$encodeNonEmpty(f.aI)),
+				$author$project$Types$encodeNonEmpty(f.aJ)),
 				_Utils_Tuple2(
 				'ulLastContact',
-				$author$project$Types$maybeDate(f.dv)),
+				$author$project$Types$maybeDate(f.dw)),
 				_Utils_Tuple2(
 				'ulNextFollowup',
-				$author$project$Types$maybeDate(f.ci)),
+				$author$project$Types$maybeDate(f.cj)),
 				_Utils_Tuple2(
 				'ulConsultantId',
 				A2(
@@ -8831,17 +8845,17 @@ var $author$project$Main$contactData = F2(
 			case 'add-lead':
 				return {
 					i: model.q.i,
-					aG: 'leads',
-					aJ: $author$project$Types$encodeNewLead(model.q),
-					F: model.q.F,
+					aH: 'leads',
+					aK: $author$project$Types$encodeNewLead(model.q),
+					H: model.q.H,
 					aM: $elm$core$Maybe$Nothing
 				};
 			case 'edit-lead':
 				return {
 					i: model.h.i,
-					aG: 'leads',
-					aJ: $author$project$Types$encodeUpdateLead(model.h),
-					F: model.h.F,
+					aH: 'leads',
+					aK: $author$project$Types$encodeUpdateLead(model.h),
+					H: model.h.H,
 					aM: A2(
 						$elm$core$Maybe$map,
 						A2(
@@ -8857,9 +8871,9 @@ var $author$project$Main$contactData = F2(
 			default:
 				return {
 					i: model.f.i,
-					aG: 'clients',
-					aJ: $author$project$Main$clientPayload(model),
-					F: model.f.F,
+					aH: 'clients',
+					aK: $author$project$Main$clientPayload(model),
+					H: model.f.H,
 					aM: model.N
 				};
 		}
@@ -8870,11 +8884,11 @@ var $author$project$Main$contactSignature = F2(
 		return target + (':' + (A2(
 			$elm$core$Maybe$withDefault,
 			'new',
-			A2($elm$core$Maybe$map, $elm$core$String$fromInt, contact.aM)) + (':' + A2($elm$json$Json$Encode$encode, 0, contact.aJ))));
+			A2($elm$core$Maybe$map, $elm$core$String$fromInt, contact.aM)) + (':' + A2($elm$json$Json$Encode$encode, 0, contact.aK))));
 	});
 var $author$project$Main$checkContactBeforeSave = F2(
 	function (target, model) {
-		var ctx = {aq: model._, dW: model.dW};
+		var ctx = {ar: model.V, dX: model.dX};
 		var contact = A2($author$project$Main$contactData, target, model);
 		var body = $elm$json$Json$Encode$object(
 			_List_fromArray(
@@ -8884,10 +8898,10 @@ var $author$project$Main$checkContactBeforeSave = F2(
 					$elm$json$Json$Encode$string(contact.i)),
 					_Utils_Tuple2(
 					'phone',
-					$elm$json$Json$Encode$string(contact.F)),
+					$elm$json$Json$Encode$string(contact.H)),
 					_Utils_Tuple2(
 					'kind',
-					$elm$json$Json$Encode$string(contact.aG)),
+					$elm$json$Json$Encode$string(contact.aH)),
 					_Utils_Tuple2(
 					'exclude',
 					A2(
@@ -8910,7 +8924,7 @@ var $author$project$Main$checkContactBeforeSave = F2(
 						$author$project$State$ContactCheckDone,
 						target,
 						A2($author$project$Main$contactSignature, target, model),
-						contact.aJ))));
+						contact.aK))));
 	});
 var $elm$http$Http$filePart = _Http_pair;
 var $elm$http$Http$multipartBody = function (parts) {
@@ -8943,17 +8957,17 @@ var $author$project$Main$clearDraftInputs = function (model) {
 	var empty = A2($author$project$State$initialModel, model.x, model.bw);
 	return _Utils_update(
 		model,
-		{q: empty.q, g: empty.g, m: empty.m, c2: empty.c2, N: empty.N, f: empty.f, bU: empty.bU, V: $elm$core$Maybe$Nothing, bZ: empty.bZ, c4: empty.c4, b_: empty.b_, h: empty.h, P: empty.P, C: empty.C, D: empty.D, dl: empty.dl, dp: empty.dp, b: empty.b, af: empty.af, bn: empty.bn, L: empty.L, S: empty.S, ai: empty.ai, av: empty.av, aw: empty.aw, Y: empty.Y, o: empty.o, Z: empty.Z, M: empty.M, U: empty.U, ay: empty.ay, am: empty.am, p: empty.p});
+		{q: empty.q, g: empty.g, m: empty.m, c3: empty.c3, N: empty.N, f: empty.f, bV: empty.bV, W: $elm$core$Maybe$Nothing, b_: empty.b_, c5: empty.c5, b$: empty.b$, h: empty.h, P: empty.P, E: empty.E, F: empty.F, dm: empty.dm, dq: empty.dq, b: empty.b, af: empty.af, bn: empty.bn, L: empty.L, S: empty.S, ai: empty.ai, aw: empty.aw, ax: empty.ax, Z: empty.Z, o: empty.o, _: empty._, M: empty.M, U: empty.U, az: empty.az, an: empty.an, p: empty.p});
 };
 var $author$project$State$clientFormOf = function (c) {
 	return {
 		i: A2($elm$core$Maybe$withDefault, '', c.i),
 		a$: c.a$,
-		cl: A2(
+		cm: A2(
 			$elm$core$Maybe$withDefault,
 			'',
-			A2($elm$core$Maybe$map, $elm$core$String$fromInt, c.cY)),
-		F: A2($elm$core$Maybe$withDefault, '', c.F),
+			A2($elm$core$Maybe$map, $elm$core$String$fromInt, c.cZ)),
+		H: A2($elm$core$Maybe$withDefault, '', c.H),
 		v: c.v
 	};
 };
@@ -8985,7 +8999,7 @@ var $author$project$Main$clientTaskBody = F2(
 					$elm$json$Json$Encode$string(form.a_)),
 					_Utils_Tuple2(
 					'ntDueDate',
-					(form.aD === '') ? $elm$json$Json$Encode$null : $elm$json$Json$Encode$string(form.aD)),
+					(form.aE === '') ? $elm$json$Json$Encode$null : $elm$json$Json$Encode$string(form.aE)),
 					_Utils_Tuple2(
 					'ntPriority',
 					$elm$json$Json$Encode$string(form.a6))
@@ -8995,7 +9009,7 @@ var $author$project$Main$contactFormOpen = F2(
 	function (target, model) {
 		switch (target) {
 			case 'add-lead':
-				return model.Z;
+				return model._;
 			case 'edit-lead':
 				return model.P;
 			case 'student':
@@ -9006,7 +9020,7 @@ var $author$project$Main$contactFormOpen = F2(
 	});
 var $author$project$Types$Client = F9(
 	function (id, number, fullName, email, phone, caseOfficerId, caseOfficerName, createdAt, revision) {
-		return {cY: caseOfficerId, cZ: caseOfficerName, aB: createdAt, i: email, a$: fullName, bA: id, cj: number, F: phone, v: revision};
+		return {cZ: caseOfficerId, c_: caseOfficerName, aC: createdAt, i: email, a$: fullName, bA: id, ck: number, H: phone, v: revision};
 	});
 var $author$project$Types$clientDecoder = A4(
 	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$optional,
@@ -9091,7 +9105,7 @@ var $author$project$Types$Task = function (id) {
 										return function (createdAt) {
 											return function (clientId) {
 												return function (revision) {
-													return {cV: assignedTo, cX: assigneeName, bx: clientId, aB: createdAt, a_: description, aD: dueDate, bA: id, a1: leadId, cf: leadName, a6: priority, v: revision, dT: status, ac: title};
+													return {cW: assignedTo, cY: assigneeName, bx: clientId, aC: createdAt, a_: description, aE: dueDate, bA: id, a1: leadId, cg: leadName, a6: priority, v: revision, dU: status, ac: title};
 												};
 											};
 										};
@@ -9172,7 +9186,7 @@ var $author$project$Api$createTask = F2(
 	});
 var $author$project$Types$User = F6(
 	function (id, email, name, role, revision, mfaRequired) {
-		return {i: email, bA: id, bp: mfaRequired, z: name, v: revision, G: role};
+		return {i: email, bA: id, bp: mfaRequired, z: name, v: revision, A: role};
 	});
 var $author$project$Types$userDecoder = A4(
 	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$optional,
@@ -9213,16 +9227,16 @@ var $author$project$Api$createUser = F2(
 			$author$project$Types$userDecoder);
 	});
 var $author$project$Main$dateSummaryIsStale = function (model) {
-	var _v0 = model.bM;
+	var _v0 = model.bN;
 	if (!_v0.$) {
 		var stats = _v0.a;
 		var _v1 = A2(
 			$elm$json$Json$Decode$decodeValue,
 			A2($elm$json$Json$Decode$field, 'date', $elm$json$Json$Decode$string),
-			stats.A);
+			stats.B);
 		if (!_v1.$) {
 			var date = _v1.a;
-			return !_Utils_eq(date, model.A);
+			return !_Utils_eq(date, model.B);
 		} else {
 			return false;
 		}
@@ -9319,18 +9333,18 @@ var $author$project$State$editLeadOf = function (l) {
 		bj: A2($elm$core$Maybe$withDefault, 'Canada', l.bj),
 		i: A2($elm$core$Maybe$withDefault, '', l.i),
 		a$: l.a$,
-		dv: A2($elm$core$Maybe$withDefault, '', l.dv),
-		ci: A2($elm$core$Maybe$withDefault, '', l.ci),
-		aI: A2($elm$core$Maybe$withDefault, '', l.aI),
-		F: A2($elm$core$Maybe$withDefault, '', l.F),
+		dw: A2($elm$core$Maybe$withDefault, '', l.dw),
+		cj: A2($elm$core$Maybe$withDefault, '', l.cj),
+		aJ: A2($elm$core$Maybe$withDefault, '', l.aJ),
+		H: A2($elm$core$Maybe$withDefault, '', l.H),
 		aL: A2($elm$core$Maybe$withDefault, 'Warm', l.aL),
 		v: l.v,
 		aO: A2($elm$core$Maybe$withDefault, 'Student Visa', l.aO),
 		aQ: A2($elm$core$Maybe$withDefault, 'Website', l.aQ),
-		dR: l.dR
+		dS: l.dS
 	};
 };
-var $author$project$State$emptyCaseForm = {aU: $elm$core$Maybe$Nothing, c$: 'Student Visa', aZ: '', bj: 'Canada', v: 1, dR: 'Documents Under Review'};
+var $author$project$State$emptyCaseForm = {aU: $elm$core$Maybe$Nothing, c0: 'Student Visa', aZ: '', bj: 'Canada', v: 1, dS: 'Documents Under Review'};
 var $author$project$Types$encodeNewUser = function (f) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
@@ -9343,7 +9357,7 @@ var $author$project$Types$encodeNewUser = function (f) {
 				$elm$json$Json$Encode$string(f.i)),
 				_Utils_Tuple2(
 				'nuRole',
-				$elm$json$Json$Encode$string(f.G)),
+				$elm$json$Json$Encode$string(f.A)),
 				_Utils_Tuple2(
 				'nuPassword',
 				$elm$json$Json$Encode$string(f.ah))
@@ -9358,7 +9372,7 @@ var $author$project$Types$encodeUpdateUser = function (f) {
 				$elm$json$Json$Encode$string(f.z)),
 				_Utils_Tuple2(
 				'uuRole',
-				$elm$json$Json$Encode$string(f.G)),
+				$elm$json$Json$Encode$string(f.A)),
 				_Utils_Tuple2(
 				'uuPassword',
 				$author$project$Types$encodeNonEmpty(f.ah))
@@ -9368,7 +9382,7 @@ var $author$project$Main$expiredSession = function (msg) {
 	_v0$18:
 	while (true) {
 		switch (msg.$) {
-			case 80:
+			case 83:
 				if (((msg.d.$ === 1) && (msg.d.a.$ === 3)) && (msg.d.a.a === 401)) {
 					return true;
 				} else {
@@ -9380,7 +9394,7 @@ var $author$project$Main$expiredSession = function (msg) {
 				} else {
 					break _v0$18;
 				}
-			case 44:
+			case 45:
 				if (((msg.a.$ === 1) && (msg.a.a.$ === 3)) && (msg.a.a.a === 401)) {
 					return true;
 				} else {
@@ -9392,26 +9406,20 @@ var $author$project$Main$expiredSession = function (msg) {
 				} else {
 					break _v0$18;
 				}
-			case 40:
-				if (((msg.a.$ === 1) && (msg.a.a.$ === 3)) && (msg.a.a.a === 401)) {
-					return true;
-				} else {
-					break _v0$18;
-				}
-			case 91:
+			case 41:
 				if (((msg.a.$ === 1) && (msg.a.a.$ === 3)) && (msg.a.a.a === 401)) {
 					return true;
 				} else {
 					break _v0$18;
 				}
 			case 94:
-				if (((msg.b.$ === 1) && (msg.b.a.$ === 3)) && (msg.b.a.a === 401)) {
+				if (((msg.a.$ === 1) && (msg.a.a.$ === 3)) && (msg.a.a.a === 401)) {
 					return true;
 				} else {
 					break _v0$18;
 				}
-			case 67:
-				if (((msg.a.$ === 1) && (msg.a.a.$ === 3)) && (msg.a.a.a === 401)) {
+			case 97:
+				if (((msg.b.$ === 1) && (msg.b.a.$ === 3)) && (msg.b.a.a === 401)) {
 					return true;
 				} else {
 					break _v0$18;
@@ -9422,7 +9430,7 @@ var $author$project$Main$expiredSession = function (msg) {
 				} else {
 					break _v0$18;
 				}
-			case 69:
+			case 73:
 				if (((msg.a.$ === 1) && (msg.a.a.$ === 3)) && (msg.a.a.a === 401)) {
 					return true;
 				} else {
@@ -9434,19 +9442,25 @@ var $author$project$Main$expiredSession = function (msg) {
 				} else {
 					break _v0$18;
 				}
-			case 71:
+			case 75:
 				if (((msg.a.$ === 1) && (msg.a.a.$ === 3)) && (msg.a.a.a === 401)) {
 					return true;
 				} else {
 					break _v0$18;
 				}
 			case 74:
+				if (((msg.a.$ === 1) && (msg.a.a.$ === 3)) && (msg.a.a.a === 401)) {
+					return true;
+				} else {
+					break _v0$18;
+				}
+			case 77:
 				if (((msg.b.$ === 1) && (msg.b.a.$ === 3)) && (msg.b.a.a === 401)) {
 					return true;
 				} else {
 					break _v0$18;
 				}
-			case 73:
+			case 76:
 				if (((msg.a.$ === 1) && (msg.a.a.$ === 3)) && (msg.a.a.a === 401)) {
 					return true;
 				} else {
@@ -9464,13 +9478,13 @@ var $author$project$Main$expiredSession = function (msg) {
 				} else {
 					break _v0$18;
 				}
-			case 68:
+			case 71:
 				if (((msg.a.$ === 1) && (msg.a.a.$ === 3)) && (msg.a.a.a === 401)) {
 					return true;
 				} else {
 					break _v0$18;
 				}
-			case 75:
+			case 78:
 				if (((msg.a.$ === 1) && (msg.a.a.$ === 3)) && (msg.a.a.a === 401)) {
 					return true;
 				} else {
@@ -9528,7 +9542,7 @@ var $elm$parser$Parser$Advanced$AddRight = F2(
 	});
 var $elm$parser$Parser$Advanced$DeadEnd = F4(
 	function (row, col, problem, contextStack) {
-		return {bY: col, c7: contextStack, cs: problem, dK: row};
+		return {bZ: col, c8: contextStack, ct: problem, dL: row};
 	});
 var $elm$parser$Parser$Advanced$Empty = {$: 0};
 var $elm$parser$Parser$Advanced$fromState = F2(
@@ -9536,7 +9550,7 @@ var $elm$parser$Parser$Advanced$fromState = F2(
 		return A2(
 			$elm$parser$Parser$Advanced$AddRight,
 			$elm$parser$Parser$Advanced$Empty,
-			A4($elm$parser$Parser$Advanced$DeadEnd, s.dK, s.bY, x, s.d));
+			A4($elm$parser$Parser$Advanced$DeadEnd, s.dL, s.bZ, x, s.d));
 	});
 var $elm$parser$Parser$Advanced$isSubChar = _Parser_isSubChar;
 var $elm$core$Basics$negate = function (n) {
@@ -9553,18 +9567,18 @@ var $elm$parser$Parser$Advanced$chompIf = F2(
 				$elm$parser$Parser$Advanced$Good,
 				true,
 				0,
-				{bY: 1, d: s.d, e: s.e, c: s.c + 1, dK: s.dK + 1, a: s.a}) : A3(
+				{bZ: 1, d: s.d, e: s.e, c: s.c + 1, dL: s.dL + 1, a: s.a}) : A3(
 				$elm$parser$Parser$Advanced$Good,
 				true,
 				0,
-				{bY: s.bY + 1, d: s.d, e: s.e, c: newOffset, dK: s.dK, a: s.a}));
+				{bZ: s.bZ + 1, d: s.d, e: s.e, c: newOffset, dL: s.dL, a: s.a}));
 		};
 	});
 var $elm$parser$Parser$chompIf = function (isGood) {
 	return A2($elm$parser$Parser$Advanced$chompIf, isGood, $elm$parser$Parser$UnexpectedChar);
 };
 var $justinmimbs$date$Date$deadEndToString = function (_v0) {
-	var problem = _v0.cs;
+	var problem = _v0.ct;
 	if (problem.$ === 12) {
 		var message = problem.a;
 		return message;
@@ -9817,7 +9831,7 @@ var $elm$parser$Parser$Advanced$token = function (_v0) {
 	var expecting = _v0.b;
 	var progress = !$elm$core$String$isEmpty(str);
 	return function (s) {
-		var _v1 = A5($elm$parser$Parser$Advanced$isSubString, str, s.c, s.dK, s.bY, s.a);
+		var _v1 = A5($elm$parser$Parser$Advanced$isSubString, str, s.c, s.dL, s.bZ, s.a);
 		var newOffset = _v1.a;
 		var newRow = _v1.b;
 		var newCol = _v1.c;
@@ -9828,7 +9842,7 @@ var $elm$parser$Parser$Advanced$token = function (_v0) {
 			$elm$parser$Parser$Advanced$Good,
 			progress,
 			0,
-			{bY: newCol, d: s.d, e: s.e, c: newOffset, dK: newRow, a: s.a});
+			{bZ: newCol, d: s.d, e: s.e, c: newOffset, dL: newRow, a: s.a});
 	};
 };
 var $elm$parser$Parser$token = function (str) {
@@ -10218,10 +10232,10 @@ var $justinmimbs$date$Date$parser = A2(
 		$justinmimbs$date$Date$dayOfYear));
 var $elm$parser$Parser$DeadEnd = F3(
 	function (row, col, problem) {
-		return {bY: col, cs: problem, dK: row};
+		return {bZ: col, ct: problem, dL: row};
 	});
 var $elm$parser$Parser$problemToDeadEnd = function (p) {
-	return A3($elm$parser$Parser$DeadEnd, p.dK, p.bY, p.cs);
+	return A3($elm$parser$Parser$DeadEnd, p.dL, p.bZ, p.ct);
 };
 var $elm$parser$Parser$Advanced$bagToList = F2(
 	function (bag, list) {
@@ -10253,7 +10267,7 @@ var $elm$parser$Parser$Advanced$run = F2(
 	function (_v0, src) {
 		var parse = _v0;
 		var _v1 = parse(
-			{bY: 1, d: _List_Nil, e: 1, c: 0, dK: 1, a: src});
+			{bZ: 1, d: _List_Nil, e: 1, c: 0, dL: 1, a: src});
 		if (!_v1.$) {
 			var value = _v1.b;
 			return $elm$core$Result$Ok(value);
@@ -10379,221 +10393,179 @@ var $author$project$Validation$feature = F4(
 			if (action === 'range') {
 				return range;
 			} else {
-				var _v0 = _Utils_Tuple2(section, action);
-				_v0$43:
-				while (true) {
-					switch (_v0.a) {
-						case 'tasks':
-							switch (_v0.b) {
-								case 'save':
+				if (A2(
+					$elm$core$List$member,
+					action,
+					_List_fromArray(
+						['zoom', 'calendar', 'checkout', 'sign'])) || (section === 'integrations')) {
+					return _List_fromArray(
+						[
+							selected('id')
+						]);
+				} else {
+					var _v0 = _Utils_Tuple2(section, action);
+					_v0$43:
+					while (true) {
+						switch (_v0.a) {
+							case 'tasks':
+								switch (_v0.b) {
+									case 'save':
+										return _List_fromArray(
+											[
+												selected('id'),
+												A2(required, 'title', 'Title'),
+												A2(required, 'assignee', 'Staff member'),
+												date('dueDate'),
+												A3(integer, 'recurrenceDays', 1, 366),
+												(get('recurrenceDays') !== '') ? A2(required, 'dueDate', 'A deadline for repeating tasks') : $elm$core$Maybe$Nothing
+											]);
+									case 'create':
+										return _List_fromArray(
+											[
+												owner,
+												A2(required, 'title', 'Title'),
+												A2(required, 'assignee', 'Staff member'),
+												date('dueDate'),
+												A3(integer, 'recurrenceDays', 1, 366),
+												(get('recurrenceDays') !== '') ? A2(required, 'dueDate', 'A deadline for repeating tasks') : $elm$core$Maybe$Nothing
+											]);
+									default:
+										break _v0$43;
+								}
+							case 'applications':
+								if (_v0.b === 'checklist') {
 									return _List_fromArray(
 										[
 											selected('id'),
-											A2(required, 'title', 'Title'),
-											A2(required, 'assignee', 'Staff member'),
-											date('dueDate'),
-											A3(integer, 'recurrenceDays', 1, 366),
-											(get('recurrenceDays') !== '') ? A2(required, 'dueDate', 'A deadline for repeating tasks') : $elm$core$Maybe$Nothing
+											A2(required, 'template', 'Checklist template')
 										]);
-								case 'create':
+								} else {
 									return _List_fromArray(
 										[
 											owner,
-											A2(required, 'title', 'Title'),
-											A2(required, 'assignee', 'Staff member'),
-											date('dueDate'),
-											A3(integer, 'recurrenceDays', 1, 366),
-											(get('recurrenceDays') !== '') ? A2(required, 'dueDate', 'A deadline for repeating tasks') : $elm$core$Maybe$Nothing
+											A2(required, 'category', 'Application type'),
+											A2(required, 'destination', 'Destination'),
+											A2(required, 'stage', 'Stage'),
+											date('intakeDate'),
+											date('deadline')
 										]);
-								default:
-									break _v0$43;
-							}
-						case 'applications':
-							if (_v0.b === 'checklist') {
+								}
+							case 'checklist-templates':
 								return _List_fromArray(
 									[
-										selected('id'),
-										A2(required, 'template', 'Checklist template')
+										A2(required, 'name', 'Checklist name'),
+										((get('requiredDocuments') === '') && (get('optionalDocuments') === '')) ? $elm$core$Maybe$Just(
+										_Utils_Tuple2('requiredDocuments', 'Add at least one document requirement.')) : $elm$core$Maybe$Nothing
 									]);
-							} else {
-								return _List_fromArray(
-									[
-										owner,
-										A2(required, 'category', 'Application type'),
-										A2(required, 'destination', 'Destination'),
-										A2(required, 'stage', 'Stage'),
-										date('intakeDate'),
-										date('deadline')
-									]);
-							}
-						case 'checklist-templates':
-							return _List_fromArray(
-								[
-									A2(required, 'name', 'Checklist name'),
-									((get('requiredDocuments') === '') && (get('optionalDocuments') === '')) ? $elm$core$Maybe$Just(
-									_Utils_Tuple2('requiredDocuments', 'Add at least one document requirement.')) : $elm$core$Maybe$Nothing
-								]);
-						case 'milestones':
-							return _List_fromArray(
-								[
-									owner,
-									A2(required, 'kind', 'Milestone type'),
-									A2(required, 'title', 'Milestone'),
-									date('plannedOn'),
-									date('completedOn'),
-									(get('status') === 'Completed') ? A2(required, 'completedOn', 'Completion date') : $elm$core$Maybe$Nothing
-								]);
-						case 'contact-log':
-							return _List_fromArray(
-								[
-									owner,
-									A2(required, 'channel', 'Channel'),
-									A2(required, 'direction', 'Direction'),
-									A2(required, 'outcome', 'Outcome'),
-									A2(required, 'occurredOn', 'Interaction date'),
-									date('occurredOn'),
-									A2(required, 'note', 'Conversation summary')
-								]);
-						case 'history':
-							return _List_fromArray(
-								[
-									owner,
-									A2(required, 'note', 'Note')
-								]);
-						case 'documents':
-							if (_v0.b === 'save') {
+							case 'milestones':
 								return _List_fromArray(
 									[
 										owner,
-										A2(required, 'title', 'Document title'),
-										date('expiresOn'),
-										(get('status') === 'Rejected') ? A2(required, 'reviewNote', 'Feedback explaining the rejection') : $elm$core$Maybe$Nothing
+										A2(required, 'kind', 'Milestone type'),
+										A2(required, 'title', 'Milestone'),
+										date('plannedOn'),
+										date('completedOn'),
+										(get('status') === 'Completed') ? A2(required, 'completedOn', 'Completion date') : $elm$core$Maybe$Nothing
 									]);
-							} else {
+							case 'contact-log':
 								return _List_fromArray(
 									[
-										selected('id'),
-										(action === 'attach') ? A2(required, 'document', 'File') : $elm$core$Maybe$Nothing
+										owner,
+										A2(required, 'channel', 'Channel'),
+										A2(required, 'direction', 'Direction'),
+										A2(required, 'outcome', 'Outcome'),
+										A2(required, 'occurredOn', 'Interaction date'),
+										date('occurredOn'),
+										A2(required, 'note', 'Conversation summary')
 									]);
-							}
-						case 'reminders':
-							return _List_fromArray(
-								[
-									A2(required, 'task', 'Task'),
-									A3(integer, 'daysBefore', 0, 365),
-									A3(integer, 'escalateAfter', 1, 365)
-								]);
-						case 'appointments':
-							return _List_fromArray(
-								[
-									owner,
-									A2(required, 'title', 'Appointment title'),
-									A2(required, 'assignee', 'Staff member'),
-									A2(required, 'startsAt', 'Start time'),
-									A2(required, 'endsAt', 'End time'),
-									((get('startsAt') !== '') && (_Utils_cmp(
-									get('endsAt'),
-									get('startsAt')) < 1)) ? $elm$core$Maybe$Just(
-									_Utils_Tuple2('endsAt', 'End time must be after the start time.')) : $elm$core$Maybe$Nothing
-								]);
-						case 'communication':
-							return _List_fromArray(
-								[
-									owner,
-									A2(required, 'subject', 'Subject'),
-									A2(required, 'message', 'Message')
-								]);
-						case 'portal':
-							switch (_v0.b) {
-								case 'create':
+							case 'history':
+								return _List_fromArray(
+									[
+										owner,
+										A2(required, 'note', 'Note')
+									]);
+							case 'documents':
+								if (_v0.b === 'save') {
 									return _List_fromArray(
 										[
 											owner,
-											A3(integer, 'days', 1, 30)
+											A2(required, 'title', 'Document title'),
+											date('expiresOn'),
+											(get('status') === 'Rejected') ? A2(required, 'reviewNote', 'Feedback explaining the rejection') : $elm$core$Maybe$Nothing
 										]);
-								case 'grant':
+								} else {
 									return _List_fromArray(
 										[
 											selected('id'),
-											A2(required, 'document', 'Approved file')
+											(action === 'attach') ? A2(required, 'document', 'File') : $elm$core$Maybe$Nothing
 										]);
-								default:
-									return _List_fromArray(
-										[
-											selected('id')
-										]);
-							}
-						case 'mail':
-							return _List_fromArray(
-								[
-									selected('id')
-								]);
-						case 'merge':
-							return _List_fromArray(
-								[
-									A2(required, 'source', 'Source record'),
-									A2(required, 'target', 'Surviving record'),
-									((get('source') !== '') && _Utils_eq(
-									get('source'),
-									get('target'))) ? $elm$core$Maybe$Just(
-									_Utils_Tuple2('target', 'Choose two different records.')) : $elm$core$Maybe$Nothing,
-									((action === 'confirm') && (get('confirmation') !== 'MERGE')) ? $elm$core$Maybe$Just(
-									_Utils_Tuple2('confirmation', 'Type MERGE after reviewing the preview.')) : $elm$core$Maybe$Nothing
-								]);
-						case 'payment-history':
-							if (_v0.b === 'reverse') {
+								}
+							case 'reminders':
 								return _List_fromArray(
 									[
-										selected('id'),
-										A2(required, 'payment', 'Receipt'),
-										A2(required, 'paidOn', 'Reversal date'),
-										date('paidOn'),
-										A2(required, 'reason', 'Reason')
+										A2(required, 'task', 'Task'),
+										A3(integer, 'daysBefore', 0, 365),
+										A3(integer, 'escalateAfter', 1, 365)
 									]);
-							} else {
-								break _v0$43;
-							}
-						case 'periods':
-							return _List_fromArray(
-								[
-									A2(required, 'month', 'Financial month'),
-									A2(required, 'reason', 'Reason')
-								]);
-						case 'reconciliation':
-							switch (_v0.b) {
-								case 'import':
-									return _List_fromArray(
-										[
-											A2(required, 'account', 'Bank account'),
-											A2(required, 'currency', 'Currency'),
-											A2(required, 'csv', 'Statement CSV')
-										]);
-								case 'match':
-									return _List_fromArray(
-										[
-											selected('id'),
-											A2(required, 'match', 'Matching recorded entry'),
-											A2(required, 'reason', 'Reason')
-										]);
-								default:
-									return _List_fromArray(
-										[
-											selected('id'),
-											A2(required, 'reason', 'Reason')
-										]);
-							}
-						case 'payments':
-							switch (_v0.b) {
-								case 'record':
-									return _List_fromArray(
-										[
-											selected('id'),
-											A2(required, 'amount', 'Payment amount'),
-											A2(required, 'paidOn', 'Payment date'),
-											date('paidOn'),
-											A2(required, 'method', 'Payment method')
-										]);
-								case 'reverse':
+							case 'appointments':
+								return _List_fromArray(
+									[
+										owner,
+										A2(required, 'title', 'Appointment title'),
+										A2(required, 'assignee', 'Staff member'),
+										A2(required, 'startsAt', 'Start time'),
+										A2(required, 'endsAt', 'End time'),
+										((get('startsAt') !== '') && (_Utils_cmp(
+										get('endsAt'),
+										get('startsAt')) < 1)) ? $elm$core$Maybe$Just(
+										_Utils_Tuple2('endsAt', 'End time must be after the start time.')) : $elm$core$Maybe$Nothing
+									]);
+							case 'communication':
+								return _List_fromArray(
+									[
+										owner,
+										A2(required, 'subject', 'Subject'),
+										A2(required, 'message', 'Message')
+									]);
+							case 'portal':
+								switch (_v0.b) {
+									case 'create':
+										return _List_fromArray(
+											[
+												owner,
+												A3(integer, 'days', 1, 30)
+											]);
+									case 'grant':
+										return _List_fromArray(
+											[
+												selected('id'),
+												A2(required, 'document', 'Approved file')
+											]);
+									default:
+										return _List_fromArray(
+											[
+												selected('id')
+											]);
+								}
+							case 'mail':
+								return _List_fromArray(
+									[
+										selected('id')
+									]);
+							case 'merge':
+								return _List_fromArray(
+									[
+										A2(required, 'source', 'Source record'),
+										A2(required, 'target', 'Surviving record'),
+										((get('source') !== '') && _Utils_eq(
+										get('source'),
+										get('target'))) ? $elm$core$Maybe$Just(
+										_Utils_Tuple2('target', 'Choose two different records.')) : $elm$core$Maybe$Nothing,
+										((action === 'confirm') && (get('confirmation') !== 'MERGE')) ? $elm$core$Maybe$Just(
+										_Utils_Tuple2('confirmation', 'Type MERGE after reviewing the preview.')) : $elm$core$Maybe$Nothing
+									]);
+							case 'payment-history':
+								if (_v0.b === 'reverse') {
 									return _List_fromArray(
 										[
 											selected('id'),
@@ -10602,146 +10574,199 @@ var $author$project$Validation$feature = F4(
 											date('paidOn'),
 											A2(required, 'reason', 'Reason')
 										]);
-								default:
+								} else {
 									break _v0$43;
-							}
-						case 'expenses':
-							switch (_v0.b) {
-								case 'submit':
+								}
+							case 'periods':
+								return _List_fromArray(
+									[
+										A2(required, 'month', 'Financial month'),
+										A2(required, 'reason', 'Reason')
+									]);
+							case 'reconciliation':
+								switch (_v0.b) {
+									case 'import':
+										return _List_fromArray(
+											[
+												A2(required, 'account', 'Bank account'),
+												A2(required, 'currency', 'Currency'),
+												A2(required, 'csv', 'Statement CSV')
+											]);
+									case 'match':
+										return _List_fromArray(
+											[
+												selected('id'),
+												A2(required, 'match', 'Matching recorded entry'),
+												A2(required, 'reason', 'Reason')
+											]);
+									default:
+										return _List_fromArray(
+											[
+												selected('id'),
+												A2(required, 'reason', 'Reason')
+											]);
+								}
+							case 'payments':
+								switch (_v0.b) {
+									case 'record':
+										return _List_fromArray(
+											[
+												selected('id'),
+												A2(required, 'amount', 'Payment amount'),
+												A2(required, 'paidOn', 'Payment date'),
+												date('paidOn'),
+												A2(required, 'method', 'Payment method')
+											]);
+									case 'reverse':
+										return _List_fromArray(
+											[
+												selected('id'),
+												A2(required, 'payment', 'Receipt'),
+												A2(required, 'paidOn', 'Reversal date'),
+												date('paidOn'),
+												A2(required, 'reason', 'Reason')
+											]);
+									default:
+										break _v0$43;
+								}
+							case 'expenses':
+								switch (_v0.b) {
+									case 'submit':
+										return _List_fromArray(
+											[
+												A2(required, 'supplier', 'Supplier'),
+												A2(required, 'description', 'Description'),
+												A2(required, 'category', 'Category'),
+												A2(required, 'amount', 'Amount'),
+												A2(required, 'expenseOn', 'Expense date'),
+												date('expenseOn')
+											]);
+									case 'pay':
+										return _List_fromArray(
+											[
+												selected('id'),
+												A2(required, 'paidOn', 'Payment date'),
+												date('paidOn'),
+												A2(required, 'method', 'Payment method')
+											]);
+									case 'reverse-expense':
+										return _List_fromArray(
+											[
+												selected('id'),
+												A2(required, 'paidOn', 'Reversal date'),
+												date('paidOn'),
+												A2(required, 'reason', 'Reason')
+											]);
+									case 'reject':
+										return _List_fromArray(
+											[
+												selected('id'),
+												A2(required, 'reason', 'Reason')
+											]);
+									case 'approve':
+										return _List_fromArray(
+											[
+												selected('id')
+											]);
+									default:
+										break _v0$43;
+								}
+							case 'invoices':
+								if (_v0.b === 'send') {
 									return _List_fromArray(
 										[
-											A2(required, 'supplier', 'Supplier'),
+											selected('id')
+										]);
+								} else {
+									return _List_fromArray(
+										[
+											owner,
 											A2(required, 'description', 'Description'),
-											A2(required, 'category', 'Category'),
 											A2(required, 'amount', 'Amount'),
-											A2(required, 'expenseOn', 'Expense date'),
-											date('expenseOn')
+											(A2(
+											$elm$core$Maybe$withDefault,
+											0,
+											$elm$core$String$toFloat(
+												get('amount'))) <= 0) ? $elm$core$Maybe$Just(
+											_Utils_Tuple2('amount', 'Enter an amount greater than zero.')) : $elm$core$Maybe$Nothing,
+											A2(required, 'dueDate', 'Due date'),
+											date('dueDate')
 										]);
-								case 'pay':
-									return _List_fromArray(
-										[
-											selected('id'),
-											A2(required, 'paidOn', 'Payment date'),
-											date('paidOn'),
-											A2(required, 'method', 'Payment method')
-										]);
-								case 'reverse-expense':
-									return _List_fromArray(
-										[
-											selected('id'),
-											A2(required, 'paidOn', 'Reversal date'),
-											date('paidOn'),
-											A2(required, 'reason', 'Reason')
-										]);
-								case 'reject':
-									return _List_fromArray(
-										[
-											selected('id'),
-											A2(required, 'reason', 'Reason')
-										]);
-								case 'approve':
+								}
+							case 'search':
+								switch (_v0.b) {
+									case 'save':
+										return _List_fromArray(
+											[
+												A2(required, 'name', 'View name')
+											]);
+									case 'views':
+										return _List_Nil;
+									default:
+										return _List_fromArray(
+											[
+												selected('id')
+											]);
+								}
+							case 'security':
+								switch (_v0.b) {
+									case 'access':
+										return _List_fromArray(
+											[
+												A2(required, 'user', 'Team account'),
+												A2(required, 'password', 'Your current password'),
+												A2(required, 'accessLevel', 'Record access')
+											]);
+									case 'reset-mfa':
+										return _List_fromArray(
+											[
+												A2(required, 'user', 'Team account'),
+												A2(required, 'password', 'Your current password'),
+												A2(required, 'code', 'Your authenticator or recovery code'),
+												A2(required, 'reason', 'Recovery reason')
+											]);
+									case 'revoke-user':
+										return _List_fromArray(
+											[
+												A2(required, 'user', 'Team account')
+											]);
+									case 'suspend':
+										return _List_fromArray(
+											[
+												A2(required, 'user', 'Team account')
+											]);
+									case 'resume':
+										return _List_fromArray(
+											[
+												A2(required, 'user', 'Team account')
+											]);
+									case 'revoke':
+										return _List_fromArray(
+											[
+												selected('session')
+											]);
+									default:
+										return _List_fromArray(
+											[
+												A2(required, 'password', 'Current password'),
+												(action !== 'setup') ? A2(required, 'code', 'Authenticator or recovery code') : $elm$core$Maybe$Nothing
+											]);
+								}
+							case 'notifications':
+								if (_v0.b === 'read') {
 									return _List_fromArray(
 										[
 											selected('id')
 										]);
-								default:
+								} else {
 									break _v0$43;
-							}
-						case 'invoices':
-							if (_v0.b === 'send') {
-								return _List_fromArray(
-									[
-										selected('id')
-									]);
-							} else {
-								return _List_fromArray(
-									[
-										owner,
-										A2(required, 'description', 'Description'),
-										A2(required, 'amount', 'Amount'),
-										(A2(
-										$elm$core$Maybe$withDefault,
-										0,
-										$elm$core$String$toFloat(
-											get('amount'))) <= 0) ? $elm$core$Maybe$Just(
-										_Utils_Tuple2('amount', 'Enter an amount greater than zero.')) : $elm$core$Maybe$Nothing,
-										A2(required, 'dueDate', 'Due date'),
-										date('dueDate')
-									]);
-							}
-						case 'search':
-							switch (_v0.b) {
-								case 'save':
-									return _List_fromArray(
-										[
-											A2(required, 'name', 'View name')
-										]);
-								case 'views':
-									return _List_Nil;
-								default:
-									return _List_fromArray(
-										[
-											selected('id')
-										]);
-							}
-						case 'security':
-							switch (_v0.b) {
-								case 'access':
-									return _List_fromArray(
-										[
-											A2(required, 'user', 'Team account'),
-											A2(required, 'password', 'Your current password'),
-											A2(required, 'accessLevel', 'Record access')
-										]);
-								case 'reset-mfa':
-									return _List_fromArray(
-										[
-											A2(required, 'user', 'Team account'),
-											A2(required, 'password', 'Your current password'),
-											A2(required, 'code', 'Your authenticator or recovery code'),
-											A2(required, 'reason', 'Recovery reason')
-										]);
-								case 'revoke-user':
-									return _List_fromArray(
-										[
-											A2(required, 'user', 'Team account')
-										]);
-								case 'suspend':
-									return _List_fromArray(
-										[
-											A2(required, 'user', 'Team account')
-										]);
-								case 'resume':
-									return _List_fromArray(
-										[
-											A2(required, 'user', 'Team account')
-										]);
-								case 'revoke':
-									return _List_fromArray(
-										[
-											selected('session')
-										]);
-								default:
-									return _List_fromArray(
-										[
-											A2(required, 'password', 'Current password'),
-											(action !== 'setup') ? A2(required, 'code', 'Authenticator or recovery code') : $elm$core$Maybe$Nothing
-										]);
-							}
-						case 'notifications':
-							if (_v0.b === 'read') {
-								return _List_fromArray(
-									[
-										selected('id')
-									]);
-							} else {
+								}
+							default:
 								break _v0$43;
-							}
-						default:
-							break _v0$43;
+						}
 					}
+					return _List_Nil;
 				}
-				return _List_Nil;
 			}
 		}();
 		return $elm$core$Dict$fromList(
@@ -10771,7 +10796,7 @@ var $author$project$Api$fetchClientsPage = F3(
 	});
 var $author$project$State$ClockStatsLoaded = F2(
 	function (a, b) {
-		return {$: 74, a: a, b: b};
+		return {$: 77, a: a, b: b};
 	});
 var $author$project$Types$Stats = function (totalLeads) {
 	return function (hotLeads) {
@@ -10783,7 +10808,7 @@ var $author$project$Types$Stats = function (totalLeads) {
 							return function (upcomingTasks) {
 								return function (recentActivity) {
 									return function (today) {
-										return {dr: hotLeads, dC: openTasks, dD: overdueTasks, dH: recentActivity, dQ: sourceCounts, dS: stageCounts, A: today, dX: totalClients, dY: totalLeads, dZ: upcomingTasks};
+										return {ds: hotLeads, dD: openTasks, dE: overdueTasks, dI: recentActivity, dR: sourceCounts, dT: stageCounts, B: today, dY: totalClients, dZ: totalLeads, d_: upcomingTasks};
 									};
 								};
 							};
@@ -10796,7 +10821,7 @@ var $author$project$Types$Stats = function (totalLeads) {
 };
 var $author$project$Types$Activity = F6(
 	function (id, leadId, leadName, kind, description, date) {
-		return {c9: date, a_: description, bA: id, aG: kind, a1: leadId, cf: leadName};
+		return {da: date, a_: description, bA: id, aH: kind, a1: leadId, cg: leadName};
 	});
 var $author$project$Types$activityDecoder = A3(
 	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
@@ -10828,7 +10853,7 @@ var $author$project$Types$statsDecoder = function () {
 		$elm$json$Json$Decode$map2,
 		F2(
 			function (s, c) {
-				return {bh: c, dR: s};
+				return {bh: c, dS: s};
 			}),
 		A2($elm$json$Json$Decode$field, 'scStage', $elm$json$Json$Decode$string),
 		A2($elm$json$Json$Decode$field, 'scCount', $elm$json$Json$Decode$int));
@@ -10887,13 +10912,13 @@ var $author$project$Api$fetchStats = function (ctx) {
 	return A5($author$project$Api$authedRequest, ctx, 'GET', '/api/stats', $elm$core$Maybe$Nothing, $author$project$Types$statsDecoder);
 };
 var $author$project$Main$fetchDateSummary = function (model) {
-	return ((!_Utils_eq(model.H, $elm$core$Maybe$Nothing)) && model.aa) ? A2(
+	return ((!_Utils_eq(model.C, $elm$core$Maybe$Nothing)) && model.aa) ? A2(
 		$author$project$Api$fetchStats,
-		{aq: model._, dW: model.dW},
+		{ar: model.V, dX: model.dX},
 		A2(
 			$author$project$Main$acceptLoad,
 			model,
-			$author$project$State$ClockStatsLoaded(model.A))) : $elm$core$Platform$Cmd$none;
+			$author$project$State$ClockStatsLoaded(model.B))) : $elm$core$Platform$Cmd$none;
 };
 var $author$project$Api$fetchFilteredLeads = F3(
 	function (ctx, filters, offset) {
@@ -10904,7 +10929,7 @@ var $author$project$Api$fetchFilteredLeads = F3(
 			$author$project$Api$authedRequest,
 			ctx,
 			'GET',
-			'/api/leads?limit=50&offset=' + ($elm$core$String$fromInt(offset) + ('&q=' + ($elm$url$Url$percentEncode(filters.dF) + ('&stage=' + (pick(filters.dj) + ('&quality=' + (pick(filters.dh) + ('&source=' + (pick(filters.di) + ('&sort=' + ($elm$url$Url$percentEncode(filters.dP) + ('&direction=' + (filters.dO ? 'asc' : 'desc'))))))))))))),
+			'/api/leads?limit=50&offset=' + ($elm$core$String$fromInt(offset) + ('&q=' + ($elm$url$Url$percentEncode(filters.dG) + ('&stage=' + (pick(filters.dk) + ('&quality=' + (pick(filters.di) + ('&source=' + (pick(filters.dj) + ('&sort=' + ($elm$url$Url$percentEncode(filters.dQ) + ('&direction=' + (filters.dP ? 'asc' : 'desc'))))))))))))),
 			$elm$core$Maybe$Nothing,
 			$elm$json$Json$Decode$list($author$project$Types$leadDecoder));
 	});
@@ -10920,7 +10945,7 @@ var $author$project$Api$fetchUsers = function (ctx) {
 var $elm$core$List$sortWith = _List_sortWith;
 var $author$project$Views$filteredLeads = function (model) {
 	var qLower = $elm$core$String$toLower(
-		$elm$core$String$trim(model.dF));
+		$elm$core$String$trim(model.dG));
 	var matchesQ = function (l) {
 		return (qLower === '') || (A2(
 			$elm$core$String$contains,
@@ -10947,10 +10972,10 @@ var $author$project$Views$filteredLeads = function (model) {
 						qLower,
 						$elm$core$String$toLower(p));
 				},
-				l.F)) || A2(
+				l.H)) || A2(
 			$elm$core$String$contains,
 			qLower,
-			$elm$core$String$toLower(l.cj)))));
+			$elm$core$String$toLower(l.ck)))));
 	};
 	var matches = F2(
 		function (f, val) {
@@ -10959,10 +10984,10 @@ var $author$project$Views$filteredLeads = function (model) {
 				$elm$core$Maybe$Just(f));
 		});
 	var keyOf = function (l) {
-		var _v0 = model.dP;
+		var _v0 = model.dQ;
 		switch (_v0) {
 			case 'stage':
-				return $elm$core$String$toLower(l.dR);
+				return $elm$core$String$toLower(l.dS);
 			case 'quality':
 				var _v1 = l.aL;
 				_v1$3:
@@ -10984,7 +11009,7 @@ var $author$project$Views$filteredLeads = function (model) {
 				}
 				return '3';
 			case 'followup':
-				return A2($elm$core$Maybe$withDefault, '9999', l.ci);
+				return A2($elm$core$Maybe$withDefault, '9999', l.cj);
 			default:
 				return $elm$core$String$toLower(l.a$);
 		}
@@ -10992,20 +11017,20 @@ var $author$project$Views$filteredLeads = function (model) {
 	var base = A2(
 		$elm$core$List$filter,
 		function (l) {
-			return matchesQ(l) && (A2(matches, model.dj, l.dR) && (A2(
-				matches,
-				model.dh,
-				A2($elm$core$Maybe$withDefault, '', l.aL)) && A2(
+			return matchesQ(l) && (A2(matches, model.dk, l.dS) && (A2(
 				matches,
 				model.di,
+				A2($elm$core$Maybe$withDefault, '', l.aL)) && A2(
+				matches,
+				model.dj,
 				A2($elm$core$Maybe$withDefault, '', l.aQ))));
 		},
-		model.at);
+		model.au);
 	return A2(
 		$elm$core$List$sortWith,
 		F2(
 			function (a, b) {
-				return model.dO ? A2(
+				return model.dP ? A2(
 					$elm$core$Basics$compare,
 					keyOf(a),
 					keyOf(b)) : A2(
@@ -11041,13 +11066,13 @@ var $author$project$Main$financeCandidateTag = function (model) {
 		':',
 		_List_fromArray(
 			[
-				A2($elm$core$Maybe$withDefault, '', model.dW),
+				A2($elm$core$Maybe$withDefault, '', model.dX),
 				A2(
 				$elm$core$Maybe$withDefault,
 				'',
-				A2($elm$core$Dict$get, 'id', model.dl)),
-				model.$7,
-				$elm$core$String$fromInt(model.dn)
+				A2($elm$core$Dict$get, 'id', model.dm)),
+				model.dp,
+				$elm$core$String$fromInt(model.$7)
 			]));
 };
 var $author$project$Main$focusFeatureForm = _Platform_outgoingPort(
@@ -11064,7 +11089,7 @@ var $elm$core$Set$fromList = function (list) {
 	return A3($elm$core$List$foldl, $elm$core$Set$insert, $elm$core$Set$empty, list);
 };
 var $author$project$Main$hasUnsavedWork = function (model) {
-	return $author$project$Main$hasDraftChanges(model) || (!_Utils_eq(model.al, $elm$core$Maybe$Nothing));
+	return $author$project$Main$hasDraftChanges(model) || (!_Utils_eq(model.am, $elm$core$Maybe$Nothing));
 };
 var $author$project$Main$httpError = function (err) {
 	switch (err.$) {
@@ -11072,9 +11097,9 @@ var $author$project$Main$httpError = function (err) {
 			var url = err.a;
 			return 'Bad URL: ' + url;
 		case 1:
-			return 'Request timed out';
+			return 'The request timed out. Your changes are still here. Check the record before retrying a save.';
 		case 2:
-			return 'Network error — is the API running?';
+			return 'Connection lost. Check your internet connection. Your changes are still here; check the record before retrying a save.';
 		case 3:
 			var code = err.a;
 			switch (code) {
@@ -11102,11 +11127,11 @@ var $author$project$Main$httpError = function (err) {
 };
 var $author$project$Types$ImportResult = F2(
 	function (imported, failed) {
-		return {b4: failed, cb: imported};
+		return {b5: failed, cc: imported};
 	});
 var $author$project$Types$ImportRowError = F2(
 	function (row, error) {
-		return {df: error, dK: row};
+		return {dg: error, dL: row};
 	});
 var $author$project$Types$importResultDecoder = A3(
 	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
@@ -11136,14 +11161,14 @@ var $author$project$Api$importLeads = F3(
 							A2($elm$http$Http$filePart, 'file', file)
 						])),
 				bk: A2($author$project$Api$expectJson, toMsg, $author$project$Types$importResultDecoder),
-				aF: _List_fromArray(
+				aG: _List_fromArray(
 					[
 						A2($elm$http$Http$header, 'X-ECC-Contract', $author$project$Release$contract)
 					]),
 				bo: 'POST',
 				bt: $elm$core$Maybe$Just(30000),
 				bv: $elm$core$Maybe$Nothing,
-				bw: ctx.aq + '/api/import/leads'
+				bw: ctx.ar + '/api/import/leads'
 			});
 	});
 var $elm$core$String$replace = F3(
@@ -11171,6 +11196,19 @@ var $elm$core$List$isEmpty = function (xs) {
 		return false;
 	}
 };
+var $author$project$Features$items = F2(
+	function (key, item) {
+		return A2(
+			$elm$core$Result$withDefault,
+			_List_Nil,
+			A2(
+				$elm$json$Json$Decode$decodeValue,
+				A2(
+					$elm$json$Json$Decode$field,
+					key,
+					$elm$json$Json$Decode$list($elm$json$Json$Decode$value)),
+				item));
+	});
 var $author$project$Main$justOf = function (r) {
 	return $elm$core$Result$toMaybe(r);
 };
@@ -11183,20 +11221,20 @@ var $author$project$Main$loadFinanceCandidates = function (model) {
 	var ident = A2(
 		$elm$core$Maybe$withDefault,
 		'',
-		A2($elm$core$Dict$get, 'id', model.dl));
-	var ctx = {aq: model._, dW: model.dW};
+		A2($elm$core$Dict$get, 'id', model.dm));
+	var ctx = {ar: model.V, dX: model.dX};
 	return (ident === '') ? $elm$core$Platform$Cmd$none : A5(
 		$author$project$Api$featureGet,
 		ctx,
 		'reconciliation/candidates/' + ident,
+		model.dp,
 		model.$7,
-		model.dn,
 		$author$project$State$FinanceCandidatesLoaded(
 			$author$project$Main$financeCandidateTag(model)));
 };
 var $author$project$Types$LoginResponse = F2(
 	function (token, user) {
-		return {dW: token, H: user};
+		return {dX: token, C: user};
 	});
 var $author$project$Types$loginResponseDecoder = A3(
 	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
@@ -11463,7 +11501,7 @@ var $author$project$Reports$payload = F3(
 					_Utils_Tuple2(
 					'range',
 					$elm$json$Json$Encode$string(
-						(model.ar === '') ? ((kind === 'reports') ? 'Last 30 days' : 'All dates') : A3($elm$core$String$replace, ',', ' to ', model.ar))),
+						(model.as === '') ? ((kind === 'reports') ? 'Last 30 days' : 'All dates') : A3($elm$core$String$replace, ',', ' to ', model.as))),
 					_Utils_Tuple2(
 					'kind',
 					$elm$json$Json$Encode$string(
@@ -11552,18 +11590,18 @@ var $elm$time$Time$posixToMillis = function (_v0) {
 	return millis;
 };
 var $author$project$State$ToastExpired = function (a) {
-	return {$: 177, a: a};
+	return {$: 183, a: a};
 };
 var $elm$core$Process$sleep = _Process_sleep;
 var $author$project$Main$pushToast = F3(
 	function (model, kind, textMsg) {
-		var id = model.cG + 1;
-		var newToast = {bA: id, aG: kind, dx: textMsg};
+		var id = model.cH + 1;
+		var newToast = {bA: id, aH: kind, dy: textMsg};
 		return _Utils_Tuple2(
 			_Utils_update(
 				model,
 				{
-					cG: id,
+					cH: id,
 					bu: _Utils_ap(
 						model.bu,
 						_List_fromArray(
@@ -11658,24 +11696,24 @@ var $author$project$Main$recordValidation = F2(
 			});
 		var errors = function () {
 			switch (msg.$) {
-				case 79:
+				case 82:
 					return _Utils_ap(
-						A3(contact, model.q.a$, model.q.i, model.q.F),
+						A3(contact, model.q.a$, model.q.i, model.q.H),
 						_List_fromArray(
 							[
-								A2(date, 'nextFollowup', model.q.ci)
+								A2(date, 'nextFollowup', model.q.cj)
 							]));
-				case 85:
+				case 88:
 					return _Utils_ap(
-						A3(contact, model.h.a$, model.h.i, model.h.F),
+						A3(contact, model.h.a$, model.h.i, model.h.H),
 						_List_fromArray(
 							[
-								A2(date, 'lastContact', model.h.dv),
-								A2(date, 'nextFollowup', model.h.ci)
+								A2(date, 'lastContact', model.h.dw),
+								A2(date, 'nextFollowup', model.h.cj)
 							]));
-				case 129:
-					return A3(contact, model.f.a$, model.f.i, model.f.F);
-				case 137:
+				case 132:
+					return A3(contact, model.f.a$, model.f.i, model.f.H);
+				case 140:
 					return _List_fromArray(
 						[
 							A2(
@@ -11685,7 +11723,7 @@ var $author$project$Main$recordValidation = F2(
 							},
 							model.m)
 						]);
-				case 156:
+				case 159:
 					return _List_fromArray(
 						[
 							A3(required, 'name', 'Name', model.p.z),
@@ -11693,20 +11731,20 @@ var $author$project$Main$recordValidation = F2(
 							email(model.p.i),
 							(model.p.ah === '') ? $elm$core$Maybe$Nothing : A2(password, 'password', model.p.ah)
 						]);
-				case 165:
+				case 168:
 					return _List_fromArray(
 						[
-							A3(required, 'pwCurrent', 'Current password', model.aw),
-							A2(password, 'pwNew', model.Y),
-							(!_Utils_eq(model.Y, model.av)) ? $elm$core$Maybe$Just(
+							A3(required, 'pwCurrent', 'Current password', model.ax),
+							A2(password, 'pwNew', model.Z),
+							(!_Utils_eq(model.Z, model.aw)) ? $elm$core$Maybe$Just(
 							_Utils_Tuple2('pwConfirm', 'Passwords do not match.')) : $elm$core$Maybe$Nothing
 						]);
-				case 121:
+				case 124:
 					return _List_fromArray(
 						[
 							A3(required, 'title', 'Task title', model.g.ac)
 						]);
-				case 122:
+				case 125:
 					return _List_fromArray(
 						[
 							A3(required, 'title', 'Task title', model.g.ac)
@@ -11738,25 +11776,25 @@ var $author$project$Api$recover = F2(
 	});
 var $author$project$Main$refreshDateSummaries = F2(
 	function (previous, current) {
-		return ((previous.A !== '') && ((!_Utils_eq(previous.A, current.A)) && ((!_Utils_eq(current.H, $elm$core$Maybe$Nothing)) && current.aa))) ? $author$project$Main$fetchDateSummary(current) : $elm$core$Platform$Cmd$none;
+		return ((previous.B !== '') && ((!_Utils_eq(previous.B, current.B)) && ((!_Utils_eq(current.C, $elm$core$Maybe$Nothing)) && current.aa))) ? $author$project$Main$fetchDateSummary(current) : $elm$core$Platform$Cmd$none;
 	});
 var $author$project$State$AuditLoaded = function (a) {
-	return {$: 75, a: a};
+	return {$: 78, a: a};
 };
 var $author$project$State$ClientDetailLoaded = function (a) {
-	return {$: 71, a: a};
+	return {$: 74, a: a};
 };
 var $author$project$State$DetailLoaded = function (a) {
-	return {$: 72, a: a};
+	return {$: 75, a: a};
 };
 var $author$project$State$OperationsLoaded = function (a) {
 	return {$: 12, a: a};
 };
 var $author$project$State$StatsLoaded = function (a) {
-	return {$: 73, a: a};
+	return {$: 76, a: a};
 };
 var $author$project$State$TasksLoaded = function (a) {
-	return {$: 69, a: a};
+	return {$: 72, a: a};
 };
 var $elm$core$String$concat = function (strings) {
 	return A2($elm$core$String$join, '', strings);
@@ -11789,7 +11827,7 @@ var $author$project$Api$fetchApplications = F5(
 	});
 var $author$project$Types$AuditEntry = F8(
 	function (id, entityType, entityId, entityName, action, changes, actorName, createdAt) {
-		return {cQ: action, cR: actorName, c1: changes, aB: createdAt, dc: entityId, dd: entityName, de: entityType, bA: id};
+		return {cR: action, cS: actorName, c2: changes, aC: createdAt, dd: entityId, de: entityName, df: entityType, bA: id};
 	});
 var $author$project$Types$auditDecoder = A3(
 	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
@@ -11836,11 +11874,11 @@ var $author$project$Api$fetchAudit = F2(
 	});
 var $author$project$Types$ClientDetail = F5(
 	function (client, cases, documents, tasks, activities) {
-		return {bP: activities, c_: cases, c3: client, b0: documents, an: tasks};
+		return {bQ: activities, c$: cases, c4: client, b1: documents, ao: tasks};
 	});
 var $author$project$Types$CaseRow = F8(
 	function (id, clientId, category, destination, stage, deadline, createdAt, revision) {
-		return {c$: category, bx: clientId, aB: createdAt, aZ: deadline, bj: destination, bA: id, v: revision, dR: stage};
+		return {c0: category, bx: clientId, aC: createdAt, aZ: deadline, bj: destination, bA: id, v: revision, dS: stage};
 	});
 var $author$project$Types$caseDecoder = A4(
 	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$optional,
@@ -11886,7 +11924,7 @@ var $author$project$Types$Document = function (id) {
 							return function (createdAt) {
 								return function (scanStatus) {
 									return function (revision) {
-										return {bx: clientId, aB: createdAt, dm: filename, bA: id, a1: leadId, dw: mimeType, v: revision, dL: scanStatus, dN: size, d0: uploaderName};
+										return {bx: clientId, aC: createdAt, dn: filename, bA: id, a1: leadId, dx: mimeType, v: revision, dM: scanStatus, dO: size, d1: uploaderName};
 									};
 								};
 							};
@@ -11982,7 +12020,7 @@ var $author$project$Api$fetchClients = function (ctx) {
 };
 var $author$project$Types$LeadDetail = F4(
 	function (lead, tasks, activities, documents) {
-		return {bP: activities, b0: documents, a0: lead, an: tasks};
+		return {bQ: activities, b1: documents, a0: lead, ao: tasks};
 	});
 var $author$project$Types$leadDetailDecoder = A3(
 	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
@@ -12061,14 +12099,14 @@ var $author$project$Api$financialHistory = F5(
 	});
 var $author$project$Main$routeCmd = F2(
 	function (model, route) {
-		var ctx = {aq: model._, dW: model.dW};
+		var ctx = {ar: model.V, dX: model.dX};
 		var alwaysFetch = $elm$core$Platform$Cmd$batch(
 			_List_fromArray(
 				[
 					A3(
 					$author$project$Api$fetchTasksPage,
 					ctx,
-					model.dE,
+					model.dF,
 					A2($author$project$Main$acceptLoad, model, $author$project$State$TasksLoaded))
 				]));
 		switch (route.$) {
@@ -12093,7 +12131,7 @@ var $author$project$Main$routeCmd = F2(
 							$author$project$Api$fetchFilteredLeads,
 							ctx,
 							model,
-							model.dE,
+							model.dF,
 							A2($author$project$Main$acceptLoad, model, $author$project$State$LeadsLoaded)),
 							A2(
 							$author$project$Api$fetchUsers,
@@ -12122,7 +12160,7 @@ var $author$project$Main$routeCmd = F2(
 							A4(
 							$author$project$Api$fetchClientsPage,
 							ctx,
-							model.dE,
+							model.dF,
 							model.bf,
 							A2($author$project$Main$acceptLoad, model, $author$project$State$ClientsLoaded)),
 							A2(
@@ -12144,7 +12182,7 @@ var $author$project$Main$routeCmd = F2(
 							A3(
 							$author$project$Api$fetchTasksPage,
 							ctx,
-							model.dE,
+							model.dF,
 							A2($author$project$Main$acceptLoad, model, $author$project$State$TasksLoaded)),
 							A2(
 							$author$project$Api$fetchUsers,
@@ -12175,9 +12213,9 @@ var $author$project$Main$routeCmd = F2(
 				return (kind === 'work/applications') ? A5(
 					$author$project$Api$fetchApplications,
 					ctx,
-					model.ar,
-					model.cT,
-					model.dE,
+					model.as,
+					model.cU,
+					model.dF,
 					A2($author$project$Main$acceptLoad, model, $author$project$State$FeatureLoaded)) : ((kind === 'work/payment-history') ? A5(
 					$author$project$Api$financialHistory,
 					ctx,
@@ -12191,20 +12229,20 @@ var $author$project$Main$routeCmd = F2(
 							A2(
 								$elm$core$String$split,
 								'&',
-								A2($elm$core$Maybe$withDefault, '', model.bw.ak)))),
-					model.ar,
-					model.dE,
+								A2($elm$core$Maybe$withDefault, '', model.bw.al)))),
+					model.as,
+					model.dF,
 					A2($author$project$Main$acceptLoad, model, $author$project$State$FeatureLoaded)) : (A2($elm$core$String$startsWith, 'work/', kind) ? A5(
 					$author$project$Api$featureGet,
 					ctx,
 					A2($elm$core$String$dropLeft, 5, kind),
-					model.ar,
-					model.dE,
+					model.as,
+					model.dF,
 					A2($author$project$Main$acceptLoad, model, $author$project$State$FeatureLoaded)) : A4(
 					$author$project$Api$fetchOperations,
 					ctx,
 					kind,
-					model.dE,
+					model.dF,
 					A2($author$project$Main$acceptLoad, model, $author$project$State$OperationsLoaded))));
 		}
 	});
@@ -12217,16 +12255,16 @@ var $author$project$Main$reloadCurrent = function (model) {
 var $author$project$Main$reloadPanel = function (model) {
 	var _v0 = _Utils_Tuple2(
 		$author$project$State$routeOf(model.bw),
-		model.bT);
+		model.bU);
 	if ((_v0.a.$ === 4) && (!_v0.b.$)) {
 		var cid = _v0.a.a;
 		var detail = _v0.b.a;
-		return _Utils_eq(detail.c3.bA, cid) ? A5(
+		return _Utils_eq(detail.c4.bA, cid) ? A5(
 			$author$project$Api$featureGet,
-			{aq: model._, dW: model.dW},
+			{ar: model.V, dX: model.dX},
 			A2($author$project$Main$inlinePath, model, cid),
-			model.ar,
-			model.dE,
+			model.as,
+			model.dF,
 			A2($author$project$Main$acceptLoad, model, $author$project$State$FeatureLoaded)) : $author$project$Main$reloadCurrent(model);
 	} else {
 		return $author$project$Main$reloadCurrent(model);
@@ -12279,16 +12317,16 @@ var $author$project$Api$resetPassword = F3(
 	});
 var $author$project$Main$restoreSessionDraft = F2(
 	function (uid, model) {
-		var _v0 = model.al;
+		var _v0 = model.am;
 		if (!_v0.$) {
 			var draft = _v0.a;
-			return (_Utils_eq(draft.cm, uid) && _Utils_eq(
+			return (_Utils_eq(draft.cn, uid) && _Utils_eq(
 				draft.t,
 				$elm$url$Url$toString(model.bw))) ? _Utils_update(
 				model,
-				{q: draft.q, g: draft.g, m: draft.m, N: draft.N, f: draft.f, h: draft.h, P: draft.P, C: draft.C, D: draft.D, dl: draft.dl, b: draft.b, af: draft.af, bn: draft.bn, L: draft.L, o: draft.o, al: $elm$core$Maybe$Nothing, Z: draft.Z, M: draft.M, U: draft.U}) : _Utils_update(
+				{q: draft.q, g: draft.g, m: draft.m, N: draft.N, f: draft.f, h: draft.h, P: draft.P, E: draft.E, F: draft.F, dm: draft.dm, b: draft.b, af: draft.af, bn: draft.bn, L: draft.L, o: draft.o, am: $elm$core$Maybe$Nothing, _: draft._, M: draft.M, U: draft.U}) : _Utils_update(
 				model,
-				{al: $elm$core$Maybe$Nothing});
+				{am: $elm$core$Maybe$Nothing});
 		} else {
 			return model;
 		}
@@ -12387,33 +12425,33 @@ var $author$project$Main$startsLoad = function (msg) {
 	_v0$59:
 	while (true) {
 		switch (msg.$) {
-			case 95:
-				return true;
-			case 93:
+			case 98:
 				return true;
 			case 96:
 				return true;
-			case 94:
+			case 99:
+				return true;
+			case 97:
 				if (!msg.b.$) {
 					return true;
 				} else {
 					break _v0$59;
 				}
-			case 97:
+			case 100:
 				return true;
-			case 39:
+			case 40:
 				return true;
-			case 41:
+			case 42:
 				return true;
-			case 57:
+			case 60:
 				return true;
 			case 10:
 				return true;
 			case 11:
 				return true;
-			case 37:
+			case 38:
 				return true;
-			case 42:
+			case 43:
 				return true;
 			case 16:
 				return true;
@@ -12425,41 +12463,35 @@ var $author$project$Main$startsLoad = function (msg) {
 				return true;
 			case 36:
 				return true;
-			case 46:
+			case 47:
 				return true;
-			case 50:
-				return true;
-			case 52:
-				return true;
-			case 53:
-				return true;
-			case 54:
-				if (!msg.a.$) {
-					return true;
-				} else {
-					break _v0$59;
-				}
 			case 51:
+				return true;
+			case 55:
+				return true;
+			case 56:
+				return true;
+			case 57:
 				if (!msg.a.$) {
 					return true;
 				} else {
 					break _v0$59;
 				}
-			case 44:
+			case 52:
 				if (!msg.a.$) {
 					return true;
 				} else {
 					break _v0$59;
 				}
-			case 102:
-				return true;
-			case 125:
-				return true;
-			case 103:
-				return true;
-			case 104:
-				return true;
+			case 45:
+				if (!msg.a.$) {
+					return true;
+				} else {
+					break _v0$59;
+				}
 			case 105:
+				return true;
+			case 128:
 				return true;
 			case 106:
 				return true;
@@ -12467,7 +12499,13 @@ var $author$project$Main$startsLoad = function (msg) {
 				return true;
 			case 108:
 				return true;
-			case 66:
+			case 109:
+				return true;
+			case 110:
+				return true;
+			case 111:
+				return true;
+			case 69:
 				return true;
 			case 9:
 				if (!msg.a.$) {
@@ -12475,13 +12513,13 @@ var $author$project$Main$startsLoad = function (msg) {
 				} else {
 					break _v0$59;
 				}
-			case 166:
+			case 169:
 				if (!msg.a.$) {
 					return true;
 				} else {
 					break _v0$59;
 				}
-			case 168:
+			case 174:
 				return true;
 			case 14:
 				if (!msg.a.$) {
@@ -12489,31 +12527,25 @@ var $author$project$Main$startsLoad = function (msg) {
 				} else {
 					break _v0$59;
 				}
-			case 82:
+			case 85:
 				if (!msg.a.$) {
 					return true;
 				} else {
 					break _v0$59;
 				}
-			case 86:
+			case 89:
 				if (!msg.a.$) {
 					return true;
 				} else {
 					break _v0$59;
 				}
-			case 88:
+			case 91:
 				if (!msg.a.$) {
 					return true;
 				} else {
 					break _v0$59;
 				}
-			case 90:
-				if (!msg.a.$) {
-					return true;
-				} else {
-					break _v0$59;
-				}
-			case 98:
+			case 93:
 				if (!msg.a.$) {
 					return true;
 				} else {
@@ -12525,37 +12557,37 @@ var $author$project$Main$startsLoad = function (msg) {
 				} else {
 					break _v0$59;
 				}
-			case 114:
+			case 104:
 				if (!msg.a.$) {
 					return true;
 				} else {
 					break _v0$59;
 				}
-			case 116:
+			case 117:
 				if (!msg.a.$) {
 					return true;
 				} else {
 					break _v0$59;
 				}
-			case 118:
+			case 119:
 				if (!msg.a.$) {
 					return true;
 				} else {
 					break _v0$59;
 				}
-			case 124:
+			case 121:
 				if (!msg.a.$) {
 					return true;
 				} else {
 					break _v0$59;
 				}
-			case 131:
+			case 127:
 				if (!msg.a.$) {
 					return true;
 				} else {
 					break _v0$59;
 				}
-			case 130:
+			case 134:
 				if (!msg.a.$) {
 					return true;
 				} else {
@@ -12567,25 +12599,19 @@ var $author$project$Main$startsLoad = function (msg) {
 				} else {
 					break _v0$59;
 				}
-			case 138:
+			case 136:
 				if (!msg.a.$) {
 					return true;
 				} else {
 					break _v0$59;
 				}
-			case 140:
+			case 141:
 				if (!msg.a.$) {
 					return true;
 				} else {
 					break _v0$59;
 				}
-			case 145:
-				if (!msg.a.$) {
-					return true;
-				} else {
-					break _v0$59;
-				}
-			case 146:
+			case 143:
 				if (!msg.a.$) {
 					return true;
 				} else {
@@ -12597,25 +12623,37 @@ var $author$project$Main$startsLoad = function (msg) {
 				} else {
 					break _v0$59;
 				}
+			case 149:
+				if (!msg.a.$) {
+					return true;
+				} else {
+					break _v0$59;
+				}
 			case 151:
 				if (!msg.a.$) {
 					return true;
 				} else {
 					break _v0$59;
 				}
-			case 157:
-				if (!msg.a.$) {
-					return true;
-				} else {
-					break _v0$59;
-				}
-			case 158:
+			case 154:
 				if (!msg.a.$) {
 					return true;
 				} else {
 					break _v0$59;
 				}
 			case 160:
+				if (!msg.a.$) {
+					return true;
+				} else {
+					break _v0$59;
+				}
+			case 161:
+				if (!msg.a.$) {
+					return true;
+				} else {
+					break _v0$59;
+				}
+			case 163:
 				if (!msg.a.$) {
 					return true;
 				} else {
@@ -12631,25 +12669,25 @@ var $author$project$Main$startsUserLoad = function (msg) {
 	_v0$7:
 	while (true) {
 		switch (msg.$) {
-			case 157:
-				if (!msg.a.$) {
-					return true;
-				} else {
-					break _v0$7;
-				}
-			case 158:
-				if (!msg.a.$) {
-					return true;
-				} else {
-					break _v0$7;
-				}
 			case 160:
 				if (!msg.a.$) {
 					return true;
 				} else {
 					break _v0$7;
 				}
-			case 66:
+			case 161:
+				if (!msg.a.$) {
+					return true;
+				} else {
+					break _v0$7;
+				}
+			case 163:
+				if (!msg.a.$) {
+					return true;
+				} else {
+					break _v0$7;
+				}
+			case 69:
 				return true;
 			case 9:
 				if (!msg.a.$) {
@@ -12657,13 +12695,13 @@ var $author$project$Main$startsUserLoad = function (msg) {
 				} else {
 					break _v0$7;
 				}
-			case 166:
+			case 169:
 				if (!msg.a.$) {
 					return true;
 				} else {
 					break _v0$7;
 				}
-			case 57:
+			case 60:
 				return true;
 			default:
 				break _v0$7;
@@ -12686,7 +12724,7 @@ var $author$project$Types$encodeNewTask = function (f) {
 				$author$project$Types$encodeNonEmpty(f.a_)),
 				_Utils_Tuple2(
 				'ntDueDate',
-				$author$project$Types$maybeDate(f.aD)),
+				$author$project$Types$maybeDate(f.aE)),
 				_Utils_Tuple2(
 				'ntPriority',
 				$author$project$Types$encodeNonEmpty(f.a6))
@@ -12700,7 +12738,7 @@ var $author$project$Main$submitTask = F3(
 				$author$project$Api$createTask,
 				ctx,
 				$author$project$Types$encodeNewTask(
-					{a_: model.g.a_, aD: model.g.aD, a1: leadId, a6: model.g.a6, ac: model.g.ac}),
+					{a_: model.g.a_, aE: model.g.aE, a1: leadId, a6: model.g.a6, ac: model.g.ac}),
 				$author$project$State$AddTaskDone));
 	});
 var $elm$core$List$takeReverse = F3(
@@ -12831,7 +12869,7 @@ var $elm$core$List$take = F2(
 	});
 var $author$project$State$ToastPushed = F2(
 	function (a, b) {
-		return {$: 176, a: a, b: b};
+		return {$: 182, a: a, b: b};
 	});
 var $author$project$Main$toast = F2(
 	function (kind, textMsg) {
@@ -12878,7 +12916,7 @@ var $elm$time$Time$toAdjustedMinutesHelp = F3(
 			} else {
 				var era = eras.a;
 				var olderEras = eras.b;
-				if (_Utils_cmp(era.bL, posixMinutes) < 0) {
+				if (_Utils_cmp(era.bM, posixMinutes) < 0) {
 					return posixMinutes + era.c;
 				} else {
 					var $temp$defaultOffset = defaultOffset,
@@ -12915,20 +12953,20 @@ var $elm$time$Time$toCivil = function (minutes) {
 	var month = mp + ((mp < 10) ? 3 : (-9));
 	var year = yearOfEra + (era * 400);
 	return {
-		b$: (dayOfYear - ((((153 * mp) + 2) / 5) | 0)) + 1,
-		ch: month,
-		cP: year + ((month <= 2) ? 1 : 0)
+		b0: (dayOfYear - ((((153 * mp) + 2) / 5) | 0)) + 1,
+		ci: month,
+		cQ: year + ((month <= 2) ? 1 : 0)
 	};
 };
 var $elm$time$Time$toDay = F2(
 	function (zone, time) {
 		return $elm$time$Time$toCivil(
-			A2($elm$time$Time$toAdjustedMinutes, zone, time)).b$;
+			A2($elm$time$Time$toAdjustedMinutes, zone, time)).b0;
 	});
 var $elm$time$Time$toMonth = F2(
 	function (zone, time) {
 		var _v0 = $elm$time$Time$toCivil(
-			A2($elm$time$Time$toAdjustedMinutes, zone, time)).ch;
+			A2($elm$time$Time$toAdjustedMinutes, zone, time)).ci;
 		switch (_v0) {
 			case 1:
 				return 0;
@@ -12959,7 +12997,7 @@ var $elm$time$Time$toMonth = F2(
 var $elm$time$Time$toYear = F2(
 	function (zone, time) {
 		return $elm$time$Time$toCivil(
-			A2($elm$time$Time$toAdjustedMinutes, zone, time)).cP;
+			A2($elm$time$Time$toAdjustedMinutes, zone, time)).cQ;
 	});
 var $justinmimbs$date$Date$fromPosix = F2(
 	function (zone, posix) {
@@ -13045,7 +13083,7 @@ var $justinmimbs$date$Date$toCalendarDateHelp = F3(
 				d = $temp$d;
 				continue toCalendarDateHelp;
 			} else {
-				return {b$: d, ch: m, cP: y};
+				return {b0: d, ci: m, cQ: y};
 			}
 		}
 	});
@@ -13076,33 +13114,33 @@ var $justinmimbs$date$Date$toOrdinalDate = function (_v0) {
 	var rd = _v0;
 	var y = $justinmimbs$date$Date$year(rd);
 	return {
-		bG: rd - $justinmimbs$date$Date$daysBeforeYear(y),
-		cP: y
+		bH: rd - $justinmimbs$date$Date$daysBeforeYear(y),
+		cQ: y
 	};
 };
 var $justinmimbs$date$Date$toCalendarDate = function (_v0) {
 	var rd = _v0;
 	var date = $justinmimbs$date$Date$toOrdinalDate(rd);
-	return A3($justinmimbs$date$Date$toCalendarDateHelp, date.cP, 0, date.bG);
+	return A3($justinmimbs$date$Date$toCalendarDateHelp, date.cQ, 0, date.bH);
 };
 var $justinmimbs$date$Date$day = A2(
 	$elm$core$Basics$composeR,
 	$justinmimbs$date$Date$toCalendarDate,
 	function ($) {
-		return $.b$;
+		return $.b0;
 	});
 var $justinmimbs$date$Date$month = A2(
 	$elm$core$Basics$composeR,
 	$justinmimbs$date$Date$toCalendarDate,
 	function ($) {
-		return $.ch;
+		return $.ci;
 	});
 var $justinmimbs$date$Date$monthNumber = A2($elm$core$Basics$composeR, $justinmimbs$date$Date$month, $justinmimbs$date$Date$monthToNumber);
 var $justinmimbs$date$Date$ordinalDay = A2(
 	$elm$core$Basics$composeR,
 	$justinmimbs$date$Date$toOrdinalDate,
 	function ($) {
-		return $.bG;
+		return $.bH;
 	});
 var $elm$core$Basics$abs = function (n) {
 	return (n < 0) ? (-n) : n;
@@ -13162,22 +13200,22 @@ var $justinmimbs$date$Date$toWeekDate = function (_v0) {
 	var wy = $justinmimbs$date$Date$year(rd + (4 - wdn));
 	var week1Day1 = $justinmimbs$date$Date$daysBeforeWeekYear(wy) + 1;
 	return {
-		cK: 1 + (((rd - week1Day1) / 7) | 0),
-		cL: wy,
-		d2: $justinmimbs$date$Date$numberToWeekday(wdn)
+		cL: 1 + (((rd - week1Day1) / 7) | 0),
+		cM: wy,
+		d3: $justinmimbs$date$Date$numberToWeekday(wdn)
 	};
 };
 var $justinmimbs$date$Date$weekNumber = A2(
 	$elm$core$Basics$composeR,
 	$justinmimbs$date$Date$toWeekDate,
 	function ($) {
-		return $.cK;
+		return $.cL;
 	});
 var $justinmimbs$date$Date$weekYear = A2(
 	$elm$core$Basics$composeR,
 	$justinmimbs$date$Date$toWeekDate,
 	function ($) {
-		return $.cL;
+		return $.cM;
 	});
 var $justinmimbs$date$Date$weekday = A2($elm$core$Basics$composeR, $justinmimbs$date$Date$weekdayNumber, $justinmimbs$date$Date$numberToWeekday);
 var $elm$core$Basics$min = F2(
@@ -13348,28 +13386,28 @@ var $justinmimbs$date$Date$formatField = F4(
 			case 'E':
 				switch (length) {
 					case 1:
-						return language.aA(
+						return language.aB(
 							$justinmimbs$date$Date$weekday(date));
 					case 2:
-						return language.aA(
+						return language.aB(
 							$justinmimbs$date$Date$weekday(date));
 					case 3:
-						return language.aA(
+						return language.aB(
 							$justinmimbs$date$Date$weekday(date));
 					case 4:
-						return language.bO(
+						return language.bP(
 							$justinmimbs$date$Date$weekday(date));
 					case 5:
 						return A2(
 							$elm$core$String$left,
 							1,
-							language.aA(
+							language.aB(
 								$justinmimbs$date$Date$weekday(date)));
 					case 6:
 						return A2(
 							$elm$core$String$left,
 							2,
-							language.aA(
+							language.aB(
 								$justinmimbs$date$Date$weekday(date)));
 					default:
 						return '';
@@ -13431,7 +13469,7 @@ var $elm$parser$Parser$Advanced$chompWhileHelp = F5(
 					$elm$parser$Parser$Advanced$Good,
 					_Utils_cmp(s0.c, offset) < 0,
 					0,
-					{bY: col, d: s0.d, e: s0.e, c: offset, dK: row, a: s0.a});
+					{bZ: col, d: s0.d, e: s0.e, c: offset, dL: row, a: s0.a});
 			} else {
 				if (_Utils_eq(newOffset, -2)) {
 					var $temp$isGood = isGood,
@@ -13463,7 +13501,7 @@ var $elm$parser$Parser$Advanced$chompWhileHelp = F5(
 	});
 var $elm$parser$Parser$Advanced$chompWhile = function (isGood) {
 	return function (s) {
-		return A5($elm$parser$Parser$Advanced$chompWhileHelp, isGood, s.c, s.dK, s.bY, s);
+		return A5($elm$parser$Parser$Advanced$chompWhileHelp, isGood, s.c, s.dL, s.bZ, s);
 	};
 };
 var $elm$parser$Parser$chompWhile = $elm$parser$Parser$Advanced$chompWhile;
@@ -13654,8 +13692,8 @@ var $justinmimbs$date$Date$language_en = {
 		$elm$core$Basics$composeR,
 		$justinmimbs$date$Date$monthToName,
 		$elm$core$String$left(3)),
-	bO: $justinmimbs$date$Date$weekdayToName,
-	aA: A2(
+	bP: $justinmimbs$date$Date$weekdayToName,
+	aB: A2(
 		$elm$core$Basics$composeR,
 		$justinmimbs$date$Date$weekdayToName,
 		$elm$core$String$left(3))
@@ -13692,7 +13730,7 @@ var $author$project$Main$updateClock = F2(
 				$elm$core$String$fromInt(number));
 		};
 		var now = $elm$time$Time$millisToPosix(
-			$elm$time$Time$posixToMillis(instant) + model.bW);
+			$elm$time$Time$posixToMillis(instant) + model.bX);
 		return _Utils_update(
 			model,
 			{
@@ -13708,7 +13746,7 @@ var $author$project$Main$updateClock = F2(
 							pad(
 							A2($elm$time$Time$toSecond, zone, now))
 						])),
-				A: $justinmimbs$date$Date$toIsoString(
+				B: $justinmimbs$date$Date$toIsoString(
 					A2($justinmimbs$date$Date$fromPosix, zone, now))
 			});
 	});
@@ -13744,14 +13782,14 @@ var $author$project$Api$uploadDocument = F5(
 							A2($elm$http$Http$filePart, 'file', file)
 						])),
 				bk: A2($author$project$Api$expectJson, toMsg, decoder),
-				aF: _List_fromArray(
+				aG: _List_fromArray(
 					[
 						A2($elm$http$Http$header, 'X-ECC-Contract', $author$project$Release$contract)
 					]),
 				bo: 'POST',
 				bt: $elm$core$Maybe$Just(30000),
 				bv: $elm$core$Maybe$Nothing,
-				bw: _Utils_ap(ctx.aq, path)
+				bw: _Utils_ap(ctx.ar, path)
 			});
 	});
 var $author$project$Api$uploadClientDocument = F3(
@@ -13777,14 +13815,14 @@ var $author$project$Api$uploadClientPhoto = F5(
 							A2($elm$http$Http$filePart, 'file', file)
 						])),
 				bk: A2($author$project$Api$expectJson, toMsg, $elm$json$Json$Decode$value),
-				aF: _List_fromArray(
+				aG: _List_fromArray(
 					[
 						A2($elm$http$Http$header, 'X-ECC-Contract', $author$project$Release$contract)
 					]),
 				bo: 'POST',
 				bt: $elm$core$Maybe$Just(60000),
 				bv: $elm$core$Maybe$Nothing,
-				bw: ctx.aq + ('/api/clients/' + ($elm$core$String$fromInt(cid) + '/photo'))
+				bw: ctx.ar + ('/api/clients/' + ($elm$core$String$fromInt(cid) + '/photo'))
 			});
 	});
 var $author$project$Api$uploadLeadDocument = F3(
@@ -13813,8 +13851,8 @@ var $author$project$State$userFormOf = function (u) {
 		z: u.z,
 		ah: '',
 		v: u.v,
-		G: u.G,
-		cI: $elm$core$Maybe$Just(u.bA)
+		A: u.A,
+		cJ: $elm$core$Maybe$Just(u.bA)
 	};
 };
 var $elm$core$Dict$values = function (dict) {
@@ -13829,9 +13867,9 @@ var $elm$core$Dict$values = function (dict) {
 };
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		if (msg.$ === 57) {
+		if (msg.$ === 60) {
 			var url = msg.a;
-			return (_Utils_eq(url.t, model.bw.t) && (_Utils_eq(url.ak, model.bw.ak) && ($author$project$Main$hasDraftChanges(model) || (!_Utils_eq(url.bm, model.bw.bm))))) ? _Utils_Tuple2(
+			return (_Utils_eq(url.t, model.bw.t) && (_Utils_eq(url.al, model.bw.al) && ($author$project$Main$hasDraftChanges(model) || (!_Utils_eq(url.bm, model.bw.bm))))) ? _Utils_Tuple2(
 				_Utils_update(
 					model,
 					{bw: url}),
@@ -13839,7 +13877,7 @@ var $author$project$Main$update = F2(
 				_Utils_update(
 					model,
 					{
-						V: $elm$core$Maybe$Just(
+						W: $elm$core$Maybe$Just(
 							_Utils_Tuple2(
 								'Discard your unsaved changes?',
 								$author$project$State$DiscardChanges(
@@ -13872,48 +13910,48 @@ var $author$project$Main$updateCore = F2(
 						{
 							bc: _List_Nil,
 							aa: true,
-							c2: $elm$core$Maybe$Nothing,
-							bT: $elm$core$Maybe$Nothing,
+							c3: $elm$core$Maybe$Nothing,
+							bU: $elm$core$Maybe$Nothing,
 							aV: false,
 							be: '',
-							bU: $elm$core$Maybe$Nothing,
-							bV: '',
+							bV: $elm$core$Maybe$Nothing,
+							bW: '',
 							aW: $elm$json$Json$Encode$null,
 							aX: _List_Nil,
-							bZ: $elm$json$Json$Encode$null,
-							c4: $elm$core$Dict$empty,
-							b_: $elm$core$Dict$empty,
+							b_: $elm$json$Json$Encode$null,
+							c5: $elm$core$Dict$empty,
+							b$: $elm$core$Dict$empty,
 							O: $elm$core$Maybe$Nothing,
-							B: false,
-							C: false,
-							D: $elm$core$Dict$empty,
+							D: false,
+							E: false,
+							F: $elm$core$Dict$empty,
 							w: false,
 							r: $elm$json$Json$Encode$null,
-							dl: $elm$core$Dict$empty,
+							dm: $elm$core$Dict$empty,
 							bl: $elm$json$Json$Encode$null,
-							dn: 0,
-							$7: '',
-							b6: _List_Nil,
-							dp: $elm$core$Maybe$Nothing,
+							$7: 0,
+							dp: '',
+							b7: _List_Nil,
+							dq: $elm$core$Maybe$Nothing,
 							b: false,
-							at: _List_Nil,
+							au: _List_Nil,
 							a3: model.a3 + 1,
 							y: 'Your session has expired. Please sign in again.',
-							aH: (!_Utils_eq(draft, $elm$core$Maybe$Nothing)) ? 'Your unsaved text is held in this tab. Sign in to the same account to recover it. Re-select any attachments.' : '',
+							aI: (!_Utils_eq(draft, $elm$core$Maybe$Nothing)) ? 'Your unsaved text is held in this tab. Sign in to the same account to recover it. Re-select any attachments.' : '',
 							a5: '',
 							R: '',
 							bs: _List_Nil,
-							aK: false,
-							bI: $elm$json$Json$Encode$null,
-							cq: $elm$core$Maybe$Nothing,
+							ak: false,
+							bJ: $elm$json$Json$Encode$null,
+							cr: $elm$core$Maybe$Nothing,
 							o: $elm$json$Json$Encode$null,
 							aN: $elm$core$Dict$empty,
-							al: draft,
-							an: _List_Nil,
-							dW: $elm$core$Maybe$Nothing,
-							H: $elm$core$Maybe$Nothing,
+							am: draft,
+							ao: _List_Nil,
+							dX: $elm$core$Maybe$Nothing,
+							C: $elm$core$Maybe$Nothing,
 							bb: model.bb + 1,
-							ap: _List_Nil
+							aq: _List_Nil
 						}),
 					$author$project$Main$saveToken($elm$core$Maybe$Nothing));
 			} else {
@@ -13931,9 +13969,9 @@ var $author$project$Main$updateCore = F2(
 	});
 var $author$project$Main$updateHelp = F2(
 	function (msg, model) {
-		var ctx = {aq: model._, dW: model.dW};
+		var ctx = {ar: model.V, dX: model.dX};
 		switch (msg.$) {
-			case 80:
+			case 83:
 				var target = msg.a;
 				var signature = msg.b;
 				var payload = msg.c;
@@ -13983,7 +14021,7 @@ var $author$project$Main$updateHelp = F2(
 								_Utils_update(
 									model,
 									{
-										V: $elm$core$Maybe$Just(
+										W: $elm$core$Maybe$Just(
 											_Utils_Tuple2(
 												'Another record uses this email or phone. Review the matches before creating a separate record. Shared family contact details can be valid.',
 												A4($author$project$State$ContactSaveConfirmed, target, signature, payload, matches))),
@@ -13993,7 +14031,7 @@ var $author$project$Main$updateHelp = F2(
 						}
 					}
 				}
-			case 81:
+			case 84:
 				var target = msg.a;
 				var signature = msg.b;
 				var payload = msg.c;
@@ -14045,7 +14083,7 @@ var $author$project$Main$updateHelp = F2(
 					_Utils_update(
 						model,
 						{
-							V: $elm$core$Maybe$Just(
+							W: $elm$core$Maybe$Just(
 								_Utils_Tuple2(message, action))
 						}),
 					$elm$core$Platform$Cmd$none);
@@ -14053,10 +14091,10 @@ var $author$project$Main$updateHelp = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{V: $elm$core$Maybe$Nothing}),
+						{W: $elm$core$Maybe$Nothing}),
 					$elm$core$Platform$Cmd$none);
 			case 2:
-				var _v9 = model.V;
+				var _v9 = model.W;
 				if (!_v9.$) {
 					var _v10 = _v9.a;
 					var action = _v10.b;
@@ -14065,13 +14103,13 @@ var $author$project$Main$updateHelp = F2(
 						action,
 						_Utils_update(
 							model,
-							{V: $elm$core$Maybe$Nothing}));
+							{W: $elm$core$Maybe$Nothing}));
 				} else {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				}
 			case 0:
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-			case 45:
+			case 46:
 				var value = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -14105,16 +14143,20 @@ var $author$project$Main$updateHelp = F2(
 							model,
 							{
 								r: value,
-								dl: (($author$project$Main$featureSection(model) === 'notifications') && (!model.b)) ? A2($elm$core$Dict$union, pref, model.dl) : (((model.af !== '') && _Utils_eq(
-									A2($elm$core$Dict$get, 'owner', model.dl),
-									$elm$core$Maybe$Nothing)) ? A3($elm$core$Dict$insert, 'owner', model.af, model.dl) : ((($author$project$Main$featureSection(model) === 'expenses') && (A2(
+								dm: (($author$project$Main$featureSection(model) === 'notifications') && (!model.b)) ? A2($elm$core$Dict$union, pref, model.dm) : (((model.af !== '') && _Utils_eq(
+									A2($elm$core$Dict$get, 'owner', model.dm),
+									$elm$core$Maybe$Nothing)) ? A3($elm$core$Dict$insert, 'owner', model.af, model.dm) : ((A2(
+									$elm$core$List$member,
+									$author$project$Main$featureSection(model),
+									_List_fromArray(
+										['expenses', 'payments'])) && (A2(
 									$elm$core$Maybe$withDefault,
 									'',
-									A2($elm$core$Dict$get, 'submissionKey', model.dl)) === '')) ? A3(
+									A2($elm$core$Dict$get, 'submissionKey', model.dm)) === '')) ? A3(
 									$elm$core$Dict$insert,
 									'submissionKey',
 									A2($author$project$Features$str, 'submissionKey', value),
-									model.dl) : model.dl)),
+									model.dm) : model.dm)),
 								bs: A2(
 									$elm$core$Result$withDefault,
 									_List_Nil,
@@ -14126,7 +14168,7 @@ var $author$project$Main$updateHelp = F2(
 											$elm$json$Json$Decode$list($elm$json$Json$Decode$value)),
 										value)),
 								s: '',
-								bH: false
+								bI: false
 							}),
 						$elm$core$Platform$Cmd$none);
 				} else {
@@ -14136,7 +14178,7 @@ var $author$project$Main$updateHelp = F2(
 							model,
 							{
 								s: $author$project$Main$httpError(err),
-								bH: false
+								bI: false
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
@@ -14148,26 +14190,26 @@ var $author$project$Main$updateHelp = F2(
 					A2(
 						$elm$core$Maybe$map,
 						function (detail) {
-							return 'client:' + $elm$core$String$fromInt(detail.c3.bA);
+							return 'client:' + $elm$core$String$fromInt(detail.c4.bA);
 						},
-						model.bT)) : model.af;
+						model.bU)) : model.af;
 				var next = _Utils_update(
 					model,
 					{
-						c2: $elm$core$Maybe$Nothing,
+						c3: $elm$core$Maybe$Nothing,
 						w: false,
-						b5: '',
-						dk: $elm$core$Dict$empty,
-						dl: A3(
+						b6: '',
+						dl: $elm$core$Dict$empty,
+						dm: A3(
 							$elm$core$Dict$insert,
 							'owner',
 							own,
 							$author$project$Features$defaults(section)),
 						bl: $elm$json$Json$Encode$null,
-						ar: '',
+						as: '',
 						af: own,
 						bn: section,
-						dE: 0
+						dF: 0
 					});
 				return _Utils_Tuple2(
 					next,
@@ -14178,16 +14220,16 @@ var $author$project$Main$updateHelp = F2(
 					model,
 					{
 						w: false,
-						b5: '',
-						dl: A3(
+						b6: '',
+						dm: A3(
 							$elm$core$Dict$insert,
 							'owner',
 							own,
 							$author$project$Features$defaults(model.bn)),
 						bl: $elm$json$Json$Encode$null,
-						ar: '',
+						as: '',
 						af: own,
-						dE: 0
+						dF: 0
 					});
 				return _Utils_Tuple2(
 					next,
@@ -14199,19 +14241,19 @@ var $author$project$Main$updateHelp = F2(
 					(25 * 1024) * 1024) > 0)) ? _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{c2: $elm$core$Maybe$Nothing, b5: 'Choose a nonempty file up to 25 MB.'}),
+						{c3: $elm$core$Maybe$Nothing, b6: 'Choose a nonempty file up to 25 MB.'}),
 					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							c2: $elm$core$Maybe$Just(file),
+							c3: $elm$core$Maybe$Just(file),
 							b: true
 						}),
 					$elm$core$Platform$Cmd$none);
 			case 25:
 				var rid = msg.a;
 				var revision = msg.b;
-				var _v12 = model.c2;
+				var _v12 = model.c3;
 				if (!_v12.$) {
 					var file = _v12.a;
 					return model.w ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : _Utils_Tuple2(
@@ -14219,12 +14261,12 @@ var $author$project$Main$updateHelp = F2(
 							model,
 							{
 								w: true,
-								b5: '',
-								dl: A3(
+								b6: '',
+								dm: A3(
 									$elm$core$Dict$insert,
 									'id',
 									$elm$core$String$fromInt(rid),
-									model.dl)
+									model.dm)
 							}),
 						A5(
 							$author$project$Api$checklistUpload,
@@ -14237,7 +14279,7 @@ var $author$project$Main$updateHelp = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{b5: 'Choose a file to upload.'}),
+							{b6: 'Choose a file to upload.'}),
 						$elm$core$Platform$Cmd$none);
 				}
 			case 26:
@@ -14247,7 +14289,7 @@ var $author$project$Main$updateHelp = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{bZ: current}),
+							{b_: current}),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					var err = result.a;
@@ -14255,7 +14297,7 @@ var $author$project$Main$updateHelp = F2(
 						_Utils_update(
 							model,
 							{
-								b5: $author$project$Main$httpError(err)
+								b6: $author$project$Main$httpError(err)
 							}),
 						A2(
 							$author$project$Main$toast,
@@ -14266,7 +14308,7 @@ var $author$project$Main$updateHelp = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{bZ: $elm$json$Json$Encode$null}),
+						{b_: $elm$json$Json$Encode$null}),
 					$elm$core$Platform$Cmd$none);
 			case 29:
 				var key = msg.a;
@@ -14276,13 +14318,13 @@ var $author$project$Main$updateHelp = F2(
 					A2(
 						$elm$core$Dict$get,
 						key,
-						$author$project$Features$formValues(model.bZ)));
+						$author$project$Features$formValues(model.b_)));
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							c4: A3($elm$core$Dict$insert, key, latest, model.c4),
-							dl: A3($elm$core$Dict$insert, key, latest, model.dl)
+							c5: A3($elm$core$Dict$insert, key, latest, model.c5),
+							dm: A3($elm$core$Dict$insert, key, latest, model.dm)
 						}),
 					$elm$core$Platform$Cmd$none);
 			case 27:
@@ -14293,7 +14335,7 @@ var $author$project$Main$updateHelp = F2(
 					A2(
 						$elm$json$Json$Decode$decodeValue,
 						A2($elm$json$Json$Decode$field, 'revision', $elm$json$Json$Decode$int),
-						model.bZ));
+						model.b_));
 				var ef = model.h;
 				var cf = model.f;
 				return _Utils_Tuple2(
@@ -14306,33 +14348,33 @@ var $author$project$Main$updateHelp = F2(
 									return _Utils_update(
 										f,
 										{
-											v: (model.c5 === 'cases') ? revision : f.v
+											v: (model.c6 === 'cases') ? revision : f.v
 										});
 								},
 								model.m),
 							f: _Utils_update(
 								cf,
 								{
-									v: (model.c5 === 'clients') ? revision : cf.v
+									v: (model.c6 === 'clients') ? revision : cf.v
 								}),
-							bZ: $elm$json$Json$Encode$null,
+							b_: $elm$json$Json$Encode$null,
 							h: _Utils_update(
 								ef,
 								{
-									v: (model.c5 === 'leads') ? revision : ef.v
+									v: (model.c6 === 'leads') ? revision : ef.v
 								}),
-							D: $author$project$Features$formValues(model.bZ),
-							b5: 'Comparison accepted. Review your form and save when ready.',
-							dl: A3(
+							F: $author$project$Features$formValues(model.b_),
+							b6: 'Comparison accepted. Review your form and save when ready.',
+							dm: A3(
 								$elm$core$Dict$insert,
 								'expectedRevision',
 								$elm$core$String$fromInt(revision),
-								model.dl),
-							o: model.bZ,
+								model.dm),
+							o: model.b_,
 							p: _Utils_update(
 								uf,
 								{
-									v: (model.c5 === 'users') ? revision : uf.v
+									v: (model.c6 === 'users') ? revision : uf.v
 								})
 						}),
 					$elm$core$Platform$Cmd$none);
@@ -14342,9 +14384,9 @@ var $author$project$Main$updateHelp = F2(
 				var next = _Utils_update(
 					model,
 					{
-						cT: A3($elm$core$Dict$insert, key, value, model.cT),
-						bH: true,
-						dE: 0
+						cU: A3($elm$core$Dict$insert, key, value, model.cU),
+						bI: true,
+						dF: 0
 					});
 				return _Utils_Tuple2(
 					next,
@@ -14352,7 +14394,7 @@ var $author$project$Main$updateHelp = F2(
 			case 31:
 				var next = _Utils_update(
 					model,
-					{cT: $elm$core$Dict$empty, ar: '', bH: true, dE: 0});
+					{cU: $elm$core$Dict$empty, as: '', bI: true, dF: 0});
 				return _Utils_Tuple2(
 					next,
 					$author$project$Main$reloadPanel(next));
@@ -14388,7 +14430,7 @@ var $author$project$Main$updateHelp = F2(
 					$author$project$Main$saveReportLayout(
 						A3($elm$json$Json$Encode$dict, $elm$core$Basics$identity, $elm$json$Json$Encode$string, model.aN))) : ((action === 'load-template') ? _Utils_Tuple2(
 					model,
-					$author$project$Main$requestReportLayout(0)) : ((model.bH || (model.s !== '')) ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : _Utils_Tuple2(
+					$author$project$Main$requestReportLayout(0)) : ((model.bI || (model.s !== '')) ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 					model,
 					$author$project$Main$reportOutput(
 						A3(
@@ -14403,8 +14445,8 @@ var $author$project$Main$updateHelp = F2(
 					_Utils_update(
 						model,
 						{
-							dk: A2($elm$core$Dict$remove, key, model.dk),
-							dl: A3($elm$core$Dict$insert, key, value, model.dl),
+							dl: A2($elm$core$Dict$remove, key, model.dl),
+							dm: A3($elm$core$Dict$insert, key, value, model.dm),
 							b: true
 						}),
 					$elm$core$Platform$Cmd$none);
@@ -14412,21 +14454,33 @@ var $author$project$Main$updateHelp = F2(
 				var query = msg.a;
 				var next = _Utils_update(
 					model,
-					{ar: query, bH: true, dE: 0});
+					{as: query, bI: true, dF: 0});
 				return _Utils_Tuple2(
 					next,
-					$author$project$Main$reloadPanel(next));
+					A2(
+						$elm$core$Task$perform,
+						$elm$core$Basics$always(
+							$author$project$State$FeatureSearchReady(
+								$author$project$Main$loadKey(next))),
+						$elm$core$Process$sleep(250)));
 			case 37:
+				var key = msg.a;
+				return _Utils_eq(
+					key,
+					$author$project$Main$loadKey(model)) ? _Utils_Tuple2(
+					model,
+					$author$project$Main$reloadPanel(model)) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+			case 38:
 				var row = msg.a;
 				var next = _Utils_update(
 					model,
 					{
-						bZ: $elm$json$Json$Encode$null,
-						D: $author$project$Features$formValues(row),
+						b_: $elm$json$Json$Encode$null,
+						F: $author$project$Features$formValues(row),
 						w: false,
-						b5: '',
-						dk: $elm$core$Dict$empty,
-						dl: A2(
+						b6: '',
+						dl: $elm$core$Dict$empty,
+						dm: A2(
 							$elm$core$Dict$union,
 							$author$project$Features$rowForm(row),
 							A3(
@@ -14436,10 +14490,10 @@ var $author$project$Main$updateHelp = F2(
 								$author$project$Features$defaults(
 									$author$project$Main$featureSection(model)))),
 						bl: $elm$json$Json$Encode$null,
-						dn: 0,
-						$7: '',
-						b6: _List_Nil,
-						dp: $elm$core$Maybe$Nothing,
+						$7: 0,
+						dp: '',
+						b7: _List_Nil,
+						dq: $elm$core$Maybe$Nothing,
 						b: false
 					});
 				return _Utils_Tuple2(
@@ -14457,24 +14511,24 @@ var $author$project$Main$updateHelp = F2(
 					(10 * 1024) * 1024) > 0)) ? _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{b5: 'Choose a nonempty PDF, PNG or JPEG up to 10 MB.', dp: $elm$core$Maybe$Nothing}),
+						{b6: 'Choose a nonempty PDF, PNG or JPEG up to 10 MB.', dq: $elm$core$Maybe$Nothing}),
 					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							dp: $elm$core$Maybe$Just(file)
+							dq: $elm$core$Maybe$Just(file)
 						}),
 					$elm$core$Platform$Cmd$none);
 			case 19:
 				var eid = msg.a;
 				var revision = msg.b;
-				var _v14 = model.dp;
+				var _v14 = model.dq;
 				if (!_v14.$) {
 					var file = _v14.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{w: true, b5: ''}),
+							{w: true, b6: ''}),
 						A5(
 							$author$project$Api$financeAttachment,
 							ctx,
@@ -14486,7 +14540,7 @@ var $author$project$Main$updateHelp = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{b5: 'Choose a supporting file first.'}),
+							{b6: 'Choose a supporting file first.'}),
 						$elm$core$Platform$Cmd$none);
 				}
 			case 20:
@@ -14503,7 +14557,7 @@ var $author$project$Main$updateHelp = F2(
 							_Utils_update(
 								model,
 								{
-									b6: A2(
+									b7: A2(
 										$elm$core$Result$withDefault,
 										_List_Nil,
 										A2(
@@ -14521,7 +14575,7 @@ var $author$project$Main$updateHelp = F2(
 							_Utils_update(
 								model,
 								{
-									b5: $author$project$Main$httpError(err)
+									b6: $author$project$Main$httpError(err)
 								}),
 							$elm$core$Platform$Cmd$none);
 					}
@@ -14530,7 +14584,7 @@ var $author$project$Main$updateHelp = F2(
 				var query = msg.a;
 				var next = _Utils_update(
 					model,
-					{dn: 0, $7: query});
+					{$7: 0, dp: query});
 				return _Utils_Tuple2(
 					next,
 					$author$project$Main$loadFinanceCandidates(next));
@@ -14539,7 +14593,7 @@ var $author$project$Main$updateHelp = F2(
 				var next = _Utils_update(
 					model,
 					{
-						dn: A2($elm$core$Basics$max, 0, model.dn + (direction * 50))
+						$7: A2($elm$core$Basics$max, 0, model.$7 + (direction * 50))
 					});
 				return _Utils_Tuple2(
 					next,
@@ -14550,7 +14604,7 @@ var $author$project$Main$updateHelp = F2(
 					_Utils_update(
 						model,
 						{
-							dl: A3(
+							dm: A3(
 								$elm$core$Dict$insert,
 								'matchLabel',
 								A2($author$project$Features$str, 'label', value),
@@ -14558,28 +14612,28 @@ var $author$project$Main$updateHelp = F2(
 									$elm$core$Dict$insert,
 									'match',
 									A2($author$project$Features$str, 'value', value),
-									model.dl)),
+									model.dm)),
 							b: true
 						}),
 					$elm$core$Platform$Cmd$none);
-			case 38:
+			case 39:
 				var action = msg.a;
 				return A2(
 					$author$project$Main$update,
 					action,
 					_Utils_update(
 						model,
-						{c2: $elm$core$Maybe$Nothing, bU: $elm$core$Maybe$Nothing, V: $elm$core$Maybe$Nothing, dp: $elm$core$Maybe$Nothing, b: false, L: '', S: $elm$core$Maybe$Nothing, ai: $elm$core$Maybe$Nothing, al: $elm$core$Maybe$Nothing}));
-			case 39:
+						{c3: $elm$core$Maybe$Nothing, bV: $elm$core$Maybe$Nothing, W: $elm$core$Maybe$Nothing, dq: $elm$core$Maybe$Nothing, b: false, L: '', S: $elm$core$Maybe$Nothing, ai: $elm$core$Maybe$Nothing, am: $elm$core$Maybe$Nothing}));
+			case 40:
 				var task = msg.a;
 				var next = _Utils_update(
 					model,
 					{
-						C: true,
+						E: true,
 						w: true,
-						b5: '',
-						dk: $elm$core$Dict$empty,
-						dl: $elm$core$Dict$fromList(
+						b6: '',
+						dl: $elm$core$Dict$empty,
+						dm: $elm$core$Dict$fromList(
 							_List_fromArray(
 								[
 									_Utils_Tuple2(
@@ -14594,15 +14648,15 @@ var $author$project$Main$updateHelp = F2(
 									A2($elm$core$Maybe$withDefault, '', task.a_)),
 									_Utils_Tuple2(
 									'dueDate',
-									A2($elm$core$Maybe$withDefault, '', task.aD)),
+									A2($elm$core$Maybe$withDefault, '', task.aE)),
 									_Utils_Tuple2('priority', task.a6),
-									_Utils_Tuple2('status', task.dT),
+									_Utils_Tuple2('status', task.dU),
 									_Utils_Tuple2(
 									'assignee',
 									A2(
 										$elm$core$Maybe$withDefault,
 										'',
-										A2($elm$core$Maybe$map, $elm$core$String$fromInt, task.cV))),
+										A2($elm$core$Maybe$map, $elm$core$String$fromInt, task.cW))),
 									_Utils_Tuple2('recurrenceDays', '')
 								])),
 						bl: $elm$json$Json$Encode$null
@@ -14616,7 +14670,7 @@ var $author$project$Main$updateHelp = F2(
 						'',
 						0,
 						A2($author$project$Main$acceptLoad, next, $author$project$State$TaskEditorLoaded)));
-			case 40:
+			case 41:
 				var result = msg.a;
 				if (!result.$) {
 					var row = result.a;
@@ -14624,9 +14678,9 @@ var $author$project$Main$updateHelp = F2(
 						_Utils_update(
 							model,
 							{
-								D: $author$project$Features$formValues(row),
+								F: $author$project$Features$formValues(row),
 								w: false,
-								dl: $author$project$Features$rowForm(row)
+								dm: $author$project$Features$rowForm(row)
 							}),
 						$elm$core$Platform$Cmd$none);
 				} else {
@@ -14634,27 +14688,27 @@ var $author$project$Main$updateHelp = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{C: false, w: false}),
+							{E: false, w: false}),
 						A2(
 							$author$project$Main$toast,
 							'error',
 							$author$project$Main$httpError(err)));
 				}
-			case 41:
+			case 42:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{C: false, b5: '', dk: $elm$core$Dict$empty, b: false}),
+						{E: false, b6: '', dl: $elm$core$Dict$empty, b: false}),
 					$elm$core$Platform$Cmd$none);
-			case 42:
+			case 43:
 				var next = _Utils_update(
 					model,
 					{
-						bZ: $elm$json$Json$Encode$null,
+						b_: $elm$json$Json$Encode$null,
 						w: false,
-						b5: '',
-						dk: $elm$core$Dict$empty,
-						dl: A3(
+						b6: '',
+						dl: $elm$core$Dict$empty,
+						dm: A3(
 							$elm$core$Dict$insert,
 							'owner',
 							model.af,
@@ -14665,23 +14719,23 @@ var $author$project$Main$updateHelp = F2(
 								$author$project$Features$defaults(
 									$author$project$Main$featureSection(model)))),
 						bl: $elm$json$Json$Encode$null,
-						dn: 0,
-						$7: '',
-						b6: _List_Nil,
-						dp: $elm$core$Maybe$Nothing,
+						$7: 0,
+						dp: '',
+						b7: _List_Nil,
+						dq: $elm$core$Maybe$Nothing,
 						b: false
 					});
 				return _Utils_Tuple2(
 					next,
 					$author$project$Main$reloadCurrent(next));
-			case 43:
+			case 44:
 				var action = msg.a;
 				var errors = A4(
 					$author$project$Validation$feature,
 					$author$project$Main$featureSection(model),
 					action,
 					model.af,
-					model.dl);
+					model.dm);
 				if (model.w) {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
@@ -14690,12 +14744,12 @@ var $author$project$Main$updateHelp = F2(
 							_Utils_update(
 								model,
 								{
-									b5: A2(
+									b6: A2(
 										$elm$core$Maybe$withDefault,
 										'Check the highlighted fields before continuing.',
 										$elm$core$List$head(
 											$elm$core$Dict$values(errors))),
-									dk: errors
+									dl: errors
 								}),
 							$elm$core$Platform$Cmd$none);
 					} else {
@@ -14715,12 +14769,12 @@ var $author$project$Main$updateHelp = F2(
 									model,
 									{
 										bl: $elm$json$Json$Encode$null,
-										ar: '@view:' + A2(
+										as: '@view:' + A2(
 											$elm$core$Maybe$withDefault,
 											'',
-											A2($elm$core$Dict$get, 'id', model.dl)),
-										bH: true,
-										dE: 0
+											A2($elm$core$Dict$get, 'id', model.dm)),
+										bI: true,
+										dF: 0
 									});
 								return _Utils_Tuple2(
 									next,
@@ -14730,21 +14784,21 @@ var $author$project$Main$updateHelp = F2(
 									var next = _Utils_update(
 										model,
 										{
-											ar: ((A2(
+											as: ((A2(
 												$elm$core$Maybe$withDefault,
 												'',
-												A2($elm$core$Dict$get, 'from', model.dl)) === '') && (A2(
+												A2($elm$core$Dict$get, 'from', model.dm)) === '') && (A2(
 												$elm$core$Maybe$withDefault,
 												'',
-												A2($elm$core$Dict$get, 'to', model.dl)) === '')) ? '' : (A2(
+												A2($elm$core$Dict$get, 'to', model.dm)) === '')) ? '' : (A2(
 												$elm$core$Maybe$withDefault,
 												'',
-												A2($elm$core$Dict$get, 'from', model.dl)) + (',' + A2(
+												A2($elm$core$Dict$get, 'from', model.dm)) + (',' + A2(
 												$elm$core$Maybe$withDefault,
 												'',
-												A2($elm$core$Dict$get, 'to', model.dl)))),
+												A2($elm$core$Dict$get, 'to', model.dm)))),
 											b: false,
-											bH: true
+											bI: true
 										});
 									return _Utils_Tuple2(
 										next,
@@ -14753,7 +14807,7 @@ var $author$project$Main$updateHelp = F2(
 									return _Utils_Tuple2(
 										_Utils_update(
 											model,
-											{w: true, b5: ''}),
+											{w: true, b6: ''}),
 										A4(
 											$author$project$Api$featurePost,
 											ctx,
@@ -14766,14 +14820,14 @@ var $author$project$Main$updateHelp = F2(
 														((model.af !== '') && (A2(
 															$elm$core$Maybe$withDefault,
 															'',
-															A2($elm$core$Dict$get, 'owner', model.dl)) === '')) ? A3($elm$core$Dict$insert, 'owner', model.af, model.dl) : model.dl))),
+															A2($elm$core$Dict$get, 'owner', model.dm)) === '')) ? A3($elm$core$Dict$insert, 'owner', model.af, model.dm) : model.dm))),
 											A2($author$project$Main$acceptLoad, model, $author$project$State$FeatureDone)));
 								}
 							}
 						}
 					}
 				}
-			case 44:
+			case 45:
 				var result = msg.a;
 				if (!result.$) {
 					var value = result.a;
@@ -14801,7 +14855,7 @@ var $author$project$Main$updateHelp = F2(
 							['merge', 'security', 'notifications', 'search'])) ? A3(
 						$elm$core$List$foldl,
 						addRevision,
-						model.dl,
+						model.dm,
 						_List_fromArray(
 							['sourceRevision', 'targetRevision'])) : A3(
 						$elm$core$Dict$insert,
@@ -14814,17 +14868,17 @@ var $author$project$Main$updateHelp = F2(
 							model,
 							{
 								g: $author$project$State$emptyAddTask,
-								c2: $elm$core$Maybe$Nothing,
-								C: false,
+								c3: $elm$core$Maybe$Nothing,
+								E: false,
 								w: false,
-								b5: '',
-								dk: $elm$core$Dict$empty,
-								dl: A2(
+								b6: '',
+								dl: $elm$core$Dict$empty,
+								dm: A2(
 									$elm$core$Dict$remove,
 									'password',
 									A2($elm$core$Dict$remove, 'code', form)),
 								bl: value,
-								dp: $elm$core$Maybe$Nothing,
+								dq: $elm$core$Maybe$Nothing,
 								b: false,
 								U: false
 							}),
@@ -14841,7 +14895,7 @@ var $author$project$Main$updateHelp = F2(
 									model,
 									{
 										w: false,
-										b5: A2(
+										b6: A2(
 											$elm$core$List$member,
 											$author$project$Main$featureSection(model),
 											_List_fromArray(
@@ -14858,16 +14912,16 @@ var $author$project$Main$updateHelp = F2(
 									A2(
 										$elm$core$Dict$get,
 										($author$project$Main$featureSection(model) === 'reminders') ? 'task' : 'id',
-										model.dl)));
+										model.dm)));
 							return A5(
 								$author$project$Main$beginConflict,
 								_Utils_update(
 									model,
-									{w: false, b5: 'The item changed. Compare the current version below.'}),
+									{w: false, b6: 'The item changed. Compare the current version below.'}),
 								$author$project$Main$featureSection(model),
 								rid,
-								$author$project$Main$dictValue(model.D),
-								$author$project$Main$dictValue(model.dl));
+								$author$project$Main$dictValue(model.F),
+								$author$project$Main$dictValue(model.dm));
 						}
 					} else {
 						var err = result.a;
@@ -14876,7 +14930,7 @@ var $author$project$Main$updateHelp = F2(
 								model,
 								{
 									w: false,
-									b5: $author$project$Main$httpError(err)
+									b6: $author$project$Main$httpError(err)
 								}),
 							A2(
 								$author$project$Main$toast,
@@ -14884,12 +14938,12 @@ var $author$project$Main$updateHelp = F2(
 								$author$project$Main$httpError(err)));
 					}
 				}
-			case 46:
+			case 47:
 				var token = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{aK: true, cp: ''}),
+						{ak: true, cq: ''}),
 					A4(
 						$author$project$Api$portalPost,
 						ctx,
@@ -14902,30 +14956,30 @@ var $author$project$Main$updateHelp = F2(
 									$elm$json$Json$Encode$string(token))
 								])),
 						$author$project$State$PortalExchanged));
-			case 47:
+			case 48:
 				var result = msg.a;
 				if (!result.$) {
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{aK: false, cp: ''}),
+							{ak: false, cq: ''}),
 						A2($elm$browser$Browser$Navigation$replaceUrl, model.x, '/portal'));
 				} else {
 					var err = result.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{aK: false, cp: 'This sign-in link is invalid, expired, or already used. Ask your case officer for a new link.'}),
+							{ak: false, cq: 'This sign-in link is invalid, expired, or already used. Ask your case officer for a new link.'}),
 						A2($elm$browser$Browser$Navigation$replaceUrl, model.x, '/portal'));
 				}
-			case 48:
+			case 49:
 				var result = msg.a;
 				if (!result.$) {
 					var value = result.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{aK: false, bI: value, cp: ''}),
+							{ak: false, bJ: value, cq: ''}),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					var err = result.a;
@@ -14933,38 +14987,38 @@ var $author$project$Main$updateHelp = F2(
 						_Utils_update(
 							model,
 							{
-								aK: false,
-								bI: $elm$json$Json$Encode$null,
-								cp: (model.cp !== '') ? model.cp : 'Your student access has expired or been revoked. Ask your case officer for a new sign-in link.'
+								ak: false,
+								bJ: $elm$json$Json$Encode$null,
+								cq: (model.cq !== '') ? model.cq : 'Your student access has expired or been revoked. Ask your case officer for a new sign-in link.'
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
-			case 49:
+			case 50:
 				var file = msg.a;
 				return (($elm$file$File$size(file) <= 0) || (_Utils_cmp(
 					$elm$file$File$size(file),
 					(25 * 1024) * 1024) > 0)) ? _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{cp: 'Choose a nonempty file up to 25 MB.', cq: $elm$core$Maybe$Nothing}),
+						{cq: 'Choose a nonempty file up to 25 MB.', cr: $elm$core$Maybe$Nothing}),
 					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							cp: '',
-							cq: $elm$core$Maybe$Just(file),
-							cr: ''
+							cq: '',
+							cr: $elm$core$Maybe$Just(file),
+							cs: ''
 						}),
 					$elm$core$Platform$Cmd$none);
-			case 50:
+			case 51:
 				var rid = msg.a;
-				var _v21 = model.cq;
+				var _v21 = model.cr;
 				if (!_v21.$) {
 					var file = _v21.a;
-					return model.aK ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : _Utils_Tuple2(
+					return model.ak ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{aK: true, cp: '', cr: ''}),
+							{ak: true, cq: '', cs: ''}),
 						A4(
 							$author$project$Api$portalUpload,
 							ctx,
@@ -14974,13 +15028,13 @@ var $author$project$Main$updateHelp = F2(
 				} else {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				}
-			case 51:
+			case 52:
 				var result = msg.a;
 				if (!result.$) {
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{aK: false, cq: $elm$core$Maybe$Nothing, cr: 'File received. It will be scanned before your case officer reviews it.'}),
+							{ak: false, cr: $elm$core$Maybe$Nothing, cs: 'File received. It will be scanned before your case officer reviews it.'}),
 						A2(
 							$author$project$Api$portalGet,
 							ctx,
@@ -14991,38 +15045,73 @@ var $author$project$Main$updateHelp = F2(
 						_Utils_update(
 							model,
 							{
-								aK: false,
-								cp: $author$project$Main$httpError(err)
+								ak: false,
+								cq: $author$project$Main$httpError(err)
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
-			case 52:
-				return model.aK ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{aK: true}),
-					A2(
-						$author$project$Api$portalGet,
-						ctx,
-						A2($author$project$Main$acceptLoad, model, $author$project$State$PortalLoaded)));
 			case 53:
-				return _Utils_Tuple2(
+				var ident = msg.a;
+				var action = msg.b;
+				return model.ak ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{aK: true}),
+						{ak: true, cq: '', cs: ''}),
 					A4(
 						$author$project$Api$portalPost,
 						ctx,
-						'logout',
+						'commercial/' + (ident + ('/' + action)),
 						$elm$json$Json$Encode$object(_List_Nil),
-						$author$project$State$PortalLogoutDone));
+						$author$project$State$PortalResponded));
 			case 54:
 				var result = msg.a;
 				if (!result.$) {
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{aK: false, bI: $elm$json$Json$Encode$null, cp: 'Signed out. Ask your case officer for a new link when you need access again.', cq: $elm$core$Maybe$Nothing, cr: ''}),
+							{ak: false, cs: 'Your response was recorded.'}),
+						A2(
+							$author$project$Api$portalGet,
+							ctx,
+							A2($author$project$Main$acceptLoad, model, $author$project$State$PortalLoaded)));
+				} else {
+					var e = result.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								ak: false,
+								cq: $author$project$Main$httpError(e)
+							}),
+						$elm$core$Platform$Cmd$none);
+				}
+			case 55:
+				return model.ak ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{ak: true}),
+					A2(
+						$author$project$Api$portalGet,
+						ctx,
+						A2($author$project$Main$acceptLoad, model, $author$project$State$PortalLoaded)));
+			case 56:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{ak: true}),
+					A4(
+						$author$project$Api$portalPost,
+						ctx,
+						'logout',
+						$elm$json$Json$Encode$object(_List_Nil),
+						$author$project$State$PortalLogoutDone));
+			case 57:
+				var result = msg.a;
+				if (!result.$) {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{ak: false, bJ: $elm$json$Json$Encode$null, cq: 'Signed out. Ask your case officer for a new link when you need access again.', cr: $elm$core$Maybe$Nothing, cs: ''}),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					var err = result.a;
@@ -15030,8 +15119,8 @@ var $author$project$Main$updateHelp = F2(
 						_Utils_update(
 							model,
 							{
-								aK: false,
-								cp: 'Sign-out failed. Please try again. ' + $author$project$Main$httpError(err)
+								ak: false,
+								cq: 'Sign-out failed. Please try again. ' + $author$project$Main$httpError(err)
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
@@ -15040,7 +15129,7 @@ var $author$project$Main$updateHelp = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{y: '', cg: mode, aH: '', R: ''}),
+						{y: '', ch: mode, aI: '', R: ''}),
 					$elm$core$Platform$Cmd$none);
 			case 5:
 				return model.K ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : ((!A2($elm$core$String$contains, '@', model.a4)) ? _Utils_Tuple2(
@@ -15072,7 +15161,7 @@ var $author$project$Main$updateHelp = F2(
 								A2(
 									$elm$core$String$dropLeft,
 									6,
-									A2($elm$core$Maybe$withDefault, '', model.bw.ak))));
+									A2($elm$core$Maybe$withDefault, '', model.bw.al))));
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
@@ -15086,7 +15175,7 @@ var $author$project$Main$updateHelp = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{K: false, aH: 'If your account exists, you’ll receive an email with a link that expires in one hour.'}),
+							{K: false, aI: 'If your account exists, you’ll receive an email with a link that expires in one hour.'}),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					var err = result.a;
@@ -15105,7 +15194,7 @@ var $author$project$Main$updateHelp = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{K: false, cg: 'login', aH: 'Password updated. Sign in with your new password.', R: ''}),
+							{K: false, ch: 'login', aI: 'Password updated. Sign in with your new password.', R: ''}),
 						A2($elm$browser$Browser$Navigation$replaceUrl, model.x, '/'));
 				} else {
 					var err = result.a;
@@ -15125,7 +15214,7 @@ var $author$project$Main$updateHelp = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							cleared,
-							{bc: _List_Nil, aa: true, c2: $elm$core$Maybe$Nothing, bT: $elm$core$Maybe$Nothing, aV: false, be: '', bU: $elm$core$Maybe$Nothing, bV: '', aW: $elm$json$Json$Encode$null, aX: _List_Nil, bZ: $elm$json$Json$Encode$null, c4: $elm$core$Dict$empty, b_: $elm$core$Dict$empty, O: $elm$core$Maybe$Nothing, B: false, C: false, D: $elm$core$Dict$empty, w: false, r: $elm$json$Json$Encode$null, dl: $elm$core$Dict$empty, bl: $elm$json$Json$Encode$null, dn: 0, $7: '', b6: _List_Nil, dp: $elm$core$Maybe$Nothing, b: false, at: _List_Nil, a5: '', R: '', bs: _List_Nil, aK: false, bI: $elm$json$Json$Encode$null, cq: $elm$core$Maybe$Nothing, o: $elm$json$Json$Encode$null, aN: $elm$core$Dict$empty, al: $elm$core$Maybe$Nothing, an: _List_Nil, dW: $elm$core$Maybe$Nothing, H: $elm$core$Maybe$Nothing, ap: _List_Nil}),
+							{bc: _List_Nil, aa: true, c3: $elm$core$Maybe$Nothing, bU: $elm$core$Maybe$Nothing, aV: false, be: '', bV: $elm$core$Maybe$Nothing, bW: '', aW: $elm$json$Json$Encode$null, aX: _List_Nil, b_: $elm$json$Json$Encode$null, c5: $elm$core$Dict$empty, b$: $elm$core$Dict$empty, O: $elm$core$Maybe$Nothing, D: false, E: false, F: $elm$core$Dict$empty, w: false, r: $elm$json$Json$Encode$null, dm: $elm$core$Dict$empty, bl: $elm$json$Json$Encode$null, $7: 0, dp: '', b7: _List_Nil, dq: $elm$core$Maybe$Nothing, b: false, au: _List_Nil, a5: '', R: '', bs: _List_Nil, ak: false, bJ: $elm$json$Json$Encode$null, cr: $elm$core$Maybe$Nothing, o: $elm$json$Json$Encode$null, aN: $elm$core$Dict$empty, am: $elm$core$Maybe$Nothing, ao: _List_Nil, dX: $elm$core$Maybe$Nothing, C: $elm$core$Maybe$Nothing, aq: _List_Nil}),
 						$elm$core$Platform$Cmd$batch(
 							_List_fromArray(
 								[
@@ -15146,8 +15235,8 @@ var $author$project$Main$updateHelp = F2(
 				var next = _Utils_update(
 					model,
 					{
-						bH: true,
-						dE: A2($elm$core$Basics$max, 0, model.dE + (step * 50)),
+						bI: true,
+						dF: A2($elm$core$Basics$max, 0, model.dF + (step * 50)),
 						T: $elm$core$Set$empty
 					});
 				return _Utils_Tuple2(
@@ -15156,10 +15245,10 @@ var $author$project$Main$updateHelp = F2(
 			case 11:
 				var kind = msg.a;
 				var query = msg.b;
-				return (((kind === 'leads') && _Utils_eq(query, model.dF)) || ((kind === 'clients') && _Utils_eq(query, model.bf))) ? _Utils_Tuple2(
+				return (((kind === 'leads') && _Utils_eq(query, model.dG)) || ((kind === 'clients') && _Utils_eq(query, model.bf))) ? _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{bH: true}),
+						{bI: true}),
 					(kind === 'leads') ? A4(
 						$author$project$Api$fetchFilteredLeads,
 						ctx,
@@ -15179,7 +15268,7 @@ var $author$project$Main$updateHelp = F2(
 						{
 							bs: A2($elm$core$Result$withDefault, _List_Nil, result),
 							s: $author$project$Main$resultError(result),
-							bH: false
+							bI: false
 						}),
 					$elm$core$Platform$Cmd$none);
 			case 13:
@@ -15207,13 +15296,13 @@ var $author$project$Main$updateHelp = F2(
 							'error',
 							$author$project$Main$httpError(err)));
 				}
-			case 55:
+			case 58:
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-			case 56:
+			case 59:
 				var request = msg.a;
 				if (!request.$) {
 					var url = request.a;
-					return (_Utils_eq(url.t, model.bw.t) && _Utils_eq(url.ak, model.bw.ak)) ? _Utils_Tuple2(
+					return (_Utils_eq(url.t, model.bw.t) && _Utils_eq(url.al, model.bw.al)) ? _Utils_Tuple2(
 						model,
 						A2(
 							$elm$browser$Browser$Navigation$pushUrl,
@@ -15229,47 +15318,48 @@ var $author$project$Main$updateHelp = F2(
 						model,
 						$elm$browser$Browser$Navigation$load(href));
 				}
-			case 57:
+			case 60:
 				var url = msg.a;
+				var next = _Utils_update(
+					model,
+					{
+						cU: $author$project$State$applicationFiltersForUrl(url),
+						c3: $elm$core$Maybe$Nothing,
+						bU: $elm$core$Maybe$Nothing,
+						aV: false,
+						be: '',
+						bV: $elm$core$Maybe$Nothing,
+						bW: '',
+						aW: $elm$json$Json$Encode$null,
+						b_: $elm$json$Json$Encode$null,
+						O: $elm$core$Maybe$Nothing,
+						E: false,
+						F: $elm$core$Dict$empty,
+						w: false,
+						b6: '',
+						dl: $elm$core$Dict$empty,
+						dm: $author$project$Main$featureDefaultsForUrl(url),
+						bl: $elm$json$Json$Encode$null,
+						as: '',
+						b: false,
+						af: $author$project$Main$ownerForUrl(url),
+						br: false,
+						bs: _List_Nil,
+						s: '',
+						bI: true,
+						dF: 0,
+						S: $elm$core$Maybe$Nothing,
+						ai: $elm$core$Maybe$Nothing,
+						T: $elm$core$Set$empty,
+						bw: url
+					});
 				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							cT: $author$project$State$applicationFiltersForUrl(url),
-							c2: $elm$core$Maybe$Nothing,
-							bT: $elm$core$Maybe$Nothing,
-							aV: false,
-							be: '',
-							bU: $elm$core$Maybe$Nothing,
-							bV: '',
-							aW: $elm$json$Json$Encode$null,
-							bZ: $elm$json$Json$Encode$null,
-							O: $elm$core$Maybe$Nothing,
-							C: false,
-							D: $elm$core$Dict$empty,
-							w: false,
-							b5: '',
-							dk: $elm$core$Dict$empty,
-							dl: $author$project$Main$featureDefaultsForUrl(url),
-							bl: $elm$json$Json$Encode$null,
-							ar: '',
-							b: false,
-							af: $author$project$Main$ownerForUrl(url),
-							br: false,
-							bs: _List_Nil,
-							s: '',
-							bH: true,
-							dE: 0,
-							S: $elm$core$Maybe$Nothing,
-							ai: $elm$core$Maybe$Nothing,
-							T: $elm$core$Set$empty,
-							bw: url
-						}),
+					next,
 					function () {
 						if (url.t === '/portal') {
-							var _v29 = url.bm;
-							if (!_v29.$) {
-								var fragment = _v29.a;
+							var _v30 = url.bm;
+							if (!_v30.$) {
+								var fragment = _v30.a;
 								return A2(
 									$elm$core$Task$perform,
 									$elm$core$Basics$always(
@@ -15280,32 +15370,20 @@ var $author$project$Main$updateHelp = F2(
 								return A2(
 									$author$project$Api$portalGet,
 									ctx,
-									A2(
-										$author$project$Main$acceptLoad,
-										_Utils_update(
-											model,
-											{ar: '', dE: 0, bw: url}),
-										$author$project$State$PortalLoaded));
+									A2($author$project$Main$acceptLoad, next, $author$project$State$PortalLoaded));
 							}
 						} else {
-							if (_Utils_eq(model.H, $elm$core$Maybe$Nothing)) {
+							if (_Utils_eq(model.C, $elm$core$Maybe$Nothing)) {
 								return $elm$core$Platform$Cmd$none;
 							} else {
 								return A2(
 									$author$project$Main$routeCmd,
-									_Utils_update(
-										model,
-										{
-											cT: $author$project$State$applicationFiltersForUrl(url),
-											ar: '',
-											dE: 0,
-											bw: url
-										}),
+									next,
 									$author$project$State$routeOf(url));
 							}
 						}
 					}());
-			case 58:
+			case 61:
 				var t = msg.a;
 				return _Utils_eq(t, $elm$core$Maybe$Nothing) ? _Utils_Tuple2(
 					_Utils_update(
@@ -15314,51 +15392,58 @@ var $author$project$Main$updateHelp = F2(
 					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{dW: t}),
+						{dX: t}),
 					A2(
 						$author$project$Api$me,
-						{aq: model._, dW: t},
+						{ar: model.V, dX: t},
 						$author$project$State$MeDone));
-			case 59:
+			case 62:
 				var flag = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{aC: flag}),
+						{aD: flag}),
 					$elm$core$Platform$Cmd$none);
-			case 60:
-				var newFlag = !model.aC;
+			case 63:
+				var newFlag = !model.aD;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{aC: newFlag}),
+						{aD: newFlag}),
 					$author$project$Main$saveDark(newFlag));
-			case 169:
+			case 175:
 				var iso = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{A: iso}),
+						{B: iso}),
 					$elm$core$Platform$Cmd$none);
-			case 170:
+			case 176:
 				var instant = msg.a;
 				var next = A2($author$project$Main$updateClock, instant, model);
 				return _Utils_Tuple2(
 					next,
 					A2($author$project$Main$refreshDateSummaries, model, next));
-			case 171:
+			case 177:
 				var instant = msg.a;
 				var next = A2($author$project$Main$updateClock, instant, model);
-				var summary = (_Utils_eq(next.A, model.A) && $author$project$Main$dateSummaryIsStale(next)) ? $author$project$Main$fetchDateSummary(next) : A2($author$project$Main$refreshDateSummaries, model, next);
+				var summary = (_Utils_eq(next.B, model.B) && $author$project$Main$dateSummaryIsStale(next)) ? $author$project$Main$fetchDateSummary(next) : A2($author$project$Main$refreshDateSummaries, model, next);
 				return _Utils_Tuple2(
 					next,
 					$elm$core$Platform$Cmd$batch(
 						_List_fromArray(
 							[
 								A2($author$project$Api$clock, ctx, $author$project$State$ClockLoaded),
-								summary
+								summary,
+								(!_Utils_eq(model.C, $elm$core$Maybe$Nothing)) ? A5(
+								$author$project$Api$featureGet,
+								ctx,
+								'notifications',
+								'',
+								0,
+								A2($author$project$Main$acceptLoad, model, $author$project$State$NotificationsLoaded)) : $elm$core$Platform$Cmd$none
 							])));
-			case 172:
+			case 178:
 				return _Utils_Tuple2(
 					model,
 					$elm$core$Platform$Cmd$batch(
@@ -15367,9 +15452,9 @@ var $author$project$Main$updateHelp = F2(
 								A2($elm$core$Task$perform, $author$project$State$ClockTick, $elm$time$Time$now),
 								A2($author$project$Api$clock, ctx, $author$project$State$ClockLoaded)
 							])));
-			case 173:
+			case 179:
 				var result = msg.a;
-				var _v30 = A2(
+				var _v31 = A2(
 					$elm$core$Result$andThen,
 					A2(
 						$elm$core$Basics$composeR,
@@ -15386,11 +15471,11 @@ var $author$project$Main$updateHelp = F2(
 						$elm$core$Result$mapError(
 							$elm$core$Basics$always($elm$http$Http$NetworkError))),
 					result);
-				if (!_v30.$) {
-					var _v31 = _v30.a;
-					var millis = _v31.a;
-					var offset = _v31.b;
-					var zone = _v31.c;
+				if (!_v31.$) {
+					var _v32 = _v31.a;
+					var millis = _v32.a;
+					var offset = _v32.b;
+					var zone = _v32.c;
 					return ((_Utils_cmp(offset, -720) > -1) && (offset <= 840)) ? _Utils_Tuple2(
 						model,
 						A2(
@@ -15408,7 +15493,7 @@ var $author$project$Main$updateHelp = F2(
 							{aY: false}),
 						$elm$core$Platform$Cmd$none);
 				}
-			case 174:
+			case 180:
 				var millis = msg.a;
 				var offset = msg.b;
 				var zone = msg.c;
@@ -15417,29 +15502,29 @@ var $author$project$Main$updateHelp = F2(
 					model,
 					{
 						bg: offset,
-						bW: millis - $elm$time$Time$posixToMillis(received),
+						bX: millis - $elm$time$Time$posixToMillis(received),
 						aY: true,
-						bX: zone
+						bY: zone
 					});
 				var next = A2($author$project$Main$updateClock, received, synced);
 				return _Utils_Tuple2(
 					next,
 					A2($author$project$Main$refreshDateSummaries, model, next));
-			case 61:
+			case 64:
 				var v = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{a4: v, y: ''}),
 					$elm$core$Platform$Cmd$none);
-			case 62:
+			case 65:
 				var v = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{y: '', R: v}),
 					$elm$core$Platform$Cmd$none);
-			case 63:
+			case 66:
 				return model.K ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : ((($elm$core$String$trim(model.a4) === '') || (model.R === '')) ? _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -15449,23 +15534,24 @@ var $author$project$Main$updateHelp = F2(
 						model,
 						{K: true, y: ''}),
 					A5($author$project$Api$login, ctx, model.a4, model.R, model.a5, $author$project$State$LoginDone)));
-			case 64:
+			case 67:
 				if (!msg.a.$) {
 					var resp = msg.a.a;
 					var authenticated = A2(
 						$author$project$Main$restoreSessionDraft,
-						resp.H.bA,
+						resp.C.bA,
 						_Utils_update(
 							model,
 							{
 								aa: true,
 								K: false,
 								y: '',
-								aH: '',
+								aI: '',
 								a5: '',
 								R: '',
-								dW: $elm$core$Maybe$Just(resp.dW),
-								H: $elm$core$Maybe$Just(resp.H)
+								bE: _List_Nil,
+								dX: $elm$core$Maybe$Just(resp.dX),
+								C: $elm$core$Maybe$Just(resp.C)
 							}));
 					return _Utils_Tuple2(
 						authenticated,
@@ -15473,9 +15559,19 @@ var $author$project$Main$updateHelp = F2(
 							_List_fromArray(
 								[
 									$author$project$Main$saveToken(
-									$elm$core$Maybe$Just(resp.dW)),
-									A2($author$project$Main$toast, 'success', 'Welcome back, ' + resp.H.z),
-									resp.H.bp ? A2($elm$browser$Browser$Navigation$pushUrl, model.x, '/work/security') : A2(
+									$elm$core$Maybe$Just(resp.dX)),
+									A5(
+									$author$project$Api$featureGet,
+									{
+										ar: model.V,
+										dX: $elm$core$Maybe$Just(resp.dX)
+									},
+									'notifications',
+									'',
+									0,
+									A2($author$project$Main$acceptLoad, authenticated, $author$project$State$NotificationsLoaded)),
+									A2($author$project$Main$toast, 'success', 'Welcome back, ' + resp.C.z),
+									resp.C.bp ? A2($elm$browser$Browser$Navigation$pushUrl, model.x, '/work/security') : A2(
 									$author$project$Main$routeCmd,
 									authenticated,
 									$author$project$State$routeOf(model.bw))
@@ -15493,7 +15589,7 @@ var $author$project$Main$updateHelp = F2(
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
-			case 65:
+			case 68:
 				if (!msg.a.$) {
 					var u = msg.a.a;
 					return _Utils_Tuple2(
@@ -15501,66 +15597,44 @@ var $author$project$Main$updateHelp = F2(
 							model,
 							{
 								aa: true,
-								H: $elm$core$Maybe$Just(u)
+								C: $elm$core$Maybe$Just(u)
 							}),
-						u.bp ? A2($elm$browser$Browser$Navigation$pushUrl, model.x, '/work/security') : A2(
-							$author$project$Main$routeCmd,
-							model,
-							$author$project$State$routeOf(model.bw)));
+						$elm$core$Platform$Cmd$batch(
+							_List_fromArray(
+								[
+									A5(
+									$author$project$Api$featureGet,
+									ctx,
+									'notifications',
+									'',
+									0,
+									A2($author$project$Main$acceptLoad, model, $author$project$State$NotificationsLoaded)),
+									u.bp ? A2($elm$browser$Browser$Navigation$pushUrl, model.x, '/work/security') : A2(
+									$author$project$Main$routeCmd,
+									model,
+									$author$project$State$routeOf(model.bw))
+								])));
 				} else {
 					var e = msg.a.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{aa: true, dW: $elm$core$Maybe$Nothing, H: $elm$core$Maybe$Nothing}),
+							{aa: true, dX: $elm$core$Maybe$Nothing, C: $elm$core$Maybe$Nothing}),
 						$author$project$Main$saveToken($elm$core$Maybe$Nothing));
 				}
-			case 66:
+			case 69:
 				return _Utils_Tuple2(
 					model,
 					A2($author$project$Api$logout, ctx, $author$project$State$LogoutDone));
-			case 67:
-				var result = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							at: A2($elm$core$Result$withDefault, model.at, result),
-							s: $author$project$Main$resultError(result),
-							bH: false
-						}),
-					$elm$core$Platform$Cmd$none);
-			case 68:
-				var result = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							s: $author$project$Main$resultError(result),
-							bH: false,
-							ap: A2($elm$core$Result$withDefault, model.ap, result)
-						}),
-					$elm$core$Platform$Cmd$none);
-			case 69:
-				var result = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							s: $author$project$Main$resultError(result),
-							bH: false,
-							an: A2($elm$core$Result$withDefault, model.an, result)
-						}),
-					$elm$core$Platform$Cmd$none);
 			case 70:
 				var result = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							aX: A2($elm$core$Result$withDefault, model.aX, result),
+							au: A2($elm$core$Result$withDefault, model.au, result),
 							s: $author$project$Main$resultError(result),
-							bH: false
+							bI: false
 						}),
 					$elm$core$Platform$Cmd$none);
 			case 71:
@@ -15569,9 +15643,42 @@ var $author$project$Main$updateHelp = F2(
 					_Utils_update(
 						model,
 						{
-							bT: $author$project$Main$justOf(result),
 							s: $author$project$Main$resultError(result),
-							bH: false
+							bI: false,
+							aq: A2($elm$core$Result$withDefault, model.aq, result)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 72:
+				var result = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							s: $author$project$Main$resultError(result),
+							bI: false,
+							ao: A2($elm$core$Result$withDefault, model.ao, result)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 73:
+				var result = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							aX: A2($elm$core$Result$withDefault, model.aX, result),
+							s: $author$project$Main$resultError(result),
+							bI: false
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 74:
+				var result = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							bU: $author$project$Main$justOf(result),
+							s: $author$project$Main$resultError(result),
+							bI: false
 						}),
 					function () {
 						if (!result.$) {
@@ -15582,16 +15689,16 @@ var $author$project$Main$updateHelp = F2(
 										A3(
 										$author$project$Api$clientProfile,
 										ctx,
-										detail.c3.bA,
+										detail.c4.bA,
 										A2($author$project$Main$acceptLoad, model, $author$project$State$ClientProfileLoaded)),
 										A5(
 										$author$project$Api$featureGet,
 										ctx,
-										A2($author$project$Main$inlinePath, model, detail.c3.bA),
-										model.ar,
-										model.dE,
+										A2($author$project$Main$inlinePath, model, detail.c4.bA),
+										model.as,
+										model.dF,
 										A2($author$project$Main$acceptLoad, model, $author$project$State$FeatureLoaded)),
-										$elm$core$List$isEmpty(model.ap) ? A2(
+										$elm$core$List$isEmpty(model.aq) ? A2(
 										$author$project$Api$fetchUsers,
 										ctx,
 										A2($author$project$Main$acceptLoad, model, $author$project$State$UsersLoaded)) : $elm$core$Platform$Cmd$none
@@ -15600,7 +15707,7 @@ var $author$project$Main$updateHelp = F2(
 							return $elm$core$Platform$Cmd$none;
 						}
 					}());
-			case 72:
+			case 75:
 				var result = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -15608,36 +15715,36 @@ var $author$project$Main$updateHelp = F2(
 						{
 							O: $author$project$Main$justOf(result),
 							s: $author$project$Main$resultError(result),
-							bH: false
+							bI: false
 						}),
 					$elm$core$Platform$Cmd$none);
-			case 74:
+			case 77:
 				var requestedDate = msg.a;
 				var result = msg.b;
 				if (!result.$) {
 					var stats = result.a;
-					return _Utils_eq(requestedDate, model.A) ? _Utils_Tuple2(
+					return _Utils_eq(requestedDate, model.B) ? _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
-								bM: $elm$core$Maybe$Just(stats)
+								bN: $elm$core$Maybe$Just(stats)
 							}),
 						$elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				}
-			case 73:
+			case 76:
 				var result = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
 							s: $author$project$Main$resultError(result),
-							bH: false,
-							bM: $author$project$Main$justOf(result)
+							bI: false,
+							bN: $author$project$Main$justOf(result)
 						}),
 					$elm$core$Platform$Cmd$none);
-			case 75:
+			case 78:
 				var result = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -15646,32 +15753,32 @@ var $author$project$Main$updateHelp = F2(
 							bc: A2($elm$core$Result$withDefault, model.bc, result)
 						}),
 					$elm$core$Platform$Cmd$none);
-			case 76:
+			case 79:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{q: $author$project$State$emptyAddLead, Z: true}),
+						{q: $author$project$State$emptyAddLead, _: true}),
 					$elm$core$Platform$Cmd$none);
-			case 77:
+			case 80:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{b: false, Z: false}),
+						{b: false, _: false}),
 					$elm$core$Platform$Cmd$none);
-			case 78:
+			case 81:
 				var f = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
 							q: f(model.q),
-							dk: $elm$core$Dict$empty,
+							dl: $elm$core$Dict$empty,
 							b: true
 						}),
 					$elm$core$Platform$Cmd$none);
-			case 79:
-				return A2($author$project$Main$checkContactBeforeSave, 'add-lead', model);
 			case 82:
+				return A2($author$project$Main$checkContactBeforeSave, 'add-lead', model);
+			case 85:
 				if (!msg.a.$) {
 					var lead = msg.a.a;
 					return _Utils_Tuple2(
@@ -15680,13 +15787,13 @@ var $author$project$Main$updateHelp = F2(
 							{
 								w: false,
 								b: false,
-								at: A2($elm$core$List$cons, lead, model.at),
-								Z: false
+								au: A2($elm$core$List$cons, lead, model.au),
+								_: false
 							}),
 						$elm$core$Platform$Cmd$batch(
 							_List_fromArray(
 								[
-									A2($author$project$Main$toast, 'success', 'Lead ' + (lead.cj + ' created')),
+									A2($author$project$Main$toast, 'success', 'Lead ' + (lead.ck + ' created')),
 									A2($author$project$Main$navigateTo, model.x, '/leads')
 								])));
 				} else {
@@ -15700,12 +15807,12 @@ var $author$project$Main$updateHelp = F2(
 							'error',
 							$author$project$Main$httpError(e)));
 				}
-			case 83:
-				var _v34 = model.O;
-				if (_v34.$ === 1) {
+			case 86:
+				var _v35 = model.O;
+				if (_v35.$ === 1) {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					var d = _v34.a;
+					var d = _v35.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -15717,20 +15824,20 @@ var $author$project$Main$updateHelp = F2(
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
-			case 84:
+			case 87:
 				var f = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
 							h: f(model.h),
-							dk: $elm$core$Dict$empty,
+							dl: $elm$core$Dict$empty,
 							b: true
 						}),
 					$elm$core$Platform$Cmd$none);
-			case 85:
+			case 88:
 				return A2($author$project$Main$checkContactBeforeSave, 'edit-lead', model);
-			case 86:
+			case 89:
 				if (!msg.a.$) {
 					var lead = msg.a.a;
 					return _Utils_Tuple2(
@@ -15779,12 +15886,12 @@ var $author$project$Main$updateHelp = F2(
 								$author$project$Main$httpError(e)));
 					}
 				}
-			case 87:
+			case 90:
 				var id = msg.a;
 				return _Utils_Tuple2(
 					model,
 					A3($author$project$Api$deleteLead, ctx, id, $author$project$State$DeleteLeadDone));
-			case 88:
+			case 91:
 				if (!msg.a.$) {
 					return _Utils_Tuple2(
 						model,
@@ -15803,12 +15910,12 @@ var $author$project$Main$updateHelp = F2(
 							'error',
 							$author$project$Main$httpError(e)));
 				}
-			case 89:
+			case 92:
 				var id = msg.a;
 				return _Utils_Tuple2(
 					model,
 					A3($author$project$Api$advanceLead, ctx, id, $author$project$State$AdvanceDone));
-			case 90:
+			case 93:
 				if (!msg.a.$) {
 					var lead = msg.a.a;
 					return _Utils_Tuple2(
@@ -15816,7 +15923,7 @@ var $author$project$Main$updateHelp = F2(
 						$elm$core$Platform$Cmd$batch(
 							_List_fromArray(
 								[
-									A2($author$project$Main$toast, 'success', 'Advanced to ' + lead.dR),
+									A2($author$project$Main$toast, 'success', 'Advanced to ' + lead.dS),
 									$author$project$Main$reloadCurrent(model)
 								])));
 				} else {
@@ -15828,7 +15935,7 @@ var $author$project$Main$updateHelp = F2(
 							'error',
 							$author$project$Main$httpError(e)));
 				}
-			case 91:
+			case 94:
 				var result = msg.a;
 				if (!result.$) {
 					var value = result.a;
@@ -15847,7 +15954,7 @@ var $author$project$Main$updateHelp = F2(
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
-			case 92:
+			case 95:
 				var file = msg.a;
 				return (($elm$file$File$size(file) <= 0) || ((_Utils_cmp(
 					$elm$file$File$size(file),
@@ -15858,27 +15965,27 @@ var $author$project$Main$updateHelp = F2(
 						['image/jpeg', 'image/png']))))) ? _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{be: 'Choose a PNG or JPEG up to 2 MB and 4096 × 4096 pixels.', bU: $elm$core$Maybe$Nothing}),
+						{be: 'Choose a PNG or JPEG up to 2 MB and 4096 × 4096 pixels.', bV: $elm$core$Maybe$Nothing}),
 					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
 							be: '',
-							bU: $elm$core$Maybe$Just(file),
+							bV: $elm$core$Maybe$Just(file),
 							b: true
 						}),
 					$elm$core$Platform$Cmd$none);
-			case 93:
+			case 96:
 				var cid = msg.a;
-				var _v36 = model.bU;
-				if (_v36.$ === 1) {
+				var _v37 = model.bV;
+				if (_v37.$ === 1) {
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{be: 'Choose a student photo first.'}),
 						$elm$core$Platform$Cmd$none);
 				} else {
-					var file = _v36.a;
+					var file = _v37.a;
 					var expected = A2(
 						$elm$core$Result$withDefault,
 						0,
@@ -15893,7 +16000,7 @@ var $author$project$Main$updateHelp = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{aV: true, be: '', bV: ''}),
+							{aV: true, be: '', bW: ''}),
 						A5(
 							$author$project$Api$uploadClientPhoto,
 							ctx,
@@ -15905,7 +16012,7 @@ var $author$project$Main$updateHelp = F2(
 								model,
 								$author$project$State$ClientPhotoDone(cid))));
 				}
-			case 94:
+			case 97:
 				var cid = msg.a;
 				var result = msg.b;
 				if (!result.$) {
@@ -15915,8 +16022,8 @@ var $author$project$Main$updateHelp = F2(
 							model,
 							{
 								aV: false,
-								bU: $elm$core$Maybe$Nothing,
-								bV: A2($author$project$Features$str, 'message', value),
+								bV: $elm$core$Maybe$Nothing,
+								bW: A2($author$project$Features$str, 'message', value),
 								b: false
 							}),
 						A3(
@@ -15937,7 +16044,7 @@ var $author$project$Main$updateHelp = F2(
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
-			case 95:
+			case 98:
 				var cid = msg.a;
 				return _Utils_Tuple2(
 					model,
@@ -15946,7 +16053,7 @@ var $author$project$Main$updateHelp = F2(
 						ctx,
 						cid,
 						A2($author$project$Main$acceptLoad, model, $author$project$State$ClientProfileLoaded)));
-			case 96:
+			case 99:
 				var cid = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -15960,7 +16067,7 @@ var $author$project$Main$updateHelp = F2(
 							$author$project$Main$acceptLoad,
 							model,
 							$author$project$State$ClientPhotoDone(cid))));
-			case 97:
+			case 100:
 				var id = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -15971,7 +16078,7 @@ var $author$project$Main$updateHelp = F2(
 						ctx,
 						id,
 						A2($author$project$Main$acceptLoad, model, $author$project$State$ConvertDone)));
-			case 98:
+			case 101:
 				if (!msg.a.$) {
 					var client = msg.a.a;
 					return _Utils_Tuple2(
@@ -15981,7 +16088,7 @@ var $author$project$Main$updateHelp = F2(
 						$elm$core$Platform$Cmd$batch(
 							_List_fromArray(
 								[
-									A2($author$project$Main$toast, 'success', 'Converted to student ' + client.cj),
+									A2($author$project$Main$toast, 'success', 'Converted to student ' + client.ck),
 									A2(
 									$author$project$Main$navigateTo,
 									model.x,
@@ -15998,19 +16105,19 @@ var $author$project$Main$updateHelp = F2(
 							'error',
 							$author$project$Main$httpError(e)));
 				}
-			case 99:
+			case 102:
 				var v = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{b: true, L: v}),
 					$elm$core$Platform$Cmd$none);
-			case 100:
+			case 103:
 				var id = msg.a;
 				return ($elm$core$String$trim(model.L) === '') ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 					model,
 					A4($author$project$Api$addNote, ctx, id, model.L, $author$project$State$NoteDone));
-			case 101:
+			case 104:
 				if (!msg.a.$) {
 					return _Utils_Tuple2(
 						_Utils_update(
@@ -16031,62 +16138,43 @@ var $author$project$Main$updateHelp = F2(
 							'error',
 							$author$project$Main$httpError(e)));
 				}
-			case 102:
-				var v = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{dE: 0, dF: v}),
-					A2(
-						$elm$core$Task$perform,
-						function (_v38) {
-							return A2($author$project$State$SearchReady, 'leads', v);
-						},
-						$elm$core$Process$sleep(300)));
-			case 103:
-				var v = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{dj: v, bH: true, dE: 0}),
-					A4(
-						$author$project$Api$fetchFilteredLeads,
-						ctx,
-						_Utils_update(
-							model,
-							{dj: v}),
-						0,
-						A2(
-							$author$project$Main$acceptLoad,
-							_Utils_update(
-								model,
-								{dj: v, dE: 0}),
-							$author$project$State$LeadsLoaded)));
-			case 104:
-				var v = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{dh: v, bH: true, dE: 0}),
-					A4(
-						$author$project$Api$fetchFilteredLeads,
-						ctx,
-						_Utils_update(
-							model,
-							{dh: v}),
-						0,
-						A2(
-							$author$project$Main$acceptLoad,
-							_Utils_update(
-								model,
-								{dh: v, dE: 0}),
-							$author$project$State$LeadsLoaded)));
 			case 105:
 				var v = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{di: v, bH: true, dE: 0}),
+						{dF: 0, dG: v}),
+					A2(
+						$elm$core$Task$perform,
+						function (_v39) {
+							return A2($author$project$State$SearchReady, 'leads', v);
+						},
+						$elm$core$Process$sleep(300)));
+			case 106:
+				var v = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{dk: v, bI: true, dF: 0}),
+					A4(
+						$author$project$Api$fetchFilteredLeads,
+						ctx,
+						_Utils_update(
+							model,
+							{dk: v}),
+						0,
+						A2(
+							$author$project$Main$acceptLoad,
+							_Utils_update(
+								model,
+								{dk: v, dF: 0}),
+							$author$project$State$LeadsLoaded)));
+			case 107:
+				var v = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{di: v, bI: true, dF: 0}),
 					A4(
 						$author$project$Api$fetchFilteredLeads,
 						ctx,
@@ -16098,49 +16186,68 @@ var $author$project$Main$updateHelp = F2(
 							$author$project$Main$acceptLoad,
 							_Utils_update(
 								model,
-								{di: v, dE: 0}),
+								{di: v, dF: 0}),
 							$author$project$State$LeadsLoaded)));
-			case 106:
+			case 108:
 				var v = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{bH: true, dE: 0, dP: v}),
+						{dj: v, bI: true, dF: 0}),
 					A4(
 						$author$project$Api$fetchFilteredLeads,
 						ctx,
 						_Utils_update(
 							model,
-							{dP: v}),
+							{dj: v}),
 						0,
 						A2(
 							$author$project$Main$acceptLoad,
 							_Utils_update(
 								model,
-								{dE: 0, dP: v}),
+								{dj: v, dF: 0}),
 							$author$project$State$LeadsLoaded)));
-			case 107:
+			case 109:
+				var v = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{dE: 0, dO: !model.dO}),
+						{bI: true, dF: 0, dQ: v}),
 					A4(
 						$author$project$Api$fetchFilteredLeads,
 						ctx,
 						_Utils_update(
 							model,
-							{dO: !model.dO}),
+							{dQ: v}),
 						0,
 						A2(
 							$author$project$Main$acceptLoad,
 							_Utils_update(
 								model,
-								{dE: 0, dO: !model.dO}),
+								{dF: 0, dQ: v}),
 							$author$project$State$LeadsLoaded)));
-			case 108:
+			case 110:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{dF: 0, dP: !model.dP}),
+					A4(
+						$author$project$Api$fetchFilteredLeads,
+						ctx,
+						_Utils_update(
+							model,
+							{dP: !model.dP}),
+						0,
+						A2(
+							$author$project$Main$acceptLoad,
+							_Utils_update(
+								model,
+								{dF: 0, dP: !model.dP}),
+							$author$project$State$LeadsLoaded)));
+			case 111:
 				var next = _Utils_update(
 					model,
-					{dh: 'All', di: 'All', dj: 'All', bH: true, dE: 0, dF: '', T: $elm$core$Set$empty});
+					{di: 'All', dj: 'All', dk: 'All', bI: true, dF: 0, dG: '', T: $elm$core$Set$empty});
 				return _Utils_Tuple2(
 					next,
 					A4(
@@ -16149,7 +16256,7 @@ var $author$project$Main$updateHelp = F2(
 						next,
 						0,
 						A2($author$project$Main$acceptLoad, next, $author$project$State$LeadsLoaded)));
-			case 109:
+			case 112:
 				var id = msg.a;
 				var flag = msg.b;
 				return _Utils_Tuple2(
@@ -16159,7 +16266,7 @@ var $author$project$Main$updateHelp = F2(
 							T: flag ? A2($elm$core$Set$insert, id, model.T) : A2($elm$core$Set$remove, id, model.T)
 						}),
 					$elm$core$Platform$Cmd$none);
-			case 110:
+			case 113:
 				var flag = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -16174,7 +16281,7 @@ var $author$project$Main$updateHelp = F2(
 									$author$project$Views$filteredLeads(model))) : $elm$core$Set$empty
 						}),
 					$elm$core$Platform$Cmd$none);
-			case 111:
+			case 114:
 				return _Utils_Tuple2(
 					model,
 					A3(
@@ -16183,16 +16290,16 @@ var $author$project$Main$updateHelp = F2(
 						{
 							by: $elm$core$Maybe$Nothing,
 							bB: $elm$core$Set$toList(model.T),
-							bF: 'advance'
+							bG: 'advance'
 						},
 						$author$project$State$BulkDone));
-			case 112:
+			case 115:
 				var userIdStr = msg.a;
-				var _v39 = $elm$core$String$toInt(userIdStr);
-				if (_v39.$ === 1) {
+				var _v40 = $elm$core$String$toInt(userIdStr);
+				if (_v40.$ === 1) {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					var uid = _v39.a;
+					var uid = _v40.a;
 					return _Utils_Tuple2(
 						model,
 						A3(
@@ -16201,11 +16308,11 @@ var $author$project$Main$updateHelp = F2(
 							{
 								by: $elm$core$Maybe$Just(uid),
 								bB: $elm$core$Set$toList(model.T),
-								bF: 'assign'
+								bG: 'assign'
 							},
 							$author$project$State$BulkDone));
 				}
-			case 113:
+			case 116:
 				return _Utils_Tuple2(
 					model,
 					A3(
@@ -16214,10 +16321,10 @@ var $author$project$Main$updateHelp = F2(
 						{
 							by: $elm$core$Maybe$Nothing,
 							bB: $elm$core$Set$toList(model.T),
-							bF: 'delete'
+							bG: 'delete'
 						},
 						$author$project$State$BulkDone));
-			case 114:
+			case 117:
 				if (!msg.a.$) {
 					return _Utils_Tuple2(
 						_Utils_update(
@@ -16238,11 +16345,11 @@ var $author$project$Main$updateHelp = F2(
 							'error',
 							$author$project$Main$httpError(e)));
 				}
-			case 115:
+			case 118:
 				var id = msg.a;
 				var status = msg.b;
 				var allTasks = _Utils_ap(
-					model.an,
+					model.ao,
 					_Utils_ap(
 						A2(
 							$elm$core$Maybe$withDefault,
@@ -16250,7 +16357,7 @@ var $author$project$Main$updateHelp = F2(
 							A2(
 								$elm$core$Maybe$map,
 								function ($) {
-									return $.an;
+									return $.ao;
 								},
 								model.O)),
 						A2(
@@ -16259,9 +16366,9 @@ var $author$project$Main$updateHelp = F2(
 							A2(
 								$elm$core$Maybe$map,
 								function ($) {
-									return $.an;
+									return $.ao;
 								},
-								model.bT))));
+								model.bU))));
 				var revision = A2(
 					$elm$core$Maybe$withDefault,
 					0,
@@ -16280,7 +16387,7 @@ var $author$project$Main$updateHelp = F2(
 				return _Utils_Tuple2(
 					model,
 					A5($author$project$Api$setTaskStatus, ctx, id, revision, status, $author$project$State$TaskStatusDone));
-			case 116:
+			case 119:
 				if (!msg.a.$) {
 					return _Utils_Tuple2(
 						model,
@@ -16299,12 +16406,12 @@ var $author$project$Main$updateHelp = F2(
 							'error',
 							$author$project$Main$httpError(e)));
 				}
-			case 117:
+			case 120:
 				var id = msg.a;
 				return _Utils_Tuple2(
 					model,
 					A3($author$project$Api$deleteTask, ctx, id, $author$project$State$TaskDeleteDone));
-			case 118:
+			case 121:
 				if (!msg.a.$) {
 					return _Utils_Tuple2(
 						model,
@@ -16323,27 +16430,27 @@ var $author$project$Main$updateHelp = F2(
 							'error',
 							$author$project$Main$httpError(e)));
 				}
-			case 119:
+			case 122:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{g: $author$project$State$emptyAddTask, b5: '', dk: $elm$core$Dict$empty, U: !model.U}),
+						{g: $author$project$State$emptyAddTask, b6: '', dl: $elm$core$Dict$empty, U: !model.U}),
 					$elm$core$Platform$Cmd$none);
-			case 120:
+			case 123:
 				var f = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
 							g: f(model.g),
-							dk: $elm$core$Dict$empty,
+							dl: $elm$core$Dict$empty,
 							b: true
 						}),
 					$elm$core$Platform$Cmd$none);
-			case 121:
+			case 124:
 				var leadId = msg.a;
 				return A3($author$project$Main$submitTask, model, ctx, leadId);
-			case 122:
+			case 125:
 				var cid = msg.a;
 				return _Utils_Tuple2(
 					model,
@@ -16352,7 +16459,7 @@ var $author$project$Main$updateHelp = F2(
 						ctx,
 						A2($author$project$Main$clientTaskBody, model, cid),
 						$author$project$State$AddTaskDone));
-			case 123:
+			case 126:
 				var form = model.g;
 				var own = A2($elm$core$String$startsWith, 'client:', form.a1) ? form.a1 : ((form.a1 === '') ? '' : ('lead:' + form.a1));
 				var values = $elm$core$Dict$fromList(
@@ -16361,28 +16468,28 @@ var $author$project$Main$updateHelp = F2(
 							_Utils_Tuple2('owner', own),
 							_Utils_Tuple2('title', form.ac),
 							_Utils_Tuple2('description', form.a_),
-							_Utils_Tuple2('dueDate', form.aD),
+							_Utils_Tuple2('dueDate', form.aE),
 							_Utils_Tuple2('priority', form.a6),
-							_Utils_Tuple2('assignee', form.cW),
-							_Utils_Tuple2('recurrenceDays', form.dI),
+							_Utils_Tuple2('assignee', form.cX),
+							_Utils_Tuple2('recurrenceDays', form.dJ),
 							_Utils_Tuple2('status', 'Pending')
 						]));
 				var errors = A4($author$project$Validation$feature, 'tasks', 'create', '', values);
 				return model.w ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : ((!$elm$core$Dict$isEmpty(errors)) ? _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{b5: 'Check the highlighted task fields.', dk: errors}),
+						{b6: 'Check the highlighted task fields.', dl: errors}),
 					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{w: true, b5: '', dk: $elm$core$Dict$empty}),
+						{w: true, b6: '', dl: $elm$core$Dict$empty}),
 					A4(
 						$author$project$Api$featurePost,
 						ctx,
 						'tasks/create',
 						$author$project$Main$dictValue(values),
 						A2($author$project$Main$acceptLoad, model, $author$project$State$FeatureDone))));
-			case 124:
+			case 127:
 				if (!msg.a.$) {
 					var task = msg.a.a;
 					return _Utils_Tuple2(
@@ -16404,66 +16511,66 @@ var $author$project$Main$updateHelp = F2(
 							'error',
 							$author$project$Main$httpError(e)));
 				}
-			case 125:
+			case 128:
 				var v = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{bf: v, dE: 0}),
+						{bf: v, dF: 0}),
 					A2(
 						$elm$core$Task$perform,
-						function (_v40) {
+						function (_v41) {
 							return A2($author$project$State$SearchReady, 'clients', v);
 						},
 						$elm$core$Process$sleep(300)));
-			case 126:
+			case 129:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{N: $elm$core$Maybe$Nothing, f: $author$project$State$emptyClientForm, M: true}),
 					$elm$core$Platform$Cmd$none);
-			case 175:
-				var _v41 = model.bT;
-				if (_v41.$ === 1) {
+			case 181:
+				var _v42 = model.bU;
+				if (_v42.$ === 1) {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					var cd = _v41.a;
+					var cd = _v42.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
-								N: $elm$core$Maybe$Just(cd.c3.bA),
-								f: $author$project$State$clientFormOf(cd.c3),
+								N: $elm$core$Maybe$Just(cd.c4.bA),
+								f: $author$project$State$clientFormOf(cd.c4),
 								o: $author$project$Main$clientPayload(
 									_Utils_update(
 										model,
 										{
-											f: $author$project$State$clientFormOf(cd.c3)
+											f: $author$project$State$clientFormOf(cd.c4)
 										})),
 								M: true
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
-			case 127:
+			case 130:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{w: false, b: false, M: false}),
 					$elm$core$Platform$Cmd$none);
-			case 128:
+			case 131:
 				var f = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
 							f: f(model.f),
-							dk: $elm$core$Dict$empty,
+							dl: $elm$core$Dict$empty,
 							b: true
 						}),
 					$elm$core$Platform$Cmd$none);
-			case 129:
+			case 132:
 				return A2($author$project$Main$checkContactBeforeSave, 'student', model);
-			case 131:
+			case 134:
 				if (!msg.a.$) {
 					return _Utils_Tuple2(
 						_Utils_update(
@@ -16498,7 +16605,7 @@ var $author$project$Main$updateHelp = F2(
 								$author$project$Main$httpError(e)));
 					}
 				}
-			case 130:
+			case 133:
 				if (!msg.a.$) {
 					return _Utils_Tuple2(
 						_Utils_update(
@@ -16521,12 +16628,12 @@ var $author$project$Main$updateHelp = F2(
 							'error',
 							$author$project$Main$httpError(e)));
 				}
-			case 132:
+			case 135:
 				var id = msg.a;
 				return _Utils_Tuple2(
 					model,
 					A3($author$project$Api$deleteClient, ctx, id, $author$project$State$DeleteClientDone));
-			case 133:
+			case 136:
 				if (!msg.a.$) {
 					return _Utils_Tuple2(
 						model,
@@ -16545,7 +16652,7 @@ var $author$project$Main$updateHelp = F2(
 							'error',
 							$author$project$Main$httpError(e)));
 				}
-			case 134:
+			case 137:
 				var mcase = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -16565,30 +16672,30 @@ var $author$project$Main$updateHelp = F2(
 									mcase))
 						}),
 					$elm$core$Platform$Cmd$none);
-			case 135:
+			case 138:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{m: $elm$core$Maybe$Nothing, b: false}),
 					$elm$core$Platform$Cmd$none);
-			case 136:
+			case 139:
 				var f = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
 							m: A2($elm$core$Maybe$map, f, model.m),
-							dk: $elm$core$Dict$empty,
+							dl: $elm$core$Dict$empty,
 							b: true
 						}),
 					$elm$core$Platform$Cmd$none);
-			case 137:
+			case 140:
 				var clientId = msg.a;
-				var _v42 = model.m;
-				if (_v42.$ === 1) {
+				var _v43 = model.m;
+				if (_v43.$ === 1) {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					var cf = _v42.a;
+					var cf = _v43.a;
 					return _Utils_Tuple2(
 						model,
 						A4(
@@ -16599,10 +16706,10 @@ var $author$project$Main$updateHelp = F2(
 								$author$project$Main$withRevision,
 								cf.v,
 								$author$project$Types$encodeCaseInput(
-									{aU: cf.aU, c$: cf.c$, aZ: cf.aZ, bj: cf.bj, dR: cf.dR})),
+									{aU: cf.aU, c0: cf.c0, aZ: cf.aZ, bj: cf.bj, dS: cf.dS})),
 							$author$project$State$CaseFormSaved));
 				}
-			case 138:
+			case 141:
 				if (!msg.a.$) {
 					var cd = msg.a.a;
 					return _Utils_Tuple2(
@@ -16610,7 +16717,7 @@ var $author$project$Main$updateHelp = F2(
 							model,
 							{
 								m: $elm$core$Maybe$Nothing,
-								bT: $elm$core$Maybe$Just(cd),
+								bU: $elm$core$Maybe$Just(cd),
 								b: false
 							}),
 						$elm$core$Platform$Cmd$batch(
@@ -16649,17 +16756,17 @@ var $author$project$Main$updateHelp = F2(
 								$author$project$Main$httpError(e)));
 					}
 				}
-			case 139:
+			case 142:
 				var caseId = msg.a;
 				return _Utils_Tuple2(
 					model,
 					A3($author$project$Api$deleteCase, ctx, caseId, $author$project$State$DeleteCaseDone));
-			case 140:
+			case 143:
 				if (!msg.a.$) {
 					var next = _Utils_update(
 						model,
 						{
-							dl: A3(
+							dm: A3(
 								$elm$core$Dict$insert,
 								'owner',
 								$author$project$Main$ownerForUrl(model.bw),
@@ -16683,7 +16790,7 @@ var $author$project$Main$updateHelp = F2(
 							'error',
 							$author$project$Main$httpError(e)));
 				}
-			case 141:
+			case 144:
 				var file = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -16692,32 +16799,13 @@ var $author$project$Main$updateHelp = F2(
 							S: $elm$core$Maybe$Just(file)
 						}),
 					$elm$core$Platform$Cmd$none);
-			case 142:
+			case 145:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{S: $elm$core$Maybe$Nothing}),
 					$elm$core$Platform$Cmd$none);
-			case 143:
-				var id = msg.a;
-				var _v43 = model.S;
-				if (_v43.$ === 1) {
-					return _Utils_Tuple2(
-						model,
-						A2($author$project$Main$toast, 'error', 'Choose a file first'));
-				} else {
-					var file = _v43.a;
-					return model.B ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : ((($elm$file$File$size(file) <= 0) || (_Utils_cmp(
-						$elm$file$File$size(file),
-						(25 * 1024) * 1024) > 0)) ? _Utils_Tuple2(
-						model,
-						A2($author$project$Main$toast, 'error', 'Choose a nonempty file up to 25 MB')) : _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{B: true}),
-						A4($author$project$Api$uploadLeadDocument, ctx, id, file, $author$project$State$LeadDocUploaded)));
-				}
-			case 144:
+			case 146:
 				var id = msg.a;
 				var _v44 = model.S;
 				if (_v44.$ === 1) {
@@ -16726,17 +16814,36 @@ var $author$project$Main$updateHelp = F2(
 						A2($author$project$Main$toast, 'error', 'Choose a file first'));
 				} else {
 					var file = _v44.a;
-					return model.B ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : ((($elm$file$File$size(file) <= 0) || (_Utils_cmp(
+					return model.D ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : ((($elm$file$File$size(file) <= 0) || (_Utils_cmp(
 						$elm$file$File$size(file),
 						(25 * 1024) * 1024) > 0)) ? _Utils_Tuple2(
 						model,
 						A2($author$project$Main$toast, 'error', 'Choose a nonempty file up to 25 MB')) : _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{B: true}),
+							{D: true}),
+						A4($author$project$Api$uploadLeadDocument, ctx, id, file, $author$project$State$LeadDocUploaded)));
+				}
+			case 147:
+				var id = msg.a;
+				var _v45 = model.S;
+				if (_v45.$ === 1) {
+					return _Utils_Tuple2(
+						model,
+						A2($author$project$Main$toast, 'error', 'Choose a file first'));
+				} else {
+					var file = _v45.a;
+					return model.D ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : ((($elm$file$File$size(file) <= 0) || (_Utils_cmp(
+						$elm$file$File$size(file),
+						(25 * 1024) * 1024) > 0)) ? _Utils_Tuple2(
+						model,
+						A2($author$project$Main$toast, 'error', 'Choose a nonempty file up to 25 MB')) : _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{D: true}),
 						A4($author$project$Api$uploadClientDocument, ctx, id, file, $author$project$State$ClientDocUploaded)));
 				}
-			case 145:
+			case 148:
 				if (!msg.a.$) {
 					var detail = msg.a.a;
 					return _Utils_Tuple2(
@@ -16744,7 +16851,7 @@ var $author$project$Main$updateHelp = F2(
 							model,
 							{
 								O: $elm$core$Maybe$Just(detail),
-								B: false,
+								D: false,
 								S: $elm$core$Maybe$Nothing
 							}),
 						A2($author$project$Main$toast, 'success', 'File uploaded. Scanning must finish before download or approval.'));
@@ -16753,21 +16860,21 @@ var $author$project$Main$updateHelp = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{B: false}),
+							{D: false}),
 						A2(
 							$author$project$Main$toast,
 							'error',
 							$author$project$Main$httpError(e)));
 				}
-			case 146:
+			case 149:
 				if (!msg.a.$) {
 					var cd = msg.a.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
-								bT: $elm$core$Maybe$Just(cd),
-								B: false,
+								bU: $elm$core$Maybe$Just(cd),
+								D: false,
 								S: $elm$core$Maybe$Nothing
 							}),
 						$elm$core$Platform$Cmd$batch(
@@ -16781,18 +16888,18 @@ var $author$project$Main$updateHelp = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{B: false}),
+							{D: false}),
 						A2(
 							$author$project$Main$toast,
 							'error',
 							$author$project$Main$httpError(e)));
 				}
-			case 147:
+			case 150:
 				var id = msg.a;
 				return _Utils_Tuple2(
 					model,
 					A3($author$project$Api$deleteDocument, ctx, id, $author$project$State$DocDeleteDone));
-			case 148:
+			case 151:
 				if (!msg.a.$) {
 					return _Utils_Tuple2(
 						model,
@@ -16811,7 +16918,7 @@ var $author$project$Main$updateHelp = F2(
 							'error',
 							$author$project$Main$httpError(e)));
 				}
-			case 149:
+			case 152:
 				var file = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -16820,19 +16927,19 @@ var $author$project$Main$updateHelp = F2(
 							ai: $elm$core$Maybe$Just(file)
 						}),
 					$elm$core$Platform$Cmd$none);
-			case 150:
-				var _v45 = model.ai;
-				if (_v45.$ === 1) {
+			case 153:
+				var _v46 = model.ai;
+				if (_v46.$ === 1) {
 					return _Utils_Tuple2(
 						model,
 						A2($author$project$Main$toast, 'error', 'Choose a CSV file first'));
 				} else {
-					var file = _v45.a;
+					var file = _v46.a;
 					return _Utils_Tuple2(
 						model,
 						A3($author$project$Api$importLeads, ctx, file, $author$project$State$LeadsImported));
 				}
-			case 151:
+			case 154:
 				if (!msg.a.$) {
 					var res = msg.a.a;
 					var failureSummary = A2(
@@ -16841,10 +16948,10 @@ var $author$project$Main$updateHelp = F2(
 						A2(
 							$elm$core$List$map,
 							function (fe) {
-								return 'row ' + ($elm$core$String$fromInt(fe.dK) + (': ' + fe.df));
+								return 'row ' + ($elm$core$String$fromInt(fe.dL) + (': ' + fe.dg));
 							},
-							A2($elm$core$List$take, 3, res.b4)));
-					var failCount = $elm$core$List$length(res.b4);
+							A2($elm$core$List$take, 3, res.b5)));
+					var failCount = $elm$core$List$length(res.b5);
 					var failToast = (!failCount) ? $elm$core$Platform$Cmd$none : A2(
 						$author$project$Main$toast,
 						'error',
@@ -16859,7 +16966,7 @@ var $author$project$Main$updateHelp = F2(
 									A2(
 									$author$project$Main$toast,
 									'success',
-									'Imported ' + ($elm$core$String$fromInt(res.cb) + (' lead' + ((res.cb === 1) ? '' : 's')))),
+									'Imported ' + ($elm$core$String$fromInt(res.cc) + (' lead' + ((res.cc === 1) ? '' : 's')))),
 									failToast,
 									$author$project$Main$reloadCurrent(model)
 								])));
@@ -16872,22 +16979,22 @@ var $author$project$Main$updateHelp = F2(
 							'error',
 							$author$project$Main$httpError(e)));
 				}
-			case 152:
+			case 155:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{am: true, p: $author$project$State$emptyUserForm}),
+						{an: true, p: $author$project$State$emptyUserForm}),
 					$elm$core$Platform$Cmd$none);
-			case 153:
+			case 156:
 				var uid = msg.a;
-				var _v46 = A2(
+				var _v47 = A2(
 					$elm$core$List$filter,
 					function (u) {
 						return _Utils_eq(u.bA, uid);
 					},
-					model.ap);
-				if (_v46.b) {
-					var u = _v46.a;
+					model.aq);
+				if (_v47.b) {
+					var u = _v47.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -16900,36 +17007,36 @@ var $author$project$Main$updateHelp = F2(
 											$elm$json$Json$Encode$string(u.z)),
 											_Utils_Tuple2(
 											'uuRole',
-											$elm$json$Json$Encode$string(u.G))
+											$elm$json$Json$Encode$string(u.A))
 										])),
-								am: true,
+								an: true,
 								p: $author$project$State$userFormOf(u)
 							}),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				}
-			case 154:
+			case 157:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{b: false, am: false}),
+						{b: false, an: false}),
 					$elm$core$Platform$Cmd$none);
-			case 155:
+			case 158:
 				var f = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							dk: $elm$core$Dict$empty,
+							dl: $elm$core$Dict$empty,
 							b: true,
 							p: f(model.p)
 						}),
 					$elm$core$Platform$Cmd$none);
-			case 156:
+			case 159:
 				var f = model.p;
-				var _v47 = f.cI;
-				if (_v47.$ === 1) {
+				var _v48 = f.cJ;
+				if (_v48.$ === 1) {
 					return ((f.ah !== '') && ($elm$core$String$length(f.ah) < 12)) ? _Utils_Tuple2(
 						model,
 						A2($author$project$Main$toast, 'error', 'Password must be at least 12 characters')) : _Utils_Tuple2(
@@ -16938,10 +17045,10 @@ var $author$project$Main$updateHelp = F2(
 							$author$project$Api$createUser,
 							ctx,
 							$author$project$Types$encodeNewUser(
-								{i: f.i, z: f.z, ah: f.ah, G: f.G}),
+								{i: f.i, z: f.z, ah: f.ah, A: f.A}),
 							$author$project$State$UserSaved));
 				} else {
-					var uid = _v47.a;
+					var uid = _v48.a;
 					return _Utils_Tuple2(
 						model,
 						A4(
@@ -16952,10 +17059,10 @@ var $author$project$Main$updateHelp = F2(
 								$author$project$Main$withRevision,
 								f.v,
 								$author$project$Types$encodeUpdateUser(
-									{z: f.z, ah: f.ah, G: f.G})),
+									{z: f.z, ah: f.ah, A: f.A})),
 							$author$project$State$UserUpdatedDone));
 				}
-			case 157:
+			case 160:
 				if (!msg.a.$) {
 					var u = msg.a.a;
 					return _Utils_Tuple2(
@@ -16963,9 +17070,9 @@ var $author$project$Main$updateHelp = F2(
 							model,
 							{
 								b: false,
-								am: false,
-								ap: _Utils_ap(
-									model.ap,
+								an: false,
+								aq: _Utils_ap(
+									model.aq,
 									_List_fromArray(
 										[u]))
 							}),
@@ -16984,12 +17091,12 @@ var $author$project$Main$updateHelp = F2(
 							'error',
 							$author$project$Main$httpError(e)));
 				}
-			case 158:
+			case 161:
 				if (!msg.a.$) {
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{b: false, am: false}),
+							{b: false, an: false}),
 						$elm$core$Platform$Cmd$batch(
 							_List_fromArray(
 								[
@@ -17002,7 +17109,7 @@ var $author$project$Main$updateHelp = F2(
 							$author$project$Main$beginConflict,
 							model,
 							'users',
-							A2($elm$core$Maybe$withDefault, 0, model.p.cI),
+							A2($elm$core$Maybe$withDefault, 0, model.p.cJ),
 							model.o,
 							$elm$json$Json$Encode$object(
 								_List_fromArray(
@@ -17012,7 +17119,7 @@ var $author$project$Main$updateHelp = F2(
 										$elm$json$Json$Encode$string(model.p.z)),
 										_Utils_Tuple2(
 										'uuRole',
-										$elm$json$Json$Encode$string(model.p.G))
+										$elm$json$Json$Encode$string(model.p.A))
 									])));
 					} else {
 						var e = msg.a.a;
@@ -17024,12 +17131,12 @@ var $author$project$Main$updateHelp = F2(
 								$author$project$Main$httpError(e)));
 					}
 				}
-			case 159:
+			case 162:
 				var uid = msg.a;
 				return _Utils_Tuple2(
 					model,
 					A3($author$project$Api$deleteUser, ctx, uid, $author$project$State$DeleteUserDone));
-			case 160:
+			case 163:
 				if (!msg.a.$) {
 					return _Utils_Tuple2(
 						model,
@@ -17048,46 +17155,46 @@ var $author$project$Main$updateHelp = F2(
 							'error',
 							$author$project$Main$httpError(e)));
 				}
-			case 161:
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{av: '', aw: '', Y: '', ay: !model.ay}),
-					$elm$core$Platform$Cmd$none);
-			case 162:
-				var v = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{dk: $elm$core$Dict$empty, b: true, aw: v}),
-					$elm$core$Platform$Cmd$none);
-			case 163:
-				var v = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{dk: $elm$core$Dict$empty, b: true, Y: v}),
-					$elm$core$Platform$Cmd$none);
 			case 164:
-				var v = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{dk: $elm$core$Dict$empty, b: true, av: v}),
+						{aw: '', ax: '', Z: '', az: !model.az}),
 					$elm$core$Platform$Cmd$none);
 			case 165:
-				var validationError = ($elm$core$String$length(model.Y) < 12) ? 'New password must be at least 12 characters' : ((!_Utils_eq(model.Y, model.av)) ? 'Passwords do not match' : '');
+				var v = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{dl: $elm$core$Dict$empty, b: true, ax: v}),
+					$elm$core$Platform$Cmd$none);
+			case 166:
+				var v = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{dl: $elm$core$Dict$empty, b: true, Z: v}),
+					$elm$core$Platform$Cmd$none);
+			case 167:
+				var v = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{dl: $elm$core$Dict$empty, b: true, aw: v}),
+					$elm$core$Platform$Cmd$none);
+			case 168:
+				var validationError = ($elm$core$String$length(model.Z) < 12) ? 'New password must be at least 12 characters' : ((!_Utils_eq(model.Z, model.aw)) ? 'Passwords do not match' : '');
 				return (validationError !== '') ? _Utils_Tuple2(
 					model,
 					A2($author$project$Main$toast, 'error', validationError)) : _Utils_Tuple2(
 					model,
-					A4($author$project$Api$changePassword, ctx, model.aw, model.Y, $author$project$State$PasswordChangeDone));
-			case 166:
+					A4($author$project$Api$changePassword, ctx, model.ax, model.Z, $author$project$State$PasswordChangeDone));
+			case 169:
 				if (!msg.a.$) {
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{aH: 'Your password was updated. Sign in with your new password.', av: '', aw: '', Y: '', ay: false}),
+							{aI: 'Your password was updated. Sign in with your new password.', aw: '', ax: '', Z: '', az: false}),
 						$elm$core$Platform$Cmd$batch(
 							_List_fromArray(
 								[
@@ -17103,20 +17210,88 @@ var $author$project$Main$updateHelp = F2(
 							'error',
 							$author$project$Main$httpError(e)));
 				}
-			case 167:
+			case 170:
+				var result = msg.a;
+				if (!result.$) {
+					var value = result.a;
+					var entries = A2($author$project$Features$items, 'rows', value);
+					var fresh = A2(
+						$elm$core$List$filter,
+						function (item) {
+							return (A2($author$project$Features$str, 'status', item) === 'Unread') && ((A2($author$project$Features$str, 'kind', item) === 'escalations') && (!A2(
+								$elm$core$List$any,
+								function (old) {
+									return _Utils_eq(
+										A2($author$project$Features$str, 'id', old),
+										A2($author$project$Features$str, 'id', item));
+								},
+								model.bE)));
+						},
+						entries);
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{bE: entries}),
+						A2(
+							$elm$core$Maybe$withDefault,
+							$elm$core$Platform$Cmd$none,
+							A2(
+								$elm$core$Maybe$map,
+								A2(
+									$elm$core$Basics$composeR,
+									$author$project$Features$str('title'),
+									$author$project$Main$toast('error')),
+								$elm$core$List$head(fresh))));
+				} else {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				}
+			case 171:
+				var ident = msg.a;
+				var action = msg.b;
+				return _Utils_Tuple2(
+					model,
+					A4(
+						$author$project$Api$featurePost,
+						ctx,
+						'notifications/' + action,
+						$elm$json$Json$Encode$object(
+							_List_fromArray(
+								[
+									_Utils_Tuple2(
+									'id',
+									$elm$json$Json$Encode$string(ident))
+								])),
+						A2($author$project$Main$acceptLoad, model, $author$project$State$NotificationUpdated)));
+			case 172:
+				return _Utils_Tuple2(
+					model,
+					A5(
+						$author$project$Api$featureGet,
+						ctx,
+						'notifications',
+						'',
+						0,
+						A2($author$project$Main$acceptLoad, model, $author$project$State$NotificationsLoaded)));
+			case 173:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{br: !model.br}),
-					$elm$core$Platform$Cmd$none);
-			case 168:
+					A5(
+						$author$project$Api$featureGet,
+						ctx,
+						'notifications',
+						'',
+						0,
+						A2($author$project$Main$acceptLoad, model, $author$project$State$NotificationsLoaded)));
+			case 174:
 				var path = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{br: false, s: ''}),
 					_Utils_eq(path, model.bw.t) ? $author$project$Main$reloadCurrent(model) : A2($elm$browser$Browser$Navigation$pushUrl, model.x, path));
-			case 176:
+			case 182:
 				var kind = msg.a;
 				var textMsg = msg.b;
 				return A3($author$project$Main$pushToast, model, kind, textMsg);
@@ -17141,60 +17316,62 @@ var $author$project$Main$updateNormal = F2(
 		var recordErrors = A2($author$project$Main$recordValidation, msg, model);
 		var guarded = function () {
 			switch (msg.$) {
-				case 56:
+				case 59:
 					if (!msg.a.$) {
 						var url = msg.a.a;
-						return (!_Utils_eq(url.t, model.bw.t)) || (!_Utils_eq(url.ak, model.bw.ak));
+						return (!_Utils_eq(url.t, model.bw.t)) || (!_Utils_eq(url.al, model.bw.al));
 					} else {
 						return true;
 					}
-				case 168:
+				case 174:
 					return true;
-				case 66:
+				case 69:
 					return true;
-				case 42:
+				case 43:
 					return true;
-				case 37:
+				case 38:
 					return true;
 				case 16:
 					return true;
 				case 17:
 					return true;
-				case 41:
+				case 42:
 					return true;
-				case 39:
+				case 40:
 					return true;
-				case 77:
+				case 80:
 					return true;
-				case 127:
+				case 130:
 					return true;
-				case 135:
+				case 138:
 					return true;
-				case 154:
+				case 157:
 					return true;
-				case 119:
+				case 122:
 					return model.U;
-				case 83:
+				case 86:
 					return model.P;
-				case 161:
-					return model.ay;
+				case 164:
+					return model.az;
 				default:
 					return false;
 			}
 		}();
 		var busyRequest = function () {
 			switch (msg.$) {
-				case 50:
-					return model.aK;
-				case 52:
-					return model.aK;
-				case 43:
+				case 51:
+					return model.ak;
+				case 53:
+					return model.ak;
+				case 55:
+					return model.ak;
+				case 44:
 					return model.w;
 				case 25:
 					return model.w;
-				case 42:
+				case 43:
 					return model.w;
-				case 37:
+				case 38:
 					return model.w;
 				case 16:
 					return model.w;
@@ -17207,28 +17384,28 @@ var $author$project$Main$updateNormal = F2(
 				case 36:
 					return model.w;
 				case 10:
-					return model.w || model.B;
-				case 143:
-					return model.B;
-				case 144:
-					return model.B;
-				case 97:
+					return model.w || model.D;
+				case 146:
+					return model.D;
+				case 147:
+					return model.D;
+				case 100:
 					return model.w;
-				case 93:
-					return model.aV;
 				case 96:
 					return model.aV;
-				case 95:
+				case 99:
 					return model.aV;
-				case 79:
+				case 98:
+					return model.aV;
+				case 82:
 					return model.w;
-				case 85:
+				case 88:
 					return model.w;
-				case 129:
+				case 132:
 					return model.w;
-				case 81:
+				case 84:
 					return model.w;
-				case 123:
+				case 126:
 					return model.w;
 				default:
 					return false;
@@ -17237,12 +17414,12 @@ var $author$project$Main$updateNormal = F2(
 		var _v0 = busyRequest ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : ((!$elm$core$Dict$isEmpty(recordErrors)) ? _Utils_Tuple2(
 			_Utils_update(
 				model,
-				{dk: recordErrors}),
+				{dl: recordErrors}),
 			$elm$core$Platform$Cmd$none) : ((guarded && $author$project$Main$hasDraftChanges(model)) ? _Utils_Tuple2(
 			_Utils_update(
 				model,
 				{
-					V: $elm$core$Maybe$Just(
+					W: $elm$core$Maybe$Just(
 						_Utils_Tuple2(
 							'Discard your unsaved changes?',
 							$author$project$State$DiscardChanges(msg)))
@@ -17494,10 +17671,10 @@ var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $author$project$Features$conflictView = function (model) {
 	var workflow = A2(
 		$elm$core$List$member,
-		model.c5,
+		model.c6,
 		_List_fromArray(
 			['tasks', 'documents', 'reminders']));
-	var latest = $author$project$Features$formValues(model.bZ);
+	var latest = $author$project$Features$formValues(model.b_);
 	var hidden = function (key) {
 		return A2(
 			$elm$core$List$member,
@@ -17516,7 +17693,7 @@ var $author$project$Features$conflictView = function (model) {
 		$elm$core$List$filter,
 		function (key) {
 			return (!hidden(key)) && (!_Utils_eq(
-				A2(get, model.b_, key),
+				A2(get, model.b$, key),
 				A2(get, latest, key)));
 		},
 		$elm$core$Dict$keys(latest));
@@ -17537,7 +17714,7 @@ var $author$project$Features$conflictView = function (model) {
 			A2(
 				$elm$json$Json$Decode$decodeValue,
 				A2($elm$json$Json$Decode$field, 'revision', $elm$json$Json$Decode$int),
-				model.bZ))) ? $elm$html$Html$text('') : A2(
+				model.b_))) ? $elm$html$Html$text('') : A2(
 		$author$project$Ui$modal,
 		'Review changes before saving',
 		A2(
@@ -17622,8 +17799,8 @@ var $author$project$Features$conflictView = function (model) {
 																$elm$html$Html$text(
 																$author$project$Features$fieldLabel(key))
 															])),
-														A2(cell_, model.b_, key),
-														A2(cell_, model.c4, key),
+														A2(cell_, model.b$, key),
+														A2(cell_, model.c5, key),
 														A2(cell_, latest, key),
 														A2(
 														$elm$html$Html$td,
@@ -17698,7 +17875,7 @@ var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$Main$contactConfirmation = F2(
 	function (message, action) {
 		var matches = function () {
-			if (action.$ === 81) {
+			if (action.$ === 84) {
 				var rows = action.d;
 				return rows;
 			} else {
@@ -17786,9 +17963,9 @@ var $author$project$Main$contactConfirmation = F2(
 							]))
 					])));
 	});
-var $author$project$State$LogoutClicked = {$: 66};
-var $author$project$State$ToggleDarkMode = {$: 60};
-var $author$project$State$TogglePwModal = {$: 161};
+var $author$project$State$LogoutClicked = {$: 69};
+var $author$project$State$ToggleDarkMode = {$: 63};
+var $author$project$State$TogglePwModal = {$: 164};
 var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
 var $elm$core$String$toUpper = _String_toUpper;
 var $elm$core$String$words = _String_words;
@@ -17937,8 +18114,8 @@ var $elm$html$Html$Attributes$width = function (n) {
 var $author$project$Main$headerBar = function (model) {
 	var user_ = A2(
 		$elm$core$Maybe$withDefault,
-		{i: '', bA: 0, bp: false, z: '', v: 1, G: ''},
-		model.H);
+		{i: '', bA: 0, bp: false, z: '', v: 1, A: ''},
+		model.C);
 	var current = model.bw.t;
 	var isActive = function (path) {
 		return (path === '/') ? (current === '/') : ((path === '/work/notifications') ? A2(
@@ -18118,14 +18295,14 @@ var $author$project$Main$headerBar = function (model) {
 										A2(navBtn, '/work/appointments', 'Appointments'),
 										A2(navBtn, '/work/milestones', 'Milestones'),
 										A2(navBtn, '/work/contact-log', 'Calls and messages'),
-										(user_.G === 'admin') ? A2(navBtn, '/work/invoices', 'Invoices') : $elm$html$Html$text(''),
+										(user_.A === 'admin') ? A2(navBtn, '/work/invoices', 'Invoices') : $elm$html$Html$text(''),
 										A2(navBtn, '/work/sales', 'Sales report'),
 										A2(navBtn, '/work/payments', 'Payments and accounting'),
 										A2(navBtn, '/work/search', 'Advanced search'),
 										A2(navBtn, '/work/security', 'Account security')
 									]))
 							])),
-						(user_.G === 'admin') ? A2(
+						(user_.A === 'admin') ? A2(
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
@@ -18194,7 +18371,7 @@ var $author$project$Main$headerBar = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$text(
-								model.aC ? '☀ Light' : '☾ Dark')
+								model.aD ? '☀ Light' : '☾ Dark')
 							])),
 						A2(
 						$elm$html$Html$span,
@@ -18228,7 +18405,7 @@ var $author$project$Main$headerBar = function (model) {
 											]),
 										_List_fromArray(
 											[
-												$elm$html$Html$text(user_.G)
+												$elm$html$Html$text(user_.A)
 											]))
 									]))
 							])),
@@ -18247,18 +18424,18 @@ var $author$project$Main$headerBar = function (model) {
 			]));
 };
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
-var $author$project$State$LoginClicked = {$: 63};
+var $author$project$State$LoginClicked = {$: 66};
 var $author$project$State$LoginEmailChanged = function (a) {
-	return {$: 61, a: a};
+	return {$: 64, a: a};
 };
 var $author$project$State$LoginModeChanged = function (a) {
 	return {$: 4, a: a};
 };
 var $author$project$State$LoginOtpChanged = function (a) {
-	return {$: 45, a: a};
+	return {$: 46, a: a};
 };
 var $author$project$State$LoginPasswordChanged = function (a) {
-	return {$: 62, a: a};
+	return {$: 65, a: a};
 };
 var $author$project$State$RecoverClicked = {$: 5};
 var $author$project$State$ResetClicked = {$: 6};
@@ -18376,8 +18553,8 @@ var $elm$html$Html$Events$onSubmit = function (msg) {
 			$elm$json$Json$Decode$succeed(msg)));
 };
 var $author$project$Views$loginView = function (model) {
-	var resetting = model.cg === 'reset';
-	var recovering = model.cg === 'recover';
+	var resetting = model.ch === 'reset';
+	var recovering = model.ch === 'recover';
 	var subtitle = resetting ? 'Choose a new password for your account.' : (recovering ? 'We’ll email you a secure link to reset your password.' : 'Sign in to your student workspace.');
 	var heading = resetting ? 'A fresh start.' : (recovering ? 'Let’s get you back in.' : 'Good to see you.');
 	var action = resetting ? $author$project$State$ResetClicked : (recovering ? $author$project$State$RecoverClicked : $author$project$State$LoginClicked);
@@ -18560,7 +18737,7 @@ var $author$project$Views$loginView = function (model) {
 											[
 												$elm$html$Html$text(model.y)
 											])) : A2($elm$html$Html$span, _List_Nil, _List_Nil),
-										(model.aH !== '') ? A2(
+										(model.aI !== '') ? A2(
 										$elm$html$Html$div,
 										_List_fromArray(
 											[
@@ -18569,7 +18746,7 @@ var $author$project$Views$loginView = function (model) {
 											]),
 										_List_fromArray(
 											[
-												$elm$html$Html$text(model.aH)
+												$elm$html$Html$text(model.aI)
 											])) : A2($elm$html$Html$span, _List_Nil, _List_Nil),
 										A2(
 										$elm$html$Html$button,
@@ -18619,8 +18796,8 @@ var $elm$html$Html$main_ = _VirtualDom_node('main');
 var $author$project$Main$mobileNavigation = function (model) {
 	var user = A2(
 		$elm$core$Maybe$withDefault,
-		{i: '', bA: 0, bp: false, z: '', v: 1, G: ''},
-		model.H);
+		{i: '', bA: 0, bp: false, z: '', v: 1, A: ''},
+		model.C);
 	var current = model.bw.t;
 	var primary = F3(
 		function (path, label, iconName) {
@@ -18781,7 +18958,7 @@ var $author$project$Main$mobileNavigation = function (model) {
 										A2(tool, '/work/portal', 'Student portal'),
 										A2(tool, '/work/security', 'Account security')
 									])),
-								(user.G === 'admin') ? A2(
+								(user.A === 'admin') ? A2(
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
@@ -18840,7 +19017,7 @@ var $author$project$Main$mobileNavigation = function (model) {
 										_List_fromArray(
 											[
 												$elm$html$Html$text(
-												model.aC ? 'Light mode' : 'Dark mode')
+												model.aD ? 'Light mode' : 'Dark mode')
 											])),
 										A2(
 										$elm$html$Html$button,
@@ -18937,14 +19114,14 @@ var $author$project$Ui$emptyNote = function (msg) {
 			]));
 };
 var $author$project$Views$entityHref = function (e) {
-	var _v0 = e.de;
+	var _v0 = e.df;
 	switch (_v0) {
 		case 'lead':
 			return $elm$core$Maybe$Just(
-				'/leads/' + $elm$core$String$fromInt(e.dc));
+				'/leads/' + $elm$core$String$fromInt(e.dd));
 		case 'client':
 			return $elm$core$Maybe$Just(
-				'/clients/' + $elm$core$String$fromInt(e.dc));
+				'/clients/' + $elm$core$String$fromInt(e.dd));
 		default:
 			return $elm$core$Maybe$Nothing;
 	}
@@ -18965,9 +19142,9 @@ var $author$project$Ui$fmtDateTime = function (iso) {
 var $author$project$Views$auditView = function (model) {
 	var me_ = A2(
 		$elm$core$Maybe$withDefault,
-		{i: '', bA: 0, bp: false, z: '', v: 1, G: ''},
-		model.H);
-	if (me_.G !== 'admin') {
+		{i: '', bA: 0, bp: false, z: '', v: 1, A: ''},
+		model.C);
+	if (me_.A !== 'admin') {
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -18993,7 +19170,7 @@ var $author$project$Views$auditView = function (model) {
 					_List_fromArray(
 						[
 							$elm$html$Html$text(
-							$author$project$Ui$entityLabel(e.de) + (' #' + $elm$core$String$fromInt(e.dc)))
+							$author$project$Ui$entityLabel(e.df) + (' #' + $elm$core$String$fromInt(e.dd)))
 						]));
 			} else {
 				return A2(
@@ -19005,7 +19182,7 @@ var $author$project$Views$auditView = function (model) {
 					_List_fromArray(
 						[
 							$elm$html$Html$text(
-							$author$project$Ui$entityLabel(e.de))
+							$author$project$Ui$entityLabel(e.df))
 						]));
 			}
 		};
@@ -19034,7 +19211,7 @@ var $author$project$Views$auditView = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$text(
-								$author$project$Ui$fmtDateTime(e.aB))
+								$author$project$Ui$fmtDateTime(e.aC))
 							])),
 						A2(
 						$elm$html$Html$td,
@@ -19042,14 +19219,14 @@ var $author$project$Views$auditView = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$text(
-								A2($elm$core$Maybe$withDefault, '—', e.cR))
+								A2($elm$core$Maybe$withDefault, '—', e.cS))
 							])),
 						A2(
 						$elm$html$Html$td,
 						_List_Nil,
 						_List_fromArray(
 							[
-								actionTag(e.cQ)
+								actionTag(e.cR)
 							])),
 						A2(
 						$elm$html$Html$td,
@@ -19057,7 +19234,7 @@ var $author$project$Views$auditView = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$text(
-								A2($elm$core$Maybe$withDefault, '', e.dd))
+								A2($elm$core$Maybe$withDefault, '', e.de))
 							])),
 						A2(
 						$elm$html$Html$td,
@@ -19069,7 +19246,7 @@ var $author$project$Views$auditView = function (model) {
 						A2(
 						$elm$html$Html$td,
 						_List_Nil,
-						$author$project$Views$changeLines(e.c1))
+						$author$project$Views$changeLines(e.c2))
 					]));
 		};
 		return A2(
@@ -19189,39 +19366,39 @@ var $author$project$Views$auditView = function (model) {
 	}
 };
 var $author$project$State$DeleteCaseClicked = function (a) {
-	return {$: 139, a: a};
+	return {$: 142, a: a};
 };
 var $author$project$State$DeleteClientConfirmed = function (a) {
-	return {$: 132, a: a};
+	return {$: 135, a: a};
 };
 var $author$project$State$OpenCaseForm = function (a) {
-	return {$: 134, a: a};
-};
-var $author$project$State$OpenClientEditor = function (a) {
-	return {$: 175, a: a};
-};
-var $author$project$State$SubmitClientTask = function (a) {
-	return {$: 122, a: a};
-};
-var $author$project$State$UploadClientDocClicked = function (a) {
-	return {$: 144, a: a};
-};
-var $author$project$State$CloseCaseForm = {$: 135};
-var $author$project$State$SubmitCaseForm = function (a) {
 	return {$: 137, a: a};
 };
+var $author$project$State$OpenClientEditor = function (a) {
+	return {$: 181, a: a};
+};
+var $author$project$State$SubmitClientTask = function (a) {
+	return {$: 125, a: a};
+};
+var $author$project$State$UploadClientDocClicked = function (a) {
+	return {$: 147, a: a};
+};
+var $author$project$State$CloseCaseForm = {$: 138};
+var $author$project$State$SubmitCaseForm = function (a) {
+	return {$: 140, a: a};
+};
 var $author$project$State$UpdateCaseForm = function (a) {
-	return {$: 136, a: a};
+	return {$: 139, a: a};
 };
 var $author$project$Types$caseStages = _List_fromArray(
-	['Documents Under Review', 'Submitted', 'Decision Pending', 'Approved', 'Rejected']);
+	['New Client', 'Initial Consultation', 'Proposal', 'Contract', 'Awaiting Payment', 'Document Collection', 'Document Review', 'Application Preparation', 'Ready for Submission', 'Submitted', 'Processing', 'Additional Requirements', 'Decision Received', 'Completed', 'Cancelled', 'On Hold', 'Rejected', 'Documents Under Review', 'Decision Pending', 'Approved']);
 var $author$project$Views$checkedInputField = F6(
 	function (model, key, labelText, current, kind, changed) {
 		var fieldId = 'record-field-' + key;
 		var error = A2(
 			$elm$core$Maybe$withDefault,
 			'',
-			A2($elm$core$Dict$get, key, model.dk));
+			A2($elm$core$Dict$get, key, model.dl));
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -19281,9 +19458,9 @@ var $author$project$Views$isReadOnly = function (model) {
 		A2(
 			$elm$core$Maybe$map,
 			function ($) {
-				return $.G;
+				return $.A;
 			},
-			model.H),
+			model.C),
 		$elm$core$Maybe$Just('viewer'));
 };
 var $elm$html$Html$option = _VirtualDom_node('option');
@@ -19352,13 +19529,13 @@ var $author$project$Views$caseModal = F3(
 						$author$project$Ui$selectField,
 						'Service Category',
 						$author$project$Types$services,
-						cf.c$,
+						cf.c0,
 						function (v) {
 							return $author$project$State$UpdateCaseForm(
 								function (f) {
 									return _Utils_update(
 										f,
-										{c$: v});
+										{c0: v});
 								});
 						}),
 						A4(
@@ -19378,13 +19555,13 @@ var $author$project$Views$caseModal = F3(
 						$author$project$Ui$selectField,
 						'Stage',
 						$author$project$Types$caseStages,
-						cf.dR,
+						cf.dS,
 						function (v) {
 							return $author$project$State$UpdateCaseForm(
 								function (f) {
 									return _Utils_update(
 										f,
-										{dR: v});
+										{dS: v});
 								});
 						}),
 						A6(
@@ -19419,7 +19596,7 @@ var $author$project$Views$caseModal = F3(
 										$author$project$Views$isReadOnly(model)),
 										$elm$html$Html$Attributes$class('btn btn-primary'),
 										$elm$html$Html$Events$onClick(
-										$author$project$State$SubmitCaseForm(cd.c3.bA))
+										$author$project$State$SubmitCaseForm(cd.c4.bA))
 									]),
 								_List_fromArray(
 									[
@@ -19439,25 +19616,184 @@ var $author$project$Views$caseModal = F3(
 							]))
 					])));
 	});
+var $author$project$State$CloseClientForm = {$: 130};
+var $author$project$State$SubmitClientForm = {$: 132};
+var $author$project$State$UpdateClientForm = function (a) {
+	return {$: 131, a: a};
+};
+var $author$project$Views$clientFormModal = function (model) {
+	var title = function () {
+		var _v0 = model.N;
+		if (!_v0.$) {
+			return 'Edit Student';
+		} else {
+			return 'Add Student';
+		}
+	}();
+	var f = model.f;
+	return A2(
+		$author$project$Ui$modal,
+		title,
+		A2(
+			$elm$html$Html$div,
+			_List_Nil,
+			_List_fromArray(
+				[
+					A6(
+					$author$project$Views$checkedInputField,
+					model,
+					'fullName',
+					'Full Name *',
+					f.a$,
+					'text',
+					function (v) {
+						return $author$project$State$UpdateClientForm(
+							function (g) {
+								return _Utils_update(
+									g,
+									{a$: v});
+							});
+					}),
+					A6(
+					$author$project$Views$checkedInputField,
+					model,
+					'email',
+					'Email',
+					f.i,
+					'email',
+					function (v) {
+						return $author$project$State$UpdateClientForm(
+							function (g) {
+								return _Utils_update(
+									g,
+									{i: v});
+							});
+					}),
+					A6(
+					$author$project$Views$checkedInputField,
+					model,
+					'phone',
+					'Phone',
+					f.H,
+					'tel',
+					function (v) {
+						return $author$project$State$UpdateClientForm(
+							function (g) {
+								return _Utils_update(
+									g,
+									{H: v});
+							});
+					}),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('form-group')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$label,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Case Officer')
+								])),
+							A2(
+							$elm$html$Html$select,
+							_List_fromArray(
+								[
+									$elm$html$Html$Events$onInput(
+									function (v) {
+										return $author$project$State$UpdateClientForm(
+											function (g) {
+												return _Utils_update(
+													g,
+													{cm: v});
+											});
+									})
+								]),
+							A2(
+								$elm$core$List$cons,
+								A2(
+									$elm$html$Html$option,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$value('')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Assign to me by default')
+										])),
+								A2(
+									$elm$core$List$map,
+									function (u) {
+										return A2(
+											$elm$html$Html$option,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$value(
+													$elm$core$String$fromInt(u.bA)),
+													$elm$html$Html$Attributes$selected(
+													_Utils_eq(
+														A2(
+															$elm$core$Maybe$withDefault,
+															'',
+															A2(
+																$elm$core$Maybe$map,
+																$elm$core$String$fromInt,
+																$elm$core$Maybe$Just(u.bA))),
+														f.cm))
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text(u.z)
+												]));
+									},
+									model.aq)))
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('flex'),
+							A2($elm$html$Html$Attributes$style, 'margin-top', '14px')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$disabled(
+									$author$project$Views$isReadOnly(model) || model.w),
+									$elm$html$Html$Attributes$class('btn btn-primary'),
+									$elm$html$Html$Events$onClick($author$project$State$SubmitClientForm)
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Save')
+								])),
+							A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('btn btn-outline'),
+									$elm$html$Html$Events$onClick($author$project$State$CloseClientForm)
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Cancel')
+								]))
+						]))
+				])));
+};
 var $author$project$State$ClientProfileRefresh = function (a) {
-	return {$: 95, a: a};
+	return {$: 98, a: a};
 };
 var $author$project$State$InlineSection = function (a) {
 	return {$: 16, a: a};
 };
-var $author$project$Features$items = F2(
-	function (key, item) {
-		return A2(
-			$elm$core$Result$withDefault,
-			_List_Nil,
-			A2(
-				$elm$json$Json$Decode$decodeValue,
-				A2(
-					$elm$json$Json$Decode$field,
-					key,
-					$elm$json$Json$Decode$list($elm$json$Json$Decode$value)),
-				item));
-	});
 var $author$project$Features$clientNextSteps = F2(
 	function (model, cid) {
 		var waiting = _Utils_eq(
@@ -19775,20 +20111,20 @@ var $author$project$Features$clientNextSteps = F2(
 													A2(
 														$elm$core$Basics$composeR,
 														function ($) {
-															return $.c3;
+															return $.c4;
 														},
 														function ($) {
-															return $.cZ;
+															return $.c_;
 														}),
-													model.bT)))
+													model.bU)))
 										])),
 									(!_Utils_eq(
 									A2(
 										$elm$core$Maybe$map,
 										function ($) {
-											return $.G;
+											return $.A;
 										},
-										model.H),
+										model.C),
 									$elm$core$Maybe$Just('viewer'))) ? A2(
 									$elm$html$Html$button,
 									_List_fromArray(
@@ -19806,13 +20142,13 @@ var $author$project$Features$clientNextSteps = F2(
 				]));
 	});
 var $author$project$State$ClientPhotoPicked = function (a) {
-	return {$: 92, a: a};
+	return {$: 95, a: a};
 };
 var $author$project$State$ClientPhotoRetry = function (a) {
-	return {$: 96, a: a};
+	return {$: 99, a: a};
 };
 var $author$project$State$ClientPhotoUpload = function (a) {
-	return {$: 93, a: a};
+	return {$: 96, a: a};
 };
 var $elm$html$Html$Attributes$accept = $elm$html$Html$Attributes$stringProperty('accept');
 var $elm$file$File$decoder = _File_decoder;
@@ -19840,9 +20176,9 @@ var $author$project$Features$clientPhotoCard = F2(
 			A2(
 				$elm$core$Maybe$map,
 				function ($) {
-					return $.G;
+					return $.A;
 				},
-				model.H),
+				model.C),
 			$elm$core$Maybe$Just('viewer'));
 		var photo = A2(
 			$elm$core$Result$withDefault,
@@ -19929,7 +20265,7 @@ var $author$project$Features$clientPhotoCard = F2(
 						[
 							$elm$html$Html$text(model.be)
 						])) : $elm$html$Html$text(''),
-					(model.bV !== '') ? A2(
+					(model.bW !== '') ? A2(
 					$elm$html$Html$p,
 					_List_fromArray(
 						[
@@ -19938,7 +20274,7 @@ var $author$project$Features$clientPhotoCard = F2(
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text(model.bV)
+							$elm$html$Html$text(model.bW)
 						])) : $elm$html$Html$text(''),
 					writable ? A2(
 					$elm$html$Html$div,
@@ -19988,7 +20324,7 @@ var $author$project$Features$clientPhotoCard = F2(
 									A2(
 										$elm$core$Maybe$withDefault,
 										'No replacement photo selected',
-										A2($elm$core$Maybe$map, $elm$file$File$name, model.bU)))
+										A2($elm$core$Maybe$map, $elm$file$File$name, model.bV)))
 								])),
 							A2(
 							$elm$html$Html$button,
@@ -19996,7 +20332,7 @@ var $author$project$Features$clientPhotoCard = F2(
 								[
 									$elm$html$Html$Attributes$class('btn btn-primary'),
 									$elm$html$Html$Attributes$disabled(
-									model.aV || _Utils_eq(model.bU, $elm$core$Maybe$Nothing)),
+									model.aV || _Utils_eq(model.bV, $elm$core$Maybe$Nothing)),
 									$elm$html$Html$Events$onClick(
 									$author$project$State$ClientPhotoUpload(cid))
 								]),
@@ -20031,9 +20367,9 @@ var $author$project$Features$clientPhotoCard = F2(
 							A2(
 								$elm$core$Maybe$map,
 								function ($) {
-									return $.G;
+									return $.A;
 								},
-								model.H),
+								model.C),
 							$elm$core$Maybe$Just('admin'))) ? A2(
 							$elm$html$Html$button,
 							_List_fromArray(
@@ -20051,14 +20387,14 @@ var $author$project$Features$clientPhotoCard = F2(
 				]));
 	});
 var $author$project$State$DocPicked = function (a) {
-	return {$: 141, a: a};
+	return {$: 144, a: a};
 };
 var $author$project$State$DocDeleted = function (a) {
-	return {$: 147, a: a};
+	return {$: 150, a: a};
 };
 var $author$project$Api$documentDownloadUrl = F2(
 	function (ctx, id) {
-		return ctx.aq + ('/api/documents/' + ($elm$core$String$fromInt(id) + '/download'));
+		return ctx.ar + ('/api/documents/' + ($elm$core$String$fromInt(id) + '/download'));
 	});
 var $elm$html$Html$Attributes$download = function (fileName) {
 	return A2($elm$html$Html$Attributes$stringProperty, 'download', fileName);
@@ -20069,7 +20405,7 @@ var $author$project$Views$fmtSize = function (bytes) {
 var $elm$html$Html$Attributes$title = $elm$html$Html$Attributes$stringProperty('title');
 var $author$project$Views$documentRow = F2(
 	function (model, d) {
-		var ctx = {aq: model._, dW: model.dW};
+		var ctx = {ar: model.V, dX: model.dX};
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -20082,7 +20418,7 @@ var $author$project$Views$documentRow = F2(
 					$elm$html$Html$span,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$title(d.dm)
+							$elm$html$Html$Attributes$title(d.dn)
 						]),
 					_List_fromArray(
 						[
@@ -20091,7 +20427,7 @@ var $author$project$Views$documentRow = F2(
 							_List_Nil,
 							_List_fromArray(
 								[
-									$elm$html$Html$text(d.dm)
+									$elm$html$Html$text(d.dn)
 								]))
 						])),
 					A2(
@@ -20103,7 +20439,7 @@ var $author$project$Views$documentRow = F2(
 					_List_fromArray(
 						[
 							$elm$html$Html$text(
-							$author$project$Views$fmtSize(d.dN))
+							$author$project$Views$fmtSize(d.dO))
 						])),
 					A2(
 					$elm$html$Html$span,
@@ -20114,7 +20450,7 @@ var $author$project$Views$documentRow = F2(
 					_List_fromArray(
 						[
 							$elm$html$Html$text(
-							A2($elm$core$String$left, 10, d.aB))
+							A2($elm$core$String$left, 10, d.aC))
 						])),
 					A2(
 					$elm$html$Html$span,
@@ -20122,9 +20458,9 @@ var $author$project$Views$documentRow = F2(
 					_List_fromArray(
 						[
 							$elm$html$Html$text(
-							A2($elm$core$Maybe$withDefault, '', d.d0))
+							A2($elm$core$Maybe$withDefault, '', d.d1))
 						])),
-					(d.dL !== 'Clean') ? A2(
+					(d.dM !== 'Clean') ? A2(
 					$elm$html$Html$span,
 					_List_fromArray(
 						[
@@ -20133,7 +20469,7 @@ var $author$project$Views$documentRow = F2(
 					_List_fromArray(
 						[
 							$elm$html$Html$text(
-							'Scan: ' + (d.dL + ((d.dL === 'Error') ? ' · Ask an administrator to retry' : ((d.dL === 'Infected') ? ' · Upload a safe replacement' : ' · Download unavailable until scanning passes'))))
+							'Scan: ' + (d.dM + ((d.dM === 'Error') ? ' · Ask an administrator to retry' : ((d.dM === 'Infected') ? ' · Upload a safe replacement' : ' · Download unavailable until scanning passes'))))
 						])) : A2(
 					$elm$html$Html$a,
 					_List_fromArray(
@@ -20267,14 +20603,14 @@ var $author$project$Views$documentsCard = F3(
 							_List_fromArray(
 								[
 									$elm$html$Html$Attributes$disabled(
-									$author$project$Views$isReadOnly(model) || (model.B || _Utils_eq(model.S, $elm$core$Maybe$Nothing))),
+									$author$project$Views$isReadOnly(model) || (model.D || _Utils_eq(model.S, $elm$core$Maybe$Nothing))),
 									$elm$html$Html$Attributes$class('btn btn-sm btn-primary'),
 									$elm$html$Html$Events$onClick(uploadMsg)
 								]),
 							_List_fromArray(
 								[
 									$elm$html$Html$text(
-									model.B ? 'Uploading…' : 'Upload')
+									model.D ? 'Uploading…' : 'Upload')
 								]))
 						])),
 					A2(
@@ -20287,7 +20623,7 @@ var $author$project$Views$documentsCard = F3(
 					_List_fromArray(
 						[
 							$elm$html$Html$text(
-							model.B ? 'Uploading your file. Please wait before leaving this record.' : 'Files up to 25 MB are scanned before download. Failed scans need an administrator’s retry; infected files need a safe replacement.')
+							model.D ? 'Uploading your file. Please wait before leaving this record.' : 'Files up to 25 MB are scanned before download. Failed scans need an administrator’s retry; infected files need a safe replacement.')
 						])),
 					A2($author$project$Views$documentRows, model, docs)
 				]));
@@ -20306,15 +20642,15 @@ var $author$project$State$ChecklistUpload = F2(
 		return {$: 25, a: a, b: b};
 	});
 var $author$project$State$FeatureEdit = function (a) {
-	return {$: 37, a: a};
+	return {$: 38, a: a};
 };
 var $author$project$State$FeatureField = F2(
 	function (a, b) {
 		return {$: 35, a: a, b: b};
 	});
-var $author$project$State$FeatureReset = {$: 42};
+var $author$project$State$FeatureReset = {$: 43};
 var $author$project$State$FeatureRun = function (a) {
-	return {$: 43, a: a};
+	return {$: 44, a: a};
 };
 var $author$project$State$FeatureSearch = function (a) {
 	return {$: 36, a: a};
@@ -20407,7 +20743,7 @@ var $author$project$Features$applicationOverview = function (model) {
 		return A2(
 			$elm$core$Maybe$withDefault,
 			'',
-			A2($elm$core$Dict$get, key, model.cT));
+			A2($elm$core$Dict$get, key, model.cU));
 	};
 	var optionFilter = F3(
 		function (key, labelText, kind) {
@@ -20566,7 +20902,7 @@ var $author$project$Features$applicationOverview = function (model) {
 				A2(
 				$elm$html$Html$Attributes$attribute,
 				'aria-busy',
-				model.bH ? 'true' : 'false')
+				model.bI ? 'true' : 'false')
 			]),
 		_List_fromArray(
 			[
@@ -20609,7 +20945,7 @@ var $author$project$Features$applicationOverview = function (model) {
 								return _Utils_Tuple2(v, v);
 							},
 							_List_fromArray(
-								['Documents Under Review', 'Submitted', 'Decision Pending', 'Approved', 'Rejected']))),
+								['New Client', 'Initial Consultation', 'Proposal', 'Contract', 'Awaiting Payment', 'Document Collection', 'Document Review', 'Application Preparation', 'Ready for Submission', 'Submitted', 'Processing', 'Additional Requirements', 'Decision Received', 'Completed', 'Cancelled', 'On Hold', 'Rejected', 'Documents Under Review', 'Decision Pending', 'Approved']))),
 						A2(
 						$elm$html$Html$div,
 						_List_fromArray(
@@ -20655,7 +20991,7 @@ var $author$project$Features$applicationOverview = function (model) {
 								$elm$html$Html$text('Clear filters')
 							]))
 					])),
-				model.bH ? A2(
+				model.bI ? A2(
 				$elm$html$Html$p,
 				_List_fromArray(
 					[
@@ -20759,6 +21095,18 @@ var $author$project$Features$columns = function (section) {
 		case 'finance-audit':
 			return _List_fromArray(
 				['date', 'actor', 'details']);
+		case 'proposals':
+			return _List_fromArray(
+				['number', 'currency', 'total', 'validUntil', 'status', 'acceptedAt']);
+		case 'contracts':
+			return _List_fromArray(
+				['number', 'validUntil', 'status', 'acceptedAt']);
+		case 'integrations':
+			return _List_fromArray(
+				['provider', 'record', 'status', 'providerStatus', 'errorCode', 'date']);
+		case 'payment-details':
+			return _List_fromArray(
+				['invoice', 'bank', 'accountName', 'accountNumber', 'method', 'instructions', 'clientVisible']);
 		case 'applications':
 			return _List_fromArray(
 				['clientName', 'institution', 'program', 'offerStatus', 'enrollmentStatus', 'category', 'destination', 'stage', 'intakeDate', 'deadline', 'officer']);
@@ -20773,7 +21121,7 @@ var $author$project$Features$columns = function (section) {
 				['category', 'destination', 'requiredDocuments', 'optionalDocuments']);
 		case 'tasks':
 			return _List_fromArray(
-				['recordName', 'assigneeName', 'status', 'priority', 'dueDate']);
+				['recordName', 'assigneeName', 'status', 'priority', 'scheduledAt', 'dueAt', 'dueDate', 'completedAt']);
 		case 'history':
 			return _List_fromArray(
 				['actor', 'kind', 'date', 'note']);
@@ -20806,7 +21154,7 @@ var $author$project$Features$columns = function (section) {
 				['currency', 'amount', 'paid', 'balance', 'status', 'dueDate', 'description']);
 		case 'appointments':
 			return _List_fromArray(
-				['startsAt', 'endsAt', 'location', 'status']);
+				['startsAt', 'endsAt', 'location', 'meetingId', 'passcode', 'clientVisible', 'status']);
 		default:
 			return _List_fromArray(
 				['status', 'expires', 'kind', 'phone', 'email']);
@@ -20885,6 +21233,19 @@ var $author$project$Ui$emptyState = F3(
 						]))
 				]));
 	});
+var $author$project$Features$commercialFields = _List_fromArray(
+	[
+		_Utils_Tuple3('Application', 'owner', 'case'),
+		_Utils_Tuple3('Title / contract type', 'title', 'text'),
+		_Utils_Tuple3('Service description / agreement terms', 'body', 'textarea'),
+		_Utils_Tuple3('Currency', 'currency', 'PHP|USD|EUR|GBP|AUD|CAD|NZD'),
+		_Utils_Tuple3('Professional / service fee', 'fee', 'text'),
+		_Utils_Tuple3('Government / third-party fees', 'thirdParty', 'text'),
+		_Utils_Tuple3('Other charges', 'otherCharges', 'text'),
+		_Utils_Tuple3('Discount', 'discount', 'text'),
+		_Utils_Tuple3('Tax', 'tax', 'text'),
+		_Utils_Tuple3('Valid until / expiration', 'validUntil', 'date')
+	]);
 var $author$project$Features$fields = function (section) {
 	switch (section) {
 		case 'sales':
@@ -20953,7 +21314,7 @@ var $author$project$Features$fields = function (section) {
 					_Utils_Tuple3('Student', 'owner', 'client'),
 					_Utils_Tuple3('Service / application type', 'category', 'Student Visa|Work Visa|Tourist Visa|Immigration Consultation|School Admission'),
 					_Utils_Tuple3('Destination', 'destination', 'Canada|Australia|New Zealand|UAE|UK|Schengen'),
-					_Utils_Tuple3('Stage', 'stage', 'Documents Under Review|Submitted|Decision Pending|Approved|Rejected'),
+					_Utils_Tuple3('Stage', 'stage', 'New Client|Initial Consultation|Proposal|Contract|Awaiting Payment|Document Collection|Document Review|Application Preparation|Ready for Submission|Submitted|Processing|Additional Requirements|Decision Received|Completed|Cancelled|On Hold|Rejected|Documents Under Review|Decision Pending|Approved'),
 					_Utils_Tuple3('School / institution', 'institution', 'text'),
 					_Utils_Tuple3('Course / program', 'program', 'text'),
 					_Utils_Tuple3('Offer status', 'offerStatus', 'Not requested|Requested|Conditional offer|Unconditional offer|Declined'),
@@ -20961,6 +21322,22 @@ var $author$project$Features$fields = function (section) {
 					_Utils_Tuple3('Intake date', 'intakeDate', 'date'),
 					_Utils_Tuple3('Next deadline', 'deadline', 'date'),
 					_Utils_Tuple3('Checklist template', 'template', 'template')
+				]);
+		case 'proposals':
+			return $author$project$Features$commercialFields;
+		case 'contracts':
+			return $author$project$Features$commercialFields;
+		case 'payment-details':
+			return _List_fromArray(
+				[
+					_Utils_Tuple3('Application', 'owner', 'case'),
+					_Utils_Tuple3('Invoice ID', 'invoice', 'number'),
+					_Utils_Tuple3('Bank', 'bank', 'text'),
+					_Utils_Tuple3('Account name', 'accountName', 'text'),
+					_Utils_Tuple3('Account number / reference', 'accountNumber', 'text'),
+					_Utils_Tuple3('Payment method', 'method', 'text'),
+					_Utils_Tuple3('Instructions', 'instructions', 'textarea'),
+					_Utils_Tuple3('Client visible', 'clientVisible', 'true|false')
 				]);
 		case 'checklist-templates':
 			return _List_fromArray(
@@ -20976,7 +21353,9 @@ var $author$project$Features$fields = function (section) {
 				[
 					_Utils_Tuple3('Title', 'title', 'text'),
 					_Utils_Tuple3('Description', 'description', 'textarea'),
-					_Utils_Tuple3('Due date', 'dueDate', 'date'),
+					_Utils_Tuple3('Scheduled (UTC)', 'scheduledAt', 'datetime-local'),
+					_Utils_Tuple3('Due time (UTC; optional)', 'dueAt', 'datetime-local'),
+					_Utils_Tuple3('Due date (used without a due time)', 'dueDate', 'date'),
 					_Utils_Tuple3('Priority', 'priority', 'Low|Medium|High|Urgent'),
 					_Utils_Tuple3('Status', 'status', 'Pending|In Progress|Done'),
 					_Utils_Tuple3('Assigned to', 'assignee', 'staff'),
@@ -21070,7 +21449,12 @@ var $author$project$Features$fields = function (section) {
 					_Utils_Tuple3('Staff member', 'assignee', 'staff'),
 					_Utils_Tuple3('Starts (UTC)', 'startsAt', 'datetime-local'),
 					_Utils_Tuple3('Ends (UTC)', 'endsAt', 'datetime-local'),
-					_Utils_Tuple3('Location or meeting link', 'location', 'text'),
+					_Utils_Tuple3('Location', 'location', 'text'),
+					_Utils_Tuple3('Zoom / meeting URL (HTTPS)', 'meetingUrl', 'url'),
+					_Utils_Tuple3('Meeting ID', 'meetingId', 'text'),
+					_Utils_Tuple3('Passcode', 'passcode', 'text'),
+					_Utils_Tuple3('Related task ID', 'task', 'number'),
+					_Utils_Tuple3('Client visible', 'clientVisible', 'true|false'),
 					_Utils_Tuple3('Status', 'status', 'Scheduled|Completed|Cancelled')
 				]);
 		case 'invoices':
@@ -21271,6 +21655,12 @@ var $author$project$Features$heading = function (section) {
 			return _Utils_Tuple2('Receipts and expenses', 'Net payment entries received minus visible paid expenses for the selected period, grouped by currency. Company approvers see all expenses; other users see their own. Pending and approved-but-unpaid expenses are excluded. This is a cash activity report, not a profit or tax statement.');
 		case 'finance-audit':
 			return _Utils_Tuple2('Financial audit trail', 'Payment receipts, expense reviews and reversals retain their dates, references, reasons and the person who recorded them.');
+		case 'proposals':
+			return _Utils_Tuple2('Price proposals', 'Prepare a draft for this application, then select it and issue it to the client. Issued terms are locked; the client can download and accept or reject them in the portal.');
+		case 'contracts':
+			return _Utils_Tuple2('Contract agreements', 'Prepare and issue the agreement. The client can download it and record acceptance in the portal. This records acceptance; it is not an electronic signature service.');
+		case 'payment-details':
+			return _Utils_Tuple2('Payment instructions', 'Link instructions to an issued invoice for this client. Choose Client visible to share the bank details in the portal. Record actual receipts through Payments.');
 		case 'applications':
 			return _Utils_Tuple2('Applications', 'Each application belongs to a student. A student can have multiple applications. Create one here, or select an application below to update its stage and deadline.');
 		case 'checklist-templates':
@@ -21282,7 +21672,7 @@ var $author$project$Features$heading = function (section) {
 		case 'contact-log':
 			return _Utils_Tuple2('Calls and messages', 'Log conversations and follow-ups with a student. WhatsApp and SMS are handled in your usual phone apps; saving this log does not send a message.');
 		case 'history':
-			return _Utils_Tuple2('Student and application history', 'Keep conversations, decisions and next steps together. Notes are attributed to their author.');
+			return _Utils_Tuple2('Activity Timeline', 'Application changes, task schedules, meetings, commercial documents and payment events appear here with their date and author. Internal notes stay within the CRM.');
 		case 'documents':
 			return _Utils_Tuple2('Document checklist and review', 'Create requirements, upload directly into an item, and record approval or feedback once scanning succeeds.');
 		case 'reminders':
@@ -21835,7 +22225,7 @@ var $author$project$Reports$view = F2(
 								[
 									$elm$html$Html$Attributes$class('btn btn-primary'),
 									$elm$html$Html$Attributes$disabled(
-									model.bH || ((model.s !== '') || ($elm$core$List$isEmpty(cols) || $elm$core$List$isEmpty(rows_)))),
+									model.bI || ((model.s !== '') || ($elm$core$List$isEmpty(cols) || $elm$core$List$isEmpty(rows_)))),
 									$elm$html$Html$Events$onClick(
 									$author$project$State$ReportOutput('preview'))
 								]),
@@ -21849,7 +22239,7 @@ var $author$project$Reports$view = F2(
 								[
 									$elm$html$Html$Attributes$class('btn btn-outline'),
 									$elm$html$Html$Attributes$disabled(
-									model.bH || ((model.s !== '') || ($elm$core$List$isEmpty(cols) || $elm$core$List$isEmpty(rows_)))),
+									model.bI || ((model.s !== '') || ($elm$core$List$isEmpty(cols) || $elm$core$List$isEmpty(rows_)))),
 									$elm$html$Html$Events$onClick(
 									$author$project$State$ReportOutput('csv'))
 								]),
@@ -21892,7 +22282,7 @@ var $author$project$Reports$view = F2(
 					_List_fromArray(
 						[
 							$elm$html$Html$text(
-							model.bH ? 'Updating report…' : ($elm$core$String$fromInt(
+							model.bI ? 'Updating report…' : ($elm$core$String$fromInt(
 								$elm$core$List$length(rows_)) + (' matching rows from ' + ($elm$core$String$fromInt(
 								$elm$core$List$length(model.bs)) + ' loaded rows. Layout saving excludes report data, title, subtitle, search text, footer and pictures.'))))
 						])),
@@ -21990,15 +22380,15 @@ var $author$project$Features$view = F2(
 			A2(
 				$elm$core$Maybe$map,
 				function ($) {
-					return $.G;
+					return $.A;
 				},
-				model.H),
+				model.C),
 			$elm$core$Maybe$Just('viewer'));
 		var get = function (key) {
 			return A2(
 				$elm$core$Maybe$withDefault,
 				'',
-				A2($elm$core$Dict$get, key, model.dl));
+				A2($elm$core$Dict$get, key, model.dm));
 		};
 		var extraUsers = A2(
 			$elm$core$Result$withDefault,
@@ -22019,9 +22409,9 @@ var $author$project$Features$view = F2(
 			A2(
 				$elm$core$Maybe$map,
 				function ($) {
-					return $.G;
+					return $.A;
 				},
-				model.H),
+				model.C),
 			$elm$core$Maybe$Just('admin')));
 		var control = function (_v8) {
 			var labelText = _v8.a;
@@ -22031,7 +22421,7 @@ var $author$project$Features$view = F2(
 			var fieldError = A2(
 				$elm$core$Maybe$withDefault,
 				'',
-				A2($elm$core$Dict$get, key, model.dk));
+				A2($elm$core$Dict$get, key, model.dl));
 			var choices = A2($elm$core$String$contains, '|', kind) ? A2(
 				$elm$core$List$map,
 				function (v) {
@@ -22206,6 +22596,38 @@ var $author$project$Features$view = F2(
 										$elm$html$Html$text(
 										A2($author$project$Features$str, 'title', item))
 									])),
+								((section === 'tasks') && (A2($author$project$Features$str, 'overdue', item) === 'true')) ? A2(
+								$elm$html$Html$p,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('error-banner'),
+										A2($elm$html$Html$Attributes$attribute, 'role', 'status')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Overdue — complete this task or reschedule it below.')
+									])) : $elm$html$Html$text(''),
+								(A2(
+								$elm$core$List$member,
+								section,
+								_List_fromArray(
+									['appointments', 'history'])) && A2(
+								$elm$core$String$startsWith,
+								'https://',
+								A2($author$project$Features$str, 'meetingUrl', item))) ? A2(
+								$elm$html$Html$a,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('btn btn-primary'),
+										$elm$html$Html$Attributes$href(
+										A2($author$project$Features$str, 'meetingUrl', item)),
+										$elm$html$Html$Attributes$target('_blank'),
+										$elm$html$Html$Attributes$rel('noopener noreferrer')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Join Zoom Meeting')
+									])) : $elm$html$Html$text(''),
 								(section === 'documents') ? A2(
 								$elm$html$Html$p,
 								_List_fromArray(
@@ -22380,9 +22802,9 @@ var $author$project$Features$view = F2(
 													A2(
 														$elm$core$Maybe$map,
 														function ($) {
-															return $.G;
+															return $.A;
 														},
-														model.H),
+														model.C),
 													$elm$core$Maybe$Just('admin'))) ? A2(
 													$elm$html$Html$button,
 													_List_fromArray(
@@ -22481,7 +22903,7 @@ var $author$project$Features$view = F2(
 									[
 										$elm$html$Html$Attributes$class('btn btn-outline'),
 										$elm$html$Html$Attributes$disabled(
-										(!canWrite) || (model.w || _Utils_eq(model.c2, $elm$core$Maybe$Nothing))),
+										(!canWrite) || (model.w || _Utils_eq(model.c3, $elm$core$Maybe$Nothing))),
 										$elm$html$Html$Events$onClick(
 										A2(
 											$author$project$State$ChecklistUpload,
@@ -22547,7 +22969,7 @@ var $author$project$Features$view = F2(
 								$elm$core$List$member,
 								name,
 								_List_fromArray(
-									['close', 'reopen', 'match', 'unmatch', 'ignore', 'import', 'record', 'reverse', 'submit', 'approve', 'reject', 'pay', 'reverse-expense', 'confirm', 'suspend', 'revoke-user', 'reset-mfa', 'access', 'grant', 'revoke', 'retry'])) ? A2(
+									['close', 'reopen', 'match', 'unmatch', 'ignore', 'import', 'record', 'reverse', 'submit', 'approve', 'reject', 'pay', 'reverse-expense', 'confirm', 'suspend', 'revoke-user', 'reset-mfa', 'access', 'grant', 'revoke', 'retry', 'zoom', 'calendar', 'checkout', 'sign'])) ? A2(
 								$author$project$State$ConfirmRequested,
 								'Confirm: ' + (labelText + '?'),
 								$author$project$State$FeatureRun(name)) : $author$project$State$FeatureRun(name))
@@ -22614,6 +23036,25 @@ var $author$project$Features$view = F2(
 							A2(action, 'reject', 'Reject expense'),
 							A2(action, 'pay', 'Record expense payment'),
 							A2(action, 'reverse-expense', 'Reverse expense payment')
+						]);
+				case 'proposals':
+					return _List_fromArray(
+						[
+							A2(action, 'save', 'Save draft'),
+							A2(action, 'issue', 'Issue selected proposal')
+						]);
+				case 'contracts':
+					return _List_fromArray(
+						[
+							A2(action, 'save', 'Save draft'),
+							A2(action, 'issue', 'Issue selected contract'),
+							A2(action, 'complete', 'Complete accepted contract'),
+							A2(action, 'sign', 'Send selected contract for electronic signature')
+						]);
+				case 'payment-details':
+					return _List_fromArray(
+						[
+							A2(action, 'save', 'Provide payment details')
 						]);
 				case 'applications':
 					return _List_fromArray(
@@ -22683,9 +23124,9 @@ var $author$project$Features$view = F2(
 						A2(
 							$elm$core$Maybe$map,
 							function ($) {
-								return $.G;
+								return $.A;
 							},
-							model.H),
+							model.C),
 						$elm$core$Maybe$Just('admin')) ? _List_fromArray(
 						[
 							A2(action, 'retry', 'Retry selected failed message')
@@ -22694,7 +23135,8 @@ var $author$project$Features$view = F2(
 					return _List_fromArray(
 						[
 							A2(action, 'preferences', 'Save notification preferences'),
-							A2(action, 'read', 'Mark selected notification read')
+							A2(action, 'read', 'Mark selected notification read'),
+							A2(action, 'archive', 'Archive / dismiss selected notification')
 						]);
 				case 'search':
 					return _List_fromArray(
@@ -22727,9 +23169,9 @@ var $author$project$Features$view = F2(
 								A2(
 									$elm$core$Maybe$map,
 									function ($) {
-										return $.G;
+										return $.A;
 									},
-									model.H),
+									model.C),
 								$elm$core$Maybe$Just('admin')) ? _List_fromArray(
 								[
 									A2(action, 'rescan', 'Retry failed scan for selected item')
@@ -22750,7 +23192,20 @@ var $author$project$Features$view = F2(
 					return _List_fromArray(
 						[
 							A2(action, 'save', 'Save invoice'),
-							A2(action, 'send', 'Email selected invoice')
+							A2(action, 'send', 'Email selected invoice'),
+							A2(action, 'checkout', 'Create secure payment link')
+						]);
+				case 'appointments':
+					return _List_fromArray(
+						[
+							A2(action, 'save', 'Save meeting'),
+							A2(action, 'zoom', 'Create Zoom meeting automatically'),
+							A2(action, 'calendar', 'Connect Google Calendar')
+						]);
+				case 'integrations':
+					return _List_fromArray(
+						[
+							A2(action, 'retry', 'Retry selected integration request')
 						]);
 				default:
 					return _List_fromArray(
@@ -22865,7 +23320,7 @@ var $author$project$Features$view = F2(
 								[
 									$elm$html$Html$Attributes$id('feature-search'),
 									$elm$html$Html$Attributes$class('input'),
-									$elm$html$Html$Attributes$value(model.ar),
+									$elm$html$Html$Attributes$value(model.as),
 									$elm$html$Html$Events$onInput($author$project$State$FeatureSearch),
 									$elm$html$Html$Attributes$placeholder('Name, phone, task, case or file…')
 								]),
@@ -22896,7 +23351,7 @@ var $author$project$Features$view = F2(
 					_List_fromArray(
 						[
 							$elm$html$Html$text(
-							'Active date range: ' + (((model.ar === '') ? ((section === 'reports') ? 'last 30 days' : 'all dates') : A3($elm$core$String$replace, ',', ' to ', model.ar)) + ((section === 'reports') ? '. Summary exports use this same date range.' : '. CSV exports contain up to 10,000 rows; narrow the range for larger reports.')))
+							'Active date range: ' + (((model.as === '') ? ((section === 'reports') ? 'last 30 days' : 'all dates') : A3($elm$core$String$replace, ',', ' to ', model.as)) + ((section === 'reports') ? '. Summary exports use this same date range.' : '. CSV exports contain up to 10,000 rows; narrow the range for larger reports.')))
 						])) : $elm$html$Html$text(''),
 					(get('id') !== '') ? A2(
 					$elm$html$Html$p,
@@ -22943,9 +23398,9 @@ var $author$project$Features$view = F2(
 												A2(
 													$elm$core$Maybe$map,
 													function ($) {
-														return $.G;
+														return $.A;
 													},
-													model.H),
+													model.C),
 												$elm$core$Maybe$Just('admin'))));
 										},
 										$author$project$Features$fields(section))),
@@ -22992,9 +23447,9 @@ var $author$project$Features$view = F2(
 										A2(
 											$elm$core$Maybe$map,
 											function ($) {
-												return $.G;
+												return $.A;
 											},
-											model.H),
+											model.C),
 										$elm$core$Maybe$Just('admin'))));
 								},
 								$author$project$Features$fields(section))),
@@ -23023,7 +23478,7 @@ var $author$project$Features$view = F2(
 												]))
 										])))
 							]))),
-					(model.b5 !== '') ? A2(
+					(model.b6 !== '') ? A2(
 					$elm$html$Html$p,
 					_List_fromArray(
 						[
@@ -23033,7 +23488,7 @@ var $author$project$Features$view = F2(
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text(model.b5)
+							$elm$html$Html$text(model.b6)
 						])) : A2(
 					$elm$html$Html$span,
 					_List_fromArray(
@@ -23091,7 +23546,7 @@ var $author$project$Features$view = F2(
 								[
 									$elm$html$Html$Attributes$id('reconcile-search'),
 									$elm$html$Html$Attributes$class('input'),
-									$elm$html$Html$Attributes$value(model.$7),
+									$elm$html$Html$Attributes$value(model.dp),
 									$elm$html$Html$Events$onInput($author$project$State$FinanceCandidateQuery)
 								]),
 							_List_Nil),
@@ -23115,13 +23570,13 @@ var $author$project$Features$view = F2(
 												A2($author$project$Features$str, 'label', entry) + (' · ' + A2($author$project$Features$str, 'date', entry)))
 											]));
 								},
-								model.b6)),
+								model.b7)),
 							A2(
 							$elm$html$Html$button,
 							_List_fromArray(
 								[
 									$elm$html$Html$Attributes$class('btn btn-outline'),
-									$elm$html$Html$Attributes$disabled(!model.dn),
+									$elm$html$Html$Attributes$disabled(!model.$7),
 									$elm$html$Html$Events$onClick(
 									$author$project$State$FinanceCandidateStep(-1))
 								]),
@@ -23135,7 +23590,7 @@ var $author$project$Features$view = F2(
 								[
 									$elm$html$Html$Attributes$class('btn btn-outline'),
 									$elm$html$Html$Attributes$disabled(
-									$elm$core$List$length(model.b6) < 50),
+									$elm$core$List$length(model.b7) < 50),
 									$elm$html$Html$Events$onClick(
 									$author$project$State$FinanceCandidateStep(1))
 								]),
@@ -23197,7 +23652,7 @@ var $author$project$Features$view = F2(
 								[
 									$elm$html$Html$Attributes$class('btn btn-outline'),
 									$elm$html$Html$Attributes$disabled(
-									model.w || _Utils_eq(model.dp, $elm$core$Maybe$Nothing)),
+									model.w || _Utils_eq(model.dq, $elm$core$Maybe$Nothing)),
 									$elm$html$Html$Events$onClick(
 									A2(
 										$author$project$State$FinanceUpload,
@@ -23331,7 +23786,7 @@ var $author$project$Features$view = F2(
 						[
 							$elm$html$Html$Attributes$class('btn btn-outline'),
 							$elm$html$Html$Attributes$href(
-							'/api/workspace/finance-export/' + (section + ('?q=' + $elm$url$Url$percentEncode(model.ar))))
+							'/api/workspace/finance-export/' + (section + ('?q=' + $elm$url$Url$percentEncode(model.as))))
 						]),
 					_List_fromArray(
 						[
@@ -23394,7 +23849,7 @@ var $author$project$Features$view = F2(
 						[
 							$elm$html$Html$Attributes$class('btn btn-outline'),
 							$elm$html$Html$Attributes$href(
-							'/api/workspace/reports.csv?q=' + $elm$url$Url$percentEncode(model.ar))
+							'/api/workspace/reports.csv?q=' + $elm$url$Url$percentEncode(model.as))
 						]),
 					_List_fromArray(
 						[
@@ -23429,7 +23884,7 @@ var $author$project$Features$view = F2(
 						[
 							$elm$html$Html$Attributes$class('btn btn-outline'),
 							$elm$html$Html$Attributes$href(
-							'/api/workspace/report-export/' + (section + ('?q=' + $elm$url$Url$percentEncode(model.ar))))
+							'/api/workspace/report-export/' + (section + ('?q=' + $elm$url$Url$percentEncode(model.as))))
 						]),
 					_List_fromArray(
 						[
@@ -23441,7 +23896,7 @@ var $author$project$Features$view = F2(
 						$elm$json$Json$Decode$null(0),
 						model.bl),
 					$elm$core$Result$Ok(0)) ? $elm$html$Html$text('') : $author$project$Features$resultView(model.bl),
-					model.bH ? $author$project$Ui$spinner : (($elm$core$List$isEmpty(model.bs) && (!A2(
+					model.bI ? $author$project$Ui$spinner : (($elm$core$List$isEmpty(model.bs) && (!A2(
 					$elm$core$List$member,
 					section,
 					_List_fromArray(
@@ -23449,7 +23904,7 @@ var $author$project$Features$view = F2(
 					$author$project$Ui$emptyState,
 					'check',
 					'No matching records',
-					A2($author$project$Features$emptyMessage, section, model.ar)) : (A2(
+					A2($author$project$Features$emptyMessage, section, model.as)) : (A2(
 					$elm$core$List$member,
 					section,
 					_List_fromArray(
@@ -23488,9 +23943,9 @@ var $author$project$Features$view = F2(
 					A2(
 						$elm$core$Maybe$map,
 						function ($) {
-							return $.G;
+							return $.A;
 						},
-						model.H),
+						model.C),
 					$elm$core$Maybe$Just('admin'))) ? A2(
 					$elm$html$Html$div,
 					_List_fromArray(
@@ -23585,9 +24040,9 @@ var $author$project$Features$view = F2(
 										A2(
 											$elm$core$Maybe$map,
 											function ($) {
-												return $.G;
+												return $.A;
 											},
-											model.H),
+											model.C),
 										$elm$core$Maybe$Just('admin')) ? _List_fromArray(
 										[
 											A2(action, 'access', 'Save access and privileges'),
@@ -23651,7 +24106,7 @@ var $author$project$Features$embedded = F2(
 								]),
 							_List_fromArray(
 								[
-									$elm$html$Html$text('Whole student')
+									$elm$html$Html$text('Whole client')
 								])),
 						A2(
 							$elm$core$List$map,
@@ -23670,7 +24125,7 @@ var $author$project$Features$embedded = F2(
 									_List_fromArray(
 										[
 											$elm$html$Html$text(
-											A2($elm$core$Maybe$withDefault, 'Application', c.c$) + (' · ' + (c.dR + (' · ' + $elm$core$String$fromInt(c.bA)))))
+											A2($elm$core$Maybe$withDefault, 'Application', c.c0) + (' · ' + (c.dS + (' · ' + $elm$core$String$fromInt(c.bA)))))
 										]));
 							},
 							A2(
@@ -23679,9 +24134,9 @@ var $author$project$Features$embedded = F2(
 								A2(
 									$elm$core$Maybe$map,
 									function ($) {
-										return $.c_;
+										return $.c$;
 									},
-									model.bT))))),
+									model.bU))))),
 					A2(
 					$elm$html$Html$div,
 					_List_fromArray(
@@ -23712,13 +24167,31 @@ var $author$project$Features$embedded = F2(
 										$elm$html$Html$text(labelText)
 									]));
 						},
-						_List_fromArray(
-							[
-								_Utils_Tuple2('applications', 'Applications'),
-								_Utils_Tuple2('tasks', 'Edit tasks'),
-								_Utils_Tuple2('history', 'Conversation history'),
-								_Utils_Tuple2('documents', 'Document checklist')
-							]))),
+						_Utils_ap(
+							_Utils_eq(
+								A2(
+									$elm$core$Maybe$map,
+									function ($) {
+										return $.A;
+									},
+									model.C),
+								$elm$core$Maybe$Just('admin')) ? _List_fromArray(
+								[
+									_Utils_Tuple2('invoices', 'Create Invoice')
+								]) : _List_Nil,
+							_List_fromArray(
+								[
+									_Utils_Tuple2('applications', 'Update Application Status'),
+									_Utils_Tuple2('tasks', 'Schedule Task'),
+									_Utils_Tuple2('appointments', 'Schedule Zoom Meeting'),
+									_Utils_Tuple2('proposals', 'Issue Proposal'),
+									_Utils_Tuple2('contracts', 'Issue Contract'),
+									_Utils_Tuple2('payments', 'Record Payment'),
+									_Utils_Tuple2('payment-details', 'Provide Payment Details'),
+									_Utils_Tuple2('history', 'Activity Timeline'),
+									_Utils_Tuple2('documents', 'Upload Document'),
+									_Utils_Tuple2('integrations', 'Integration status')
+								])))),
 					A2(
 					$elm$html$Html$details,
 					_List_Nil,
@@ -23754,9 +24227,9 @@ var $author$project$Features$embedded = F2(
 									A2(
 										$elm$core$Maybe$map,
 										function ($) {
-											return $.G;
+											return $.A;
 										},
-										model.H),
+										model.C),
 									$elm$core$Maybe$Just('admin')) ? A2(
 									$elm$html$Html$a,
 									_List_fromArray(
@@ -23784,7 +24257,7 @@ var $author$project$Features$embedded = F2(
 							_List_fromArray(
 								[
 									$elm$html$Html$Attributes$class('btn btn-outline'),
-									$elm$html$Html$Attributes$disabled(!model.dE),
+									$elm$html$Html$Attributes$disabled(!model.dF),
 									$elm$html$Html$Events$onClick(
 									$author$project$State$PageStep(-1))
 								]),
@@ -23889,7 +24362,7 @@ var $author$project$Views$studentContactLinks = function (phone) {
 	}
 };
 var $author$project$State$UpdateAddTask = function (a) {
-	return {$: 120, a: a};
+	return {$: 123, a: a};
 };
 var $author$project$Views$plainOptions = $elm$core$List$map(
 	function (s) {
@@ -23994,14 +24467,14 @@ var $author$project$Views$taskComposer = F2(
 								[
 									$elm$html$Html$Attributes$type_('date'),
 									$elm$html$Html$Attributes$class('input'),
-									$elm$html$Html$Attributes$value(model.g.aD),
+									$elm$html$Html$Attributes$value(model.g.aE),
 									$elm$html$Html$Events$onInput(
 									function (v) {
 										return $author$project$State$UpdateAddTask(
 											function (f) {
 												return _Utils_update(
 													f,
-													{aD: v});
+													{aE: v});
 											});
 									})
 								]),
@@ -24036,11 +24509,11 @@ var $author$project$Views$taskComposer = F2(
 				]));
 	});
 var $author$project$State$TaskDeleted = function (a) {
-	return {$: 117, a: a};
+	return {$: 120, a: a};
 };
 var $author$project$State$TaskStatusPicked = F2(
 	function (a, b) {
-		return {$: 115, a: a, b: b};
+		return {$: 118, a: a, b: b};
 	});
 var $author$project$Ui$priorityBadge = function (priority) {
 	return A2(
@@ -24094,7 +24567,7 @@ var $author$project$Views$taskRows = F2(
 												[
 													$elm$html$Html$Attributes$value(s),
 													$elm$html$Html$Attributes$selected(
-													_Utils_eq(s, t.dT))
+													_Utils_eq(s, t.dU))
 												]),
 											_List_fromArray(
 												[
@@ -24107,7 +24580,7 @@ var $author$project$Views$taskRows = F2(
 								_List_fromArray(
 									[
 										$elm$html$Html$Attributes$class(
-										(t.dT === 'Done') ? 'done-title' : '')
+										(t.dU === 'Done') ? 'done-title' : '')
 									]),
 								_List_fromArray(
 									[
@@ -24123,7 +24596,7 @@ var $author$project$Views$taskRows = F2(
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										$author$project$Ui$fmtDate(t.aD))
+										$author$project$Ui$fmtDate(t.aE))
 									])),
 								A2(
 								$elm$html$Html$button,
@@ -24148,7 +24621,7 @@ var $author$project$Views$taskRows = F2(
 	});
 var $author$project$Views$clientDetailView = F2(
 	function (model, cid) {
-		var _v0 = model.bT;
+		var _v0 = model.bU;
 		if (_v0.$ === 1) {
 			return $author$project$Ui$spinner;
 		} else {
@@ -24168,7 +24641,7 @@ var $author$project$Views$clientDetailView = F2(
 							_List_fromArray(
 								[
 									$elm$html$Html$text(
-									A2($elm$core$Maybe$withDefault, '—', cr.c$))
+									A2($elm$core$Maybe$withDefault, '—', cr.c0))
 								])),
 							A2(
 							$elm$html$Html$td,
@@ -24197,7 +24670,7 @@ var $author$project$Views$clientDetailView = F2(
 										]),
 									_List_fromArray(
 										[
-											$elm$html$Html$text(cr.dR)
+											$elm$html$Html$text(cr.dS)
 										]))
 								])),
 							A2(
@@ -24257,7 +24730,7 @@ var $author$project$Views$clientDetailView = F2(
 								]))
 						]));
 			};
-			var c = cd.c3;
+			var c = cd.c4;
 			return A2(
 				$elm$html$Html$div,
 				_List_fromArray(
@@ -24313,7 +24786,7 @@ var $author$project$Views$clientDetailView = F2(
 													]),
 												_List_fromArray(
 													[
-														$elm$html$Html$text(c.cj)
+														$elm$html$Html$text(c.ck)
 													]))
 											]))
 									])),
@@ -24490,7 +24963,7 @@ var $author$project$Views$clientDetailView = F2(
 																					$elm$html$Html$text(phone)
 																				]));
 																	},
-																	c.F))
+																	c.H))
 															]))
 													])),
 												A2(
@@ -24513,7 +24986,7 @@ var $author$project$Views$clientDetailView = F2(
 														_List_Nil,
 														_List_fromArray(
 															[
-																$author$project$Views$studentContactLinks(c.F)
+																$author$project$Views$studentContactLinks(c.H)
 															]))
 													])),
 												A2(
@@ -24537,7 +25010,7 @@ var $author$project$Views$clientDetailView = F2(
 														_List_fromArray(
 															[
 																$elm$html$Html$text(
-																A2($elm$core$Maybe$withDefault, '—', c.cZ))
+																A2($elm$core$Maybe$withDefault, '—', c.c_))
 															]))
 													])),
 												A2(
@@ -24561,7 +25034,7 @@ var $author$project$Views$clientDetailView = F2(
 														_List_fromArray(
 															[
 																$elm$html$Html$text(
-																$author$project$Ui$fmtDateTime(c.aB))
+																$author$project$Ui$fmtDateTime(c.aC))
 															]))
 													]))
 											]))
@@ -24590,7 +25063,7 @@ var $author$project$Views$clientDetailView = F2(
 														$elm$html$Html$text('Applications')
 													]))
 											])),
-										$elm$core$List$isEmpty(cd.c_) ? $author$project$Ui$emptyNote('No applications yet — add one.') : A2(
+										$elm$core$List$isEmpty(cd.c$) ? $author$project$Ui$emptyNote('No applications yet — add one.') : A2(
 										$elm$html$Html$table,
 										_List_fromArray(
 											[
@@ -24655,7 +25128,7 @@ var $author$project$Views$clientDetailView = F2(
 												A2(
 												$elm$html$Html$tbody,
 												_List_Nil,
-												A2($elm$core$List$map, caseRow, cd.c_))
+												A2($elm$core$List$map, caseRow, cd.c$))
 											]))
 									]))
 							])),
@@ -24672,8 +25145,8 @@ var $author$project$Views$clientDetailView = F2(
 								A3(
 								$author$project$Views$documentsCard,
 								model,
-								cd.b0,
-								$author$project$State$UploadClientDocClicked(cd.c3.bA)),
+								cd.b1,
+								$author$project$State$UploadClientDocClicked(cd.c4.bA)),
 								A2(
 								$elm$html$Html$div,
 								_List_fromArray(
@@ -24714,8 +25187,8 @@ var $author$project$Views$clientDetailView = F2(
 										A2(
 										$author$project$Views$taskComposer,
 										model,
-										$author$project$State$SubmitClientTask(cd.c3.bA)),
-										A2($author$project$Views$taskRows, model, cd.an)
+										$author$project$State$SubmitClientTask(cd.c4.bA)),
+										A2($author$project$Views$taskRows, model, cd.ao)
 									])),
 								A2(
 								$elm$html$Html$div,
@@ -24732,7 +25205,7 @@ var $author$project$Views$clientDetailView = F2(
 											[
 												$elm$html$Html$text('Journey history')
 											])),
-										$elm$core$List$isEmpty(cd.bP) ? $author$project$Ui$emptyNote('Activity will appear here as the relationship grows.') : A2(
+										$elm$core$List$isEmpty(cd.bQ) ? $author$project$Ui$emptyNote('Activity will appear here as the relationship grows.') : A2(
 										$elm$html$Html$div,
 										_List_Nil,
 										A2(
@@ -24754,16 +25227,17 @@ var $author$project$Views$clientDetailView = F2(
 																]),
 															_List_fromArray(
 																[
-																	$elm$html$Html$text(activity.c9)
+																	$elm$html$Html$text(activity.da)
 																])),
 															$elm$html$Html$text(
 															A2($elm$core$Maybe$withDefault, '', activity.a_))
 														]));
 											},
-											cd.bP))
+											cd.bQ))
 									]))
 							])),
 						A2($author$project$Features$embedded, model, cid),
+						model.M ? $author$project$Views$clientFormModal(model) : $elm$html$Html$text(''),
 						function () {
 						var _v1 = model.m;
 						if (!_v1.$) {
@@ -24777,184 +25251,12 @@ var $author$project$Views$clientDetailView = F2(
 		}
 	});
 var $author$project$State$ClientSearchChanged = function (a) {
-	return {$: 125, a: a};
-};
-var $author$project$State$OpenAddClient = {$: 126};
-var $author$project$State$CloseClientForm = {$: 127};
-var $author$project$State$SubmitClientForm = {$: 129};
-var $author$project$State$UpdateClientForm = function (a) {
 	return {$: 128, a: a};
 };
-var $author$project$Views$clientFormModal = function (model) {
-	var title = function () {
-		var _v0 = model.N;
-		if (!_v0.$) {
-			return 'Edit Student';
-		} else {
-			return 'Add Student';
-		}
-	}();
-	var f = model.f;
-	return A2(
-		$author$project$Ui$modal,
-		title,
-		A2(
-			$elm$html$Html$div,
-			_List_Nil,
-			_List_fromArray(
-				[
-					A6(
-					$author$project$Views$checkedInputField,
-					model,
-					'fullName',
-					'Full Name *',
-					f.a$,
-					'text',
-					function (v) {
-						return $author$project$State$UpdateClientForm(
-							function (g) {
-								return _Utils_update(
-									g,
-									{a$: v});
-							});
-					}),
-					A6(
-					$author$project$Views$checkedInputField,
-					model,
-					'email',
-					'Email',
-					f.i,
-					'email',
-					function (v) {
-						return $author$project$State$UpdateClientForm(
-							function (g) {
-								return _Utils_update(
-									g,
-									{i: v});
-							});
-					}),
-					A6(
-					$author$project$Views$checkedInputField,
-					model,
-					'phone',
-					'Phone',
-					f.F,
-					'tel',
-					function (v) {
-						return $author$project$State$UpdateClientForm(
-							function (g) {
-								return _Utils_update(
-									g,
-									{F: v});
-							});
-					}),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('form-group')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$label,
-							_List_Nil,
-							_List_fromArray(
-								[
-									$elm$html$Html$text('Case Officer')
-								])),
-							A2(
-							$elm$html$Html$select,
-							_List_fromArray(
-								[
-									$elm$html$Html$Events$onInput(
-									function (v) {
-										return $author$project$State$UpdateClientForm(
-											function (g) {
-												return _Utils_update(
-													g,
-													{cl: v});
-											});
-									})
-								]),
-							A2(
-								$elm$core$List$cons,
-								A2(
-									$elm$html$Html$option,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$value('')
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text('Assign to me by default')
-										])),
-								A2(
-									$elm$core$List$map,
-									function (u) {
-										return A2(
-											$elm$html$Html$option,
-											_List_fromArray(
-												[
-													$elm$html$Html$Attributes$value(
-													$elm$core$String$fromInt(u.bA)),
-													$elm$html$Html$Attributes$selected(
-													_Utils_eq(
-														A2(
-															$elm$core$Maybe$withDefault,
-															'',
-															A2(
-																$elm$core$Maybe$map,
-																$elm$core$String$fromInt,
-																$elm$core$Maybe$Just(u.bA))),
-														f.cl))
-												]),
-											_List_fromArray(
-												[
-													$elm$html$Html$text(u.z)
-												]));
-									},
-									model.ap)))
-						])),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('flex'),
-							A2($elm$html$Html$Attributes$style, 'margin-top', '14px')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$button,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$disabled(
-									$author$project$Views$isReadOnly(model) || model.w),
-									$elm$html$Html$Attributes$class('btn btn-primary'),
-									$elm$html$Html$Events$onClick($author$project$State$SubmitClientForm)
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('Save')
-								])),
-							A2(
-							$elm$html$Html$button,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('btn btn-outline'),
-									$elm$html$Html$Events$onClick($author$project$State$CloseClientForm)
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('Cancel')
-								]))
-						]))
-				])));
-};
+var $author$project$State$OpenAddClient = {$: 129};
 var $author$project$Api$exportCsvUrl = F2(
 	function (ctx, kind) {
-		return ctx.aq + ('/api/export/' + (kind + '.csv'));
+		return ctx.ar + ('/api/export/' + (kind + '.csv'));
 	});
 var $author$project$Views$clientsView = function (model) {
 	var row = function (c) {
@@ -25016,7 +25318,7 @@ var $author$project$Views$clientsView = function (model) {
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text(c.cj)
+							$elm$html$Html$text(c.ck)
 						])),
 					A2(
 					$elm$html$Html$td,
@@ -25027,7 +25329,7 @@ var $author$project$Views$clientsView = function (model) {
 					_List_fromArray(
 						[
 							$elm$html$Html$text(
-							A2($elm$core$Maybe$withDefault, '—', c.F))
+							A2($elm$core$Maybe$withDefault, '—', c.H))
 						])),
 					A2(
 					$elm$html$Html$td,
@@ -25038,7 +25340,7 @@ var $author$project$Views$clientsView = function (model) {
 					_List_fromArray(
 						[
 							$elm$html$Html$text(
-							A2($elm$core$Maybe$withDefault, '—', c.cZ))
+							A2($elm$core$Maybe$withDefault, '—', c.c_))
 						])),
 					A2(
 					$elm$html$Html$td,
@@ -25050,7 +25352,7 @@ var $author$project$Views$clientsView = function (model) {
 					_List_fromArray(
 						[
 							$elm$html$Html$text(
-							$author$project$Ui$fmtDateTime(c.aB))
+							$author$project$Ui$fmtDateTime(c.aC))
 						]))
 				]));
 	};
@@ -25065,7 +25367,7 @@ var $author$project$Views$clientsView = function (model) {
 				$elm$core$String$toLower(c.a$)) || A2(
 				$elm$core$String$contains,
 				q,
-				$elm$core$String$toLower(c.cj)));
+				$elm$core$String$toLower(c.ck)));
 		},
 		model.aX);
 	return A2(
@@ -25104,7 +25406,7 @@ var $author$project$Views$clientsView = function (model) {
 										$elm$html$Html$Attributes$href(
 										A2(
 											$author$project$Api$exportCsvUrl,
-											{aq: model._, dW: model.dW},
+											{ar: model.V, dX: model.dX},
 											'clients')),
 										$elm$html$Html$Attributes$download('')
 									]),
@@ -25178,7 +25480,7 @@ var $author$project$Views$clientsView = function (model) {
 						$elm$html$Html$table,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('data-table students-table')
+								$elm$html$Html$Attributes$class('data-table students-table clients-table')
 							]),
 						_List_fromArray(
 							[
@@ -25525,7 +25827,7 @@ var $author$project$Views$todayView = function (summary) {
 			]));
 };
 var $author$project$Views$dashboardView = function (model) {
-	var _v0 = model.bM;
+	var _v0 = model.bN;
 	if (_v0.$ === 1) {
 		return $author$project$Ui$spinner;
 	} else {
@@ -25539,7 +25841,7 @@ var $author$project$Views$dashboardView = function (model) {
 					function ($) {
 						return $.bh;
 					},
-					stats.dQ)));
+					stats.dR)));
 		var taskRow = function (task) {
 			return A2(
 				$elm$html$Html$a,
@@ -25588,7 +25890,7 @@ var $author$project$Views$dashboardView = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										A2($elm$core$Maybe$withDefault, 'Unlinked task', task.cf))
+										A2($elm$core$Maybe$withDefault, 'Unlinked task', task.cg))
 									]))
 							])),
 						$author$project$Ui$priorityBadge(task.a6),
@@ -25598,13 +25900,13 @@ var $author$project$Views$dashboardView = function (model) {
 							[
 								$elm$html$Html$Attributes$class(
 								(_Utils_cmp(
-									A2($elm$core$Maybe$withDefault, '9999', task.aD),
-									model.A) < 0) ? 'due-label overdue' : 'due-label')
+									A2($elm$core$Maybe$withDefault, '9999', task.aE),
+									model.B) < 0) ? 'due-label overdue' : 'due-label')
 							]),
 						_List_fromArray(
 							[
 								$elm$html$Html$text(
-								$author$project$Ui$fmtDate(task.aD))
+								$author$project$Ui$fmtDate(task.aE))
 							])),
 						$author$project$Ui$icon('arrow')
 					]));
@@ -25728,9 +26030,9 @@ var $author$project$Views$dashboardView = function (model) {
 				return A2(
 					$elm$core$List$filter,
 					function (item) {
-						return _Utils_eq(item.dR, stageName);
+						return _Utils_eq(item.dS, stageName);
 					},
-					stats.dS);
+					stats.dT);
 			},
 			$author$project$Types$leadStages);
 		var maxStage = A2(
@@ -25742,7 +26044,7 @@ var $author$project$Views$dashboardView = function (model) {
 					function ($) {
 						return $.bh;
 					},
-					stats.dS)));
+					stats.dT)));
 		var stageRow = function (sc) {
 			return A2(
 				$elm$html$Html$div,
@@ -25765,7 +26067,7 @@ var $author$project$Views$dashboardView = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(sc.dR)
+										$elm$html$Html$text(sc.dS)
 									])),
 								A2(
 								$elm$html$Html$strong,
@@ -25782,7 +26084,7 @@ var $author$project$Views$dashboardView = function (model) {
 							[
 								$elm$html$Html$Attributes$class('stage-bar'),
 								A2($elm$html$Html$Attributes$attribute, 'role', 'meter'),
-								A2($elm$html$Html$Attributes$attribute, 'aria-label', sc.dR),
+								A2($elm$html$Html$Attributes$attribute, 'aria-label', sc.dS),
 								A2(
 								$elm$html$Html$Attributes$attribute,
 								'aria-valuenow',
@@ -25851,7 +26153,7 @@ var $author$project$Views$dashboardView = function (model) {
 										_List_fromArray(
 											[
 												$elm$html$Html$text(
-												A3($elm$core$String$replace, '_', ' ', activity.aG))
+												A3($elm$core$String$replace, '_', ' ', activity.aH))
 											])),
 										A2(
 										$elm$html$Html$span,
@@ -25860,7 +26162,7 @@ var $author$project$Views$dashboardView = function (model) {
 											[
 												$elm$html$Html$text(
 												$author$project$Ui$fmtDate(
-													$elm$core$Maybe$Just(activity.c9)))
+													$elm$core$Maybe$Just(activity.da)))
 											]))
 									])),
 								A2(
@@ -25880,7 +26182,7 @@ var $author$project$Views$dashboardView = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										A2($elm$core$Maybe$withDefault, '', activity.cf))
+										A2($elm$core$Maybe$withDefault, '', activity.cg))
 									]))
 							]))
 					]));
@@ -25893,7 +26195,7 @@ var $author$project$Views$dashboardView = function (model) {
 				]),
 			_List_fromArray(
 				[
-					$author$project$Views$todayView(stats.A),
+					$author$project$Views$todayView(stats.B),
 					A2(
 					$elm$html$Html$div,
 					_List_fromArray(
@@ -25906,29 +26208,29 @@ var $author$project$Views$dashboardView = function (model) {
 							$author$project$Views$statCard,
 							'leads',
 							'Active leads',
-							$elm$core$String$fromInt(stats.dr) + ' high-priority relationships',
-							$elm$core$String$fromInt(stats.dY),
+							$elm$core$String$fromInt(stats.ds) + ' high-priority relationships',
+							$elm$core$String$fromInt(stats.dZ),
 							'/leads'),
 							A5(
 							$author$project$Views$statCard,
 							'clients',
 							'Students',
 							'People you’re helping move forward',
-							$elm$core$String$fromInt(stats.dX),
+							$elm$core$String$fromInt(stats.dY),
 							'/clients'),
 							A5(
 							$author$project$Views$statCard,
 							'tasks',
 							'Open tasks',
 							'Your next steps, in one place',
-							$elm$core$String$fromInt(stats.dC),
+							$elm$core$String$fromInt(stats.dD),
 							'/tasks'),
 							A5(
 							$author$project$Views$statCard,
 							'clock',
 							'Overdue tasks',
-							(!stats.dD) ? 'No overdue tasks' : 'A little attention goes a long way',
-							$elm$core$String$fromInt(stats.dD),
+							(!stats.dE) ? 'No overdue tasks' : 'A little attention goes a long way',
+							$elm$core$String$fromInt(stats.dE),
 							'/tasks')
 						])),
 					A2(
@@ -25936,7 +26238,7 @@ var $author$project$Views$dashboardView = function (model) {
 					_List_fromArray(
 						[
 							$elm$html$Html$Attributes$class(
-							(stats.dD > 0) ? 'attention-strip' : 'attention-strip on-track')
+							(stats.dE > 0) ? 'attention-strip' : 'attention-strip on-track')
 						]),
 					_List_fromArray(
 						[
@@ -25949,7 +26251,7 @@ var $author$project$Views$dashboardView = function (model) {
 							_List_fromArray(
 								[
 									$author$project$Ui$icon(
-									(stats.dD > 0) ? 'clock' : 'check')
+									(stats.dE > 0) ? 'clock' : 'check')
 								])),
 							A2(
 							$elm$html$Html$div,
@@ -25962,7 +26264,7 @@ var $author$project$Views$dashboardView = function (model) {
 									_List_fromArray(
 										[
 											$elm$html$Html$text(
-											(stats.dD > 0) ? ($elm$core$String$fromInt(stats.dD) + ' tasks need your attention') : 'You’re on top of your tasks')
+											(stats.dE > 0) ? ($elm$core$String$fromInt(stats.dE) + ' tasks need your attention') : 'You’re on top of your tasks')
 										])),
 									A2(
 									$elm$html$Html$p,
@@ -25970,7 +26272,7 @@ var $author$project$Views$dashboardView = function (model) {
 									_List_fromArray(
 										[
 											$elm$html$Html$text(
-											(stats.dD > 0) ? 'Start with overdue work, then make space for what’s next.' : 'Keep the momentum going. Review upcoming work and follow-ups.')
+											(stats.dE > 0) ? 'Start with overdue work, then make space for what’s next.' : 'Keep the momentum going. Review upcoming work and follow-ups.')
 										]))
 								])),
 							A2(
@@ -26020,10 +26322,10 @@ var $author$project$Views$dashboardView = function (model) {
 							_List_fromArray(
 								[
 									A3(panelTitle, 'Where leads find you', 'Your sources at a glance', '/leads'),
-									$elm$core$List$isEmpty(stats.dQ) ? A3($author$project$Ui$emptyState, 'clients', 'No sources yet', 'Sources appear when you start adding leads.') : A2(
+									$elm$core$List$isEmpty(stats.dR) ? A3($author$project$Ui$emptyState, 'clients', 'No sources yet', 'Sources appear when you start adding leads.') : A2(
 									$elm$html$Html$div,
 									_List_Nil,
-									A2($elm$core$List$map, sourceRow, stats.dQ))
+									A2($elm$core$List$map, sourceRow, stats.dR))
 								])),
 							A2(
 							$elm$html$Html$div,
@@ -26034,13 +26336,13 @@ var $author$project$Views$dashboardView = function (model) {
 							_List_fromArray(
 								[
 									A3(panelTitle, 'Next on your list', 'The next steps on your schedule', '/tasks'),
-									$elm$core$List$isEmpty(stats.dZ) ? A3($author$project$Ui$emptyState, 'check', 'A little breathing room', 'No upcoming tasks. Add a next step when you’re ready.') : A2(
+									$elm$core$List$isEmpty(stats.d_) ? A3($author$project$Ui$emptyState, 'check', 'A little breathing room', 'No upcoming tasks. Add a next step when you’re ready.') : A2(
 									$elm$html$Html$div,
 									_List_fromArray(
 										[
 											$elm$html$Html$Attributes$class('priority-list')
 										]),
-									A2($elm$core$List$map, taskRow, stats.dZ))
+									A2($elm$core$List$map, taskRow, stats.d_))
 								])),
 							A2(
 							$elm$html$Html$div,
@@ -26051,33 +26353,33 @@ var $author$project$Views$dashboardView = function (model) {
 							_List_fromArray(
 								[
 									A3(panelTitle, 'Latest activity', 'The small steps that move things forward', '/leads'),
-									$elm$core$List$isEmpty(stats.dH) ? A3($author$project$Ui$emptyState, 'clock', 'Your story starts here', 'Notes, conversations and updates will appear as you work.') : A2(
+									$elm$core$List$isEmpty(stats.dI) ? A3($author$project$Ui$emptyState, 'clock', 'Your story starts here', 'Notes, conversations and updates will appear as you work.') : A2(
 									$elm$html$Html$div,
 									_List_fromArray(
 										[
 											$elm$html$Html$Attributes$class('activity-feed')
 										]),
-									A2($elm$core$List$map, activityRow, stats.dH))
+									A2($elm$core$List$map, activityRow, stats.dI))
 								]))
 						]))
 				]));
 	}
 };
 var $author$project$State$AdvanceClicked = function (a) {
-	return {$: 89, a: a};
+	return {$: 92, a: a};
 };
 var $author$project$State$ConvertClicked = function (a) {
-	return {$: 97, a: a};
+	return {$: 100, a: a};
 };
 var $author$project$State$DeleteLeadConfirmed = function (a) {
-	return {$: 87, a: a};
+	return {$: 90, a: a};
 };
-var $author$project$State$EditLeadToggled = {$: 83};
+var $author$project$State$EditLeadToggled = {$: 86};
 var $author$project$State$UploadLeadDocClicked = function (a) {
-	return {$: 143, a: a};
+	return {$: 146, a: a};
 };
 var $author$project$State$SubmitAddTaskFor = function (a) {
-	return {$: 121, a: a};
+	return {$: 124, a: a};
 };
 var $author$project$Views$addTaskInline = F2(
 	function (model, leadId) {
@@ -26129,7 +26431,7 @@ var $author$project$Views$contactGrid = function (detail) {
 				A2(
 				kv,
 				'Phone',
-				A2($elm$core$Maybe$withDefault, '—', l.F)),
+				A2($elm$core$Maybe$withDefault, '—', l.H)),
 				A2(
 				kv,
 				'Source',
@@ -26145,24 +26447,24 @@ var $author$project$Views$contactGrid = function (detail) {
 				A2(
 				kv,
 				'Consultant',
-				A2($elm$core$Maybe$withDefault, '—', l.c6)),
+				A2($elm$core$Maybe$withDefault, '—', l.c7)),
 				A2(
 				kv,
 				'Last Contact',
-				$author$project$Ui$fmtDate(l.dv)),
+				$author$project$Ui$fmtDate(l.dw)),
 				A2(
 				kv,
 				'Next Follow-up',
-				$author$project$Ui$fmtDate(l.ci)),
+				$author$project$Ui$fmtDate(l.cj)),
 				A2(
 				kv,
 				'Notes',
-				A2($elm$core$Maybe$withDefault, '—', l.aI))
+				A2($elm$core$Maybe$withDefault, '—', l.aJ))
 			]));
 };
-var $author$project$State$SubmitEditLead = {$: 85};
+var $author$project$State$SubmitEditLead = {$: 88};
 var $author$project$State$UpdateEditLead = function (a) {
-	return {$: 84, a: a};
+	return {$: 87, a: a};
 };
 var $author$project$Types$qualities = _List_fromArray(
 	['Hot', 'Warm', 'Cold']);
@@ -26210,27 +26512,27 @@ var $author$project$Views$editLeadForm = F2(
 					model,
 					'phone',
 					'Phone',
-					f.F,
+					f.H,
 					'tel',
 					function (v) {
 						return $author$project$State$UpdateEditLead(
 							function (g) {
 								return _Utils_update(
 									g,
-									{F: v});
+									{H: v});
 							});
 					}),
 					A4(
 					$author$project$Ui$selectField,
 					'Stage',
 					$author$project$Types$leadStages,
-					f.dR,
+					f.dS,
 					function (v) {
 						return $author$project$State$UpdateEditLead(
 							function (g) {
 								return _Utils_update(
 									g,
-									{dR: v});
+									{dS: v});
 							});
 					}),
 					A4(
@@ -26290,14 +26592,14 @@ var $author$project$Views$editLeadForm = F2(
 					model,
 					'lastContact',
 					'Last Contact',
-					f.dv,
+					f.dw,
 					'date',
 					function (v) {
 						return $author$project$State$UpdateEditLead(
 							function (g) {
 								return _Utils_update(
 									g,
-									{dv: v});
+									{dw: v});
 							});
 					}),
 					A6(
@@ -26305,14 +26607,14 @@ var $author$project$Views$editLeadForm = F2(
 					model,
 					'nextFollowup',
 					'Next Follow-up',
-					f.ci,
+					f.cj,
 					'date',
 					function (v) {
 						return $author$project$State$UpdateEditLead(
 							function (g) {
 								return _Utils_update(
 									g,
-									{ci: v});
+									{cj: v});
 							});
 					}),
 					A2(
@@ -26337,14 +26639,14 @@ var $author$project$Views$editLeadForm = F2(
 								[
 									$elm$html$Html$Attributes$class('input'),
 									$elm$html$Html$Attributes$rows(3),
-									$elm$html$Html$Attributes$value(f.aI),
+									$elm$html$Html$Attributes$value(f.aJ),
 									$elm$html$Html$Events$onInput(
 									function (v) {
 										return $author$project$State$UpdateEditLead(
 											function (g) {
 												return _Utils_update(
 													g,
-													{aI: v});
+													{aJ: v});
 											});
 									})
 								]),
@@ -26390,10 +26692,10 @@ var $author$project$Views$editLeadForm = F2(
 				]));
 	});
 var $author$project$State$NoteDraftChanged = function (a) {
-	return {$: 99, a: a};
+	return {$: 102, a: a};
 };
 var $author$project$State$NoteSubmitted = function (a) {
-	return {$: 100, a: a};
+	return {$: 103, a: a};
 };
 var $author$project$Views$noteComposer = F2(
 	function (model, leadId) {
@@ -26508,7 +26810,7 @@ var $author$project$Views$timeline = function (activities) {
 								]),
 							_List_fromArray(
 								[
-									$elm$html$Html$text(act.c9)
+									$elm$html$Html$text(act.da)
 								])),
 							A2(
 							$elm$html$Html$span,
@@ -26518,7 +26820,7 @@ var $author$project$Views$timeline = function (activities) {
 								]),
 							_List_fromArray(
 								[
-									$elm$html$Html$text(act.aG)
+									$elm$html$Html$text(act.aH)
 								])),
 							A2(
 							$elm$html$Html$span,
@@ -26597,9 +26899,9 @@ var $author$project$Views$leadDetailView = F2(
 													]),
 												_List_fromArray(
 													[
-														$elm$html$Html$text(l.cj)
+														$elm$html$Html$text(l.ck)
 													])),
-												$author$project$Ui$stageTag(l.dR),
+												$author$project$Ui$stageTag(l.dS),
 												$author$project$Ui$qualityTag(l.aL)
 											]))
 									])),
@@ -26649,13 +26951,13 @@ var $author$project$Views$leadDetailView = F2(
 												$elm$html$Html$Events$onClick(
 												A2(
 													$author$project$State$ConfirmRequested,
-													'Convert this lead to a student? Documents, tasks and history will be preserved.',
+													'Convert this lead to a client? Documents, tasks and history will be preserved.',
 													$author$project$State$ConvertClicked(l.bA)))
 											]),
 										_List_fromArray(
 											[
 												$elm$html$Html$text(
-												model.w ? 'Converting…' : 'Convert to student')
+												model.w ? 'Converting…' : 'Convert to Client')
 											])),
 										A2(
 										$elm$html$Html$button,
@@ -26752,7 +27054,7 @@ var $author$project$Views$leadDetailView = F2(
 													]))
 											])),
 										A2($author$project$Views$addTaskInline, model, id),
-										A2($author$project$Views$taskRows, model, detail.an)
+										A2($author$project$Views$taskRows, model, detail.ao)
 									]))
 							])),
 						A2(
@@ -26767,7 +27069,7 @@ var $author$project$Views$leadDetailView = F2(
 								A3(
 								$author$project$Views$documentsCard,
 								model,
-								detail.b0,
+								detail.b1,
 								$author$project$State$UploadLeadDocClicked(id))
 							])),
 						A2(
@@ -26796,15 +27098,15 @@ var $author$project$Views$leadDetailView = F2(
 											]))
 									])),
 								A2($author$project$Views$noteComposer, model, id),
-								$author$project$Views$timeline(detail.bP)
+								$author$project$Views$timeline(detail.bQ)
 							]))
 					]));
 		}
 	});
-var $author$project$State$CloseAddLead = {$: 77};
-var $author$project$State$SubmitAddLead = {$: 79};
+var $author$project$State$CloseAddLead = {$: 80};
+var $author$project$State$SubmitAddLead = {$: 82};
 var $author$project$State$UpdateAddLead = function (a) {
-	return {$: 78, a: a};
+	return {$: 81, a: a};
 };
 var $author$project$Views$addLeadModal = function (model) {
 	var f = model.q;
@@ -26812,8 +27114,11 @@ var $author$project$Views$addLeadModal = function (model) {
 		$author$project$Ui$modal,
 		'Add Lead',
 		A2(
-			$elm$html$Html$div,
-			_List_Nil,
+			$elm$html$Html$form,
+			_List_fromArray(
+				[
+					$elm$html$Html$Events$onSubmit($author$project$State$SubmitAddLead)
+				]),
 			_List_fromArray(
 				[
 					A6(
@@ -26851,14 +27156,14 @@ var $author$project$Views$addLeadModal = function (model) {
 					model,
 					'phone',
 					'Phone',
-					f.F,
+					f.H,
 					'tel',
 					function (v) {
 						return $author$project$State$UpdateAddLead(
 							function (g) {
 								return _Utils_update(
 									g,
-									{F: v});
+									{H: v});
 							});
 					}),
 					A4(
@@ -26891,13 +27196,13 @@ var $author$project$Views$addLeadModal = function (model) {
 					$author$project$Ui$selectField,
 					'Stage',
 					$author$project$Types$leadStages,
-					f.dR,
+					f.dS,
 					function (v) {
 						return $author$project$State$UpdateAddLead(
 							function (g) {
 								return _Utils_update(
 									g,
-									{dR: v});
+									{dS: v});
 							});
 					}),
 					A4(
@@ -26931,27 +27236,27 @@ var $author$project$Views$addLeadModal = function (model) {
 					model,
 					'nextFollowup',
 					'Next Follow-up',
-					f.ci,
+					f.cj,
 					'date',
 					function (v) {
 						return $author$project$State$UpdateAddLead(
 							function (g) {
 								return _Utils_update(
 									g,
-									{ci: v});
+									{cj: v});
 							});
 					}),
 					A4(
 					$author$project$Ui$inputField,
 					'Notes',
-					f.aI,
+					f.aJ,
 					'text',
 					function (v) {
 						return $author$project$State$UpdateAddLead(
 							function (g) {
 								return _Utils_update(
 									g,
-									{aI: v});
+									{aJ: v});
 							});
 					}),
 					A2(
@@ -26969,8 +27274,8 @@ var $author$project$Views$addLeadModal = function (model) {
 								[
 									$elm$html$Html$Attributes$disabled(
 									$author$project$Views$isReadOnly(model) || model.w),
-									$elm$html$Html$Attributes$class('btn btn-primary'),
-									$elm$html$Html$Events$onClick($author$project$State$SubmitAddLead)
+									$elm$html$Html$Attributes$type_('submit'),
+									$elm$html$Html$Attributes$class('btn btn-primary')
 								]),
 							_List_fromArray(
 								[
@@ -26980,6 +27285,7 @@ var $author$project$Views$addLeadModal = function (model) {
 							$elm$html$Html$button,
 							_List_fromArray(
 								[
+									$elm$html$Html$Attributes$type_('button'),
 									$elm$html$Html$Attributes$class('btn btn-outline'),
 									$elm$html$Html$Events$onClick($author$project$State$CloseAddLead)
 								]),
@@ -26990,11 +27296,11 @@ var $author$project$Views$addLeadModal = function (model) {
 						]))
 				])));
 };
-var $author$project$State$BulkAdvanceClicked = {$: 111};
+var $author$project$State$BulkAdvanceClicked = {$: 114};
 var $author$project$State$BulkAssignPicked = function (a) {
-	return {$: 112, a: a};
+	return {$: 115, a: a};
 };
-var $author$project$State$BulkDeleteClicked = {$: 113};
+var $author$project$State$BulkDeleteClicked = {$: 116};
 var $elm$core$Set$isEmpty = function (_v0) {
 	var dict = _v0;
 	return $elm$core$Dict$isEmpty(dict);
@@ -27089,7 +27395,7 @@ var $author$project$Views$bulkBar = function (model) {
 										$elm$html$Html$text(u.z)
 									]));
 						},
-						model.ap))),
+						model.aq))),
 				A2(
 				$elm$html$Html$button,
 				_List_fromArray(
@@ -27108,10 +27414,10 @@ var $author$project$Views$bulkBar = function (model) {
 };
 var $author$project$State$RowChecked = F2(
 	function (a, b) {
-		return {$: 109, a: a, b: b};
+		return {$: 112, a: a, b: b};
 	});
 var $author$project$State$SelectAllChecked = function (a) {
-	return {$: 110, a: a};
+	return {$: 113, a: a};
 };
 var $elm$core$List$all = F2(
 	function (isOkay, list) {
@@ -27229,14 +27535,14 @@ var $author$project$Views$leadsTable = function (model) {
 					_List_Nil,
 					_List_fromArray(
 						[
-							$elm$html$Html$text(l.cj)
+							$elm$html$Html$text(l.ck)
 						])),
 					A2(
 					$elm$html$Html$td,
 					_List_Nil,
 					_List_fromArray(
 						[
-							$author$project$Ui$stageTag(l.dR)
+							$author$project$Ui$stageTag(l.dS)
 						])),
 					A2(
 					$elm$html$Html$td,
@@ -27262,7 +27568,7 @@ var $author$project$Views$leadsTable = function (model) {
 					_List_fromArray(
 						[
 							$elm$html$Html$text(
-							A2($elm$core$Maybe$withDefault, '—', l.c6))
+							A2($elm$core$Maybe$withDefault, '—', l.c7))
 						])),
 					A2(
 					$elm$html$Html$td,
@@ -27270,7 +27576,7 @@ var $author$project$Views$leadsTable = function (model) {
 					_List_fromArray(
 						[
 							$elm$html$Html$text(
-							$author$project$Ui$fmtDate(l.ci))
+							$author$project$Ui$fmtDate(l.cj))
 						]))
 				]));
 	};
@@ -27374,28 +27680,28 @@ var $author$project$Views$leadsTable = function (model) {
 			]));
 };
 var $author$project$State$ImportFilePicked = function (a) {
-	return {$: 149, a: a};
+	return {$: 152, a: a};
 };
-var $author$project$State$LeadImportClicked = {$: 150};
-var $author$project$State$OpenAddLead = {$: 76};
+var $author$project$State$LeadImportClicked = {$: 153};
+var $author$project$State$OpenAddLead = {$: 79};
 var $author$project$State$QualityFilterChanged = function (a) {
-	return {$: 104, a: a};
+	return {$: 107, a: a};
 };
 var $author$project$State$SearchChanged = function (a) {
-	return {$: 102, a: a};
-};
-var $author$project$State$SortByChanged = function (a) {
-	return {$: 106, a: a};
-};
-var $author$project$State$SortDirToggled = {$: 107};
-var $author$project$State$SourceFilterChanged = function (a) {
 	return {$: 105, a: a};
 };
+var $author$project$State$SortByChanged = function (a) {
+	return {$: 109, a: a};
+};
+var $author$project$State$SortDirToggled = {$: 110};
+var $author$project$State$SourceFilterChanged = function (a) {
+	return {$: 108, a: a};
+};
 var $author$project$State$StageFilterChanged = function (a) {
-	return {$: 103, a: a};
+	return {$: 106, a: a};
 };
 var $author$project$Views$leadsToolbar = function (model) {
-	var ctx = {aq: model._, dW: model.dW};
+	var ctx = {ar: model.V, dX: model.dX};
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
@@ -27427,7 +27733,7 @@ var $author$project$Views$leadsToolbar = function (model) {
 										$elm$html$Html$Attributes$class('search-input'),
 										A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Search leads'),
 										$elm$html$Html$Attributes$placeholder('Search name, email, phone, lead number…'),
-										$elm$html$Html$Attributes$value(model.dF),
+										$elm$html$Html$Attributes$value(model.dG),
 										$elm$html$Html$Events$onInput($author$project$State$SearchChanged)
 									]),
 								_List_Nil)
@@ -27535,21 +27841,21 @@ var $author$project$Views$leadsToolbar = function (model) {
 						'Stage',
 						$author$project$Views$plainOptions(
 							A2($elm$core$List$cons, 'All', $author$project$Types$leadStages)),
-						model.dj,
+						model.dk,
 						$author$project$State$StageFilterChanged),
 						A4(
 						$author$project$Views$selectFieldMsg,
 						'Quality',
 						$author$project$Views$plainOptions(
 							A2($elm$core$List$cons, 'All', $author$project$Types$qualities)),
-						model.dh,
+						model.di,
 						$author$project$State$QualityFilterChanged),
 						A4(
 						$author$project$Views$selectFieldMsg,
 						'Source',
 						$author$project$Views$plainOptions(
 							A2($elm$core$List$cons, 'All', $author$project$Types$sources)),
-						model.di,
+						model.dj,
 						$author$project$State$SourceFilterChanged),
 						A4(
 						$author$project$Views$selectFieldMsg,
@@ -27561,7 +27867,7 @@ var $author$project$Views$leadsToolbar = function (model) {
 								_Utils_Tuple2('quality', 'Quality'),
 								_Utils_Tuple2('followup', 'Follow-up')
 							]),
-						model.dP,
+						model.dQ,
 						$author$project$State$SortByChanged),
 						A2(
 						$elm$html$Html$div,
@@ -27589,7 +27895,7 @@ var $author$project$Views$leadsToolbar = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										model.dO ? '↑ Ascending' : '↓ Descending')
+										model.dP ? '↑ Ascending' : '↓ Descending')
 									]))
 							]))
 					]))
@@ -27643,17 +27949,17 @@ var $author$project$Views$leadsView = function (model) {
 					[
 						$author$project$Views$leadsTable(model)
 					])),
-				model.Z ? $author$project$Views$addLeadModal(model) : A2($elm$html$Html$div, _List_Nil, _List_Nil)
+				model._ ? $author$project$Views$addLeadModal(model) : A2($elm$html$Html$div, _List_Nil, _List_Nil)
 			]));
 };
 var $author$project$State$EditTask = function (a) {
-	return {$: 39, a: a};
+	return {$: 40, a: a};
 };
-var $author$project$State$ToggleGlobalAddTask = {$: 119};
-var $author$project$State$SubmitAddTaskGlobal = {$: 123};
+var $author$project$State$ToggleGlobalAddTask = {$: 122};
+var $author$project$State$SubmitAddTaskGlobal = {$: 126};
 var $author$project$Views$taskFieldError = F2(
 	function (model, key) {
-		var _v0 = A2($elm$core$Dict$get, key, model.dk);
+		var _v0 = A2($elm$core$Dict$get, key, model.dl);
 		if (!_v0.$) {
 			var message = _v0.a;
 			return A2(
@@ -27757,10 +28063,10 @@ var $author$project$Views$globalAddTaskForm = function (model) {
 														]),
 													_List_fromArray(
 														[
-															$elm$html$Html$text(l.cj + (' — ' + l.a$))
+															$elm$html$Html$text(l.ck + (' — ' + l.a$))
 														]));
 											},
-											model.at),
+											model.au),
 										A2(
 											$elm$core$List$map,
 											function (client) {
@@ -27824,14 +28130,14 @@ var $author$project$Views$globalAddTaskForm = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('date'),
 										$elm$html$Html$Attributes$class('input'),
-										$elm$html$Html$Attributes$value(model.g.aD),
+										$elm$html$Html$Attributes$value(model.g.aE),
 										$elm$html$Html$Events$onInput(
 										function (v) {
 											return $author$project$State$UpdateAddTask(
 												function (f) {
 													return _Utils_update(
 														f,
-														{aD: v});
+														{aE: v});
 												});
 										})
 									]),
@@ -27873,14 +28179,14 @@ var $author$project$Views$globalAddTaskForm = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$Attributes$id('new-task-assignee'),
-										$elm$html$Html$Attributes$value(model.g.cW),
+										$elm$html$Html$Attributes$value(model.g.cX),
 										$elm$html$Html$Events$onInput(
 										function (v) {
 											return $author$project$State$UpdateAddTask(
 												function (f) {
 													return _Utils_update(
 														f,
-														{cW: v});
+														{cX: v});
 												});
 										})
 									]),
@@ -27907,7 +28213,7 @@ var $author$project$Views$globalAddTaskForm = function (model) {
 														$elm$core$String$fromInt(u.bA)),
 														$elm$html$Html$Attributes$selected(
 														_Utils_eq(
-															model.g.cW,
+															model.g.cX,
 															$elm$core$String$fromInt(u.bA)))
 													]),
 												_List_fromArray(
@@ -27918,21 +28224,21 @@ var $author$project$Views$globalAddTaskForm = function (model) {
 										A2(
 											$elm$core$List$filter,
 											function (u) {
-												return u.G !== 'viewer';
+												return u.A !== 'viewer';
 											},
-											model.ap))))
+											model.aq))))
 							])),
 						A4(
 						$author$project$Ui$inputField,
 						'Repeat every days (optional)',
-						model.g.dI,
+						model.g.dJ,
 						'number',
 						function (v) {
 							return $author$project$State$UpdateAddTask(
 								function (f) {
 									return _Utils_update(
 										f,
-										{dI: v});
+										{dJ: v});
 								});
 						}),
 						A2(
@@ -27961,7 +28267,7 @@ var $author$project$Views$globalAddTaskForm = function (model) {
 					$author$project$Views$taskFieldError(model),
 					_List_fromArray(
 						['title', 'assignee', 'dueDate', 'recurrenceDays']))),
-				(model.b5 !== '') ? A2(
+				(model.b6 !== '') ? A2(
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
@@ -27970,17 +28276,17 @@ var $author$project$Views$globalAddTaskForm = function (model) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text(model.b5)
+						$elm$html$Html$text(model.b6)
 					])) : $elm$html$Html$text('')
 			]));
 };
-var $author$project$State$CloseTaskEditor = {$: 41};
+var $author$project$State$CloseTaskEditor = {$: 42};
 var $author$project$Views$taskEditor = function (model) {
 	var get = function (key) {
 		return A2(
 			$elm$core$Maybe$withDefault,
 			'',
-			A2($elm$core$Dict$get, key, model.dl));
+			A2($elm$core$Dict$get, key, model.dm));
 	};
 	var field = F3(
 		function (labelText, key, kind) {
@@ -28091,13 +28397,13 @@ var $author$project$Views$taskEditor = function (model) {
 									A2(
 										$elm$core$List$filter,
 										function (u) {
-											return u.G !== 'viewer';
+											return u.A !== 'viewer';
 										},
-										model.ap)))),
+										model.aq)))),
 							A2($author$project$Views$taskFieldError, model, 'assignee')
 						])),
 					A3(field, 'Repeat every days (optional)', 'recurrenceDays', 'number'),
-					(model.b5 !== '') ? A2(
+					(model.b6 !== '') ? A2(
 					$elm$html$Html$div,
 					_List_fromArray(
 						[
@@ -28106,7 +28412,7 @@ var $author$project$Views$taskEditor = function (model) {
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text(model.b5)
+							$elm$html$Html$text(model.b6)
 						])) : $elm$html$Html$text(''),
 					A2(
 					$elm$html$Html$div,
@@ -28150,9 +28456,9 @@ var $author$project$Views$tasksView = function (model) {
 		var items = A2(
 			$elm$core$List$filter,
 			function (t) {
-				return _Utils_eq(t.dT, status);
+				return _Utils_eq(t.dU, status);
 			},
-			model.an);
+			model.ao);
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -28233,7 +28539,7 @@ var $author$project$Views$tasksView = function (model) {
 														[
 															$elm$html$Html$Attributes$value(s),
 															$elm$html$Html$Attributes$selected(
-															_Utils_eq(s, t.dT))
+															_Utils_eq(s, t.dU))
 														]),
 													_List_fromArray(
 														[
@@ -28246,7 +28552,7 @@ var $author$project$Views$tasksView = function (model) {
 										_List_fromArray(
 											[
 												$elm$html$Html$Attributes$class(
-												(t.dT === 'Done') ? 'done-title' : '')
+												(t.dU === 'Done') ? 'done-title' : '')
 											]),
 										_List_fromArray(
 											[
@@ -28277,7 +28583,7 @@ var $author$project$Views$tasksView = function (model) {
 										_List_fromArray(
 											[
 												$elm$html$Html$text(
-												A2($elm$core$Maybe$withDefault, '', t.cf))
+												A2($elm$core$Maybe$withDefault, '', t.cg))
 											])),
 										A2(
 										$elm$html$Html$span,
@@ -28288,7 +28594,7 @@ var $author$project$Views$tasksView = function (model) {
 										_List_fromArray(
 											[
 												$elm$html$Html$text(
-												A2($elm$core$Maybe$withDefault, 'Unassigned', t.cX))
+												A2($elm$core$Maybe$withDefault, 'Unassigned', t.cY))
 											])),
 										$author$project$Views$isReadOnly(model) ? $elm$html$Html$text('') : A2(
 										$elm$html$Html$button,
@@ -28312,7 +28618,7 @@ var $author$project$Views$tasksView = function (model) {
 										_List_fromArray(
 											[
 												$elm$html$Html$text(
-												$author$project$Ui$fmtDate(t.aD))
+												$author$project$Ui$fmtDate(t.aE))
 											])),
 										A2(
 										$elm$html$Html$button,
@@ -28372,7 +28678,7 @@ var $author$project$Views$tasksView = function (model) {
 							]))
 					])),
 				model.U ? $author$project$Views$globalAddTaskForm(model) : A2($elm$html$Html$div, _List_Nil, _List_Nil),
-				model.C ? $author$project$Views$taskEditor(model) : $elm$html$Html$text(''),
+				model.E ? $author$project$Views$taskEditor(model) : $elm$html$Html$text(''),
 				$author$project$Views$isReadOnly(model) ? A2(
 				$elm$html$Html$div,
 				_List_fromArray(
@@ -28398,11 +28704,11 @@ var $author$project$Views$tasksView = function (model) {
 			]));
 };
 var $author$project$State$DeleteUserConfirmed = function (a) {
-	return {$: 159, a: a};
+	return {$: 162, a: a};
 };
-var $author$project$State$OpenAddUser = {$: 152};
+var $author$project$State$OpenAddUser = {$: 155};
 var $author$project$State$OpenUserEditor = function (a) {
-	return {$: 153, a: a};
+	return {$: 156, a: a};
 };
 var $author$project$State$RunOperation = function (a) {
 	return {$: 13, a: a};
@@ -28410,9 +28716,9 @@ var $author$project$State$RunOperation = function (a) {
 var $author$project$Views$usersView = function (model) {
 	var me_ = A2(
 		$elm$core$Maybe$withDefault,
-		{i: '', bA: 0, bp: false, z: '', v: 1, G: ''},
-		model.H);
-	if (me_.G !== 'admin') {
+		{i: '', bA: 0, bp: false, z: '', v: 1, A: ''},
+		model.C);
+	if (me_.A !== 'admin') {
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -28454,11 +28760,11 @@ var $author$project$Views$usersView = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$Attributes$class(
-										(u.G === 'admin') ? 'tag tag-hot' : ((u.G === 'viewer') ? 'tag tag-cold' : 'tag tag-warm'))
+										(u.A === 'admin') ? 'tag tag-hot' : ((u.A === 'viewer') ? 'tag tag-cold' : 'tag tag-warm'))
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text(u.G)
+										$elm$html$Html$text(u.A)
 									]))
 							])),
 						A2(
@@ -28640,7 +28946,7 @@ var $author$project$Views$usersView = function (model) {
 									A2(
 									$elm$html$Html$tbody,
 									_List_Nil,
-									A2($elm$core$List$map, userRow, model.ap))
+									A2($elm$core$List$map, userRow, model.aq))
 								]))
 						]))
 				]));
@@ -29005,7 +29311,7 @@ var $author$project$Operations$view = F2(
 									$elm$html$Html$text('Refresh ↻')
 								]))
 						])),
-					model.bH ? $author$project$Ui$spinner : (($elm$core$List$isEmpty(model.bs) && (model.s === '')) ? A2(
+					model.bI ? $author$project$Ui$spinner : (($elm$core$List$isEmpty(model.bs) && (model.s === '')) ? A2(
 					$elm$html$Html$div,
 					_List_fromArray(
 						[
@@ -29052,9 +29358,9 @@ var $author$project$Main$workspaceSections = F2(
 			A2(
 				$elm$core$Maybe$map,
 				function ($) {
-					return $.G;
+					return $.A;
 				},
-				model.H),
+				model.C),
 			$elm$core$Maybe$Just('admin'));
 		var _v0 = A2(
 			$elm$core$List$member,
@@ -29213,13 +29519,13 @@ var $author$project$Main$pagination = function (model) {
 		switch (_v1.$) {
 			case 1:
 				return $elm$core$Maybe$Just(
-					$elm$core$List$length(model.at));
+					$elm$core$List$length(model.au));
 			case 3:
 				return $elm$core$Maybe$Just(
 					$elm$core$List$length(model.aX));
 			case 5:
 				return $elm$core$Maybe$Just(
-					$elm$core$List$length(model.an));
+					$elm$core$List$length(model.ao));
 			case 8:
 				var kind = _v1.a;
 				return A2(
@@ -29251,14 +29557,14 @@ var $author$project$Main$pagination = function (model) {
 					_List_fromArray(
 						[
 							$elm$html$Html$text(
-							model.bH ? 'Loading records…' : ($elm$core$String$fromInt(count) + (' records · page ' + $elm$core$String$fromInt(1 + ((model.dE / 50) | 0)))))
+							model.bI ? 'Loading records…' : ($elm$core$String$fromInt(count) + (' records · page ' + $elm$core$String$fromInt(1 + ((model.dF / 50) | 0)))))
 						])),
 					A2(
 					$elm$html$Html$button,
 					_List_fromArray(
 						[
 							$elm$html$Html$Attributes$class('btn btn-outline'),
-							$elm$html$Html$Attributes$disabled((!model.dE) || model.bH),
+							$elm$html$Html$Attributes$disabled((!model.dF) || model.bI),
 							$elm$html$Html$Events$onClick(
 							$author$project$State$PageStep(-1))
 						]),
@@ -29271,7 +29577,7 @@ var $author$project$Main$pagination = function (model) {
 					_List_fromArray(
 						[
 							$elm$html$Html$Attributes$class('btn btn-outline'),
-							$elm$html$Html$Attributes$disabled((count < 50) || model.bH),
+							$elm$html$Html$Attributes$disabled((count < 50) || model.bI),
 							$elm$html$Html$Events$onClick(
 							$author$project$State$PageStep(1))
 						]),
@@ -29283,15 +29589,15 @@ var $author$project$Main$pagination = function (model) {
 	}
 };
 var $author$project$State$PwConfirmChanged = function (a) {
-	return {$: 164, a: a};
+	return {$: 167, a: a};
 };
 var $author$project$State$PwCurrentChanged = function (a) {
-	return {$: 162, a: a};
+	return {$: 165, a: a};
 };
 var $author$project$State$PwNewChanged = function (a) {
-	return {$: 163, a: a};
+	return {$: 166, a: a};
 };
-var $author$project$State$SubmitPasswordChange = {$: 165};
+var $author$project$State$SubmitPasswordChange = {$: 168};
 var $author$project$Views$passwordModal = function (model) {
 	return A2(
 		$author$project$Ui$modal,
@@ -29301,9 +29607,9 @@ var $author$project$Views$passwordModal = function (model) {
 			_List_Nil,
 			_List_fromArray(
 				[
-					A6($author$project$Views$checkedInputField, model, 'pwCurrent', 'Current Password', model.aw, 'password', $author$project$State$PwCurrentChanged),
-					A6($author$project$Views$checkedInputField, model, 'pwNew', 'New Password (min 12 characters)', model.Y, 'password', $author$project$State$PwNewChanged),
-					A6($author$project$Views$checkedInputField, model, 'pwConfirm', 'Confirm New Password', model.av, 'password', $author$project$State$PwConfirmChanged),
+					A6($author$project$Views$checkedInputField, model, 'pwCurrent', 'Current Password', model.ax, 'password', $author$project$State$PwCurrentChanged),
+					A6($author$project$Views$checkedInputField, model, 'pwNew', 'New Password (min 12 characters)', model.Z, 'password', $author$project$State$PwNewChanged),
+					A6($author$project$Views$checkedInputField, model, 'pwConfirm', 'Confirm New Password', model.aw, 'password', $author$project$State$PwConfirmChanged),
 					A2(
 					$elm$html$Html$div,
 					_List_fromArray(
@@ -29339,16 +29645,87 @@ var $author$project$Views$passwordModal = function (model) {
 				])));
 };
 var $author$project$State$PortalFile = function (a) {
-	return {$: 49, a: a};
-};
-var $author$project$State$PortalLogout = {$: 53};
-var $author$project$State$PortalRefresh = {$: 52};
-var $author$project$State$PortalUpload = function (a) {
 	return {$: 50, a: a};
+};
+var $author$project$State$PortalLogout = {$: 56};
+var $author$project$State$PortalRefresh = {$: 55};
+var $author$project$State$PortalRespond = F2(
+	function (a, b) {
+		return {$: 53, a: a, b: b};
+	});
+var $author$project$State$PortalUpload = function (a) {
+	return {$: 51, a: a};
+};
+var $elm$html$Html$ol = _VirtualDom_node('ol');
+var $author$project$Features$portalProgress = function (application) {
+	var stages = _List_fromArray(
+		['New Client', 'Initial Consultation', 'Proposal', 'Contract', 'Awaiting Payment', 'Document Collection', 'Document Review', 'Application Preparation', 'Ready for Submission', 'Submitted', 'Processing', 'Additional Requirements', 'Decision Received', 'Completed']);
+	var stage = A2($author$project$Features$str, 'stage', application);
+	var normalized = (stage === 'Documents Under Review') ? 'Document Review' : ((stage === 'Decision Pending') ? 'Processing' : ((stage === 'Approved') ? 'Decision Received' : stage));
+	var current = A2(
+		$elm$core$Maybe$withDefault,
+		-1,
+		A2(
+			$elm$core$Maybe$map,
+			$elm$core$Tuple$first,
+			$elm$core$List$head(
+				A2(
+					$elm$core$List$filter,
+					A2(
+						$elm$core$Basics$composeR,
+						$elm$core$Tuple$second,
+						$elm$core$Basics$eq(normalized)),
+					A2($elm$core$List$indexedMap, $elm$core$Tuple$pair, stages)))));
+	return A2(
+		$elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$h3,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(
+						A2($author$project$Features$str, 'number', application))
+					])),
+				A2(
+				$elm$html$Html$p,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Current status: ' + normalized)
+					])),
+				A2(
+				$elm$html$Html$ol,
+				_List_Nil,
+				A2(
+					$elm$core$List$indexedMap,
+					F2(
+						function (index, labelText) {
+							return A2(
+								$elm$html$Html$li,
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$Attributes$attribute,
+										'aria-current',
+										_Utils_eq(index, current) ? 'step' : 'false')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(
+										_Utils_ap(
+											((current >= 0) && (_Utils_cmp(index, current) < 0)) ? '✓ ' : (_Utils_eq(index, current) ? '→ ' : ''),
+											labelText))
+									]));
+						}),
+					stages))
+			]));
 };
 var $author$project$Features$portalView = function (model) {
 	var connected = !$elm$core$List$isEmpty(
-		A2($author$project$Features$items, 'client', model.bI));
+		A2($author$project$Features$items, 'client', model.bJ));
 	var block = F3(
 		function (name, key, render) {
 			return A2(
@@ -29367,7 +29744,7 @@ var $author$project$Features$portalView = function (model) {
 								$elm$html$Html$text(name)
 							])),
 						$elm$core$List$isEmpty(
-						A2($author$project$Features$items, key, model.bI)) ? A2(
+						A2($author$project$Features$items, key, model.bJ)) ? A2(
 						$elm$html$Html$p,
 						_List_fromArray(
 							[
@@ -29383,7 +29760,7 @@ var $author$project$Features$portalView = function (model) {
 						A2(
 							$elm$core$List$map,
 							render,
-							A2($author$project$Features$items, key, model.bI)))
+							A2($author$project$Features$items, key, model.bJ)))
 					]));
 		});
 	return A2(
@@ -29400,9 +29777,9 @@ var $author$project$Features$portalView = function (model) {
 					_List_Nil,
 					_List_fromArray(
 						[
-							$elm$html$Html$text('Your student workspace')
+							$elm$html$Html$text('Your Client Portal')
 						])),
-					(model.cp !== '') ? A2(
+					(model.cq !== '') ? A2(
 					$elm$html$Html$p,
 					_List_fromArray(
 						[
@@ -29411,9 +29788,9 @@ var $author$project$Features$portalView = function (model) {
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text(model.cp)
+							$elm$html$Html$text(model.cq)
 						])) : $elm$html$Html$text(''),
-					(model.cr !== '') ? A2(
+					(model.cs !== '') ? A2(
 					$elm$html$Html$p,
 					_List_fromArray(
 						[
@@ -29422,9 +29799,9 @@ var $author$project$Features$portalView = function (model) {
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text(model.cr)
+							$elm$html$Html$text(model.cs)
 						])) : $elm$html$Html$text(''),
-					model.aK ? A2(
+					model.ak ? A2(
 					$elm$html$Html$p,
 					_List_fromArray(
 						[
@@ -29460,7 +29837,7 @@ var $author$project$Features$portalView = function (model) {
 							_List_fromArray(
 								[
 									$elm$html$Html$Attributes$class('btn btn-outline'),
-									$elm$html$Html$Attributes$disabled(model.aK),
+									$elm$html$Html$Attributes$disabled(model.ak),
 									$elm$html$Html$Events$onClick($author$project$State$PortalRefresh)
 								]),
 							_List_fromArray(
@@ -29472,7 +29849,7 @@ var $author$project$Features$portalView = function (model) {
 							_List_fromArray(
 								[
 									$elm$html$Html$Attributes$class('btn btn-outline'),
-									$elm$html$Html$Attributes$disabled(model.aK),
+									$elm$html$Html$Attributes$disabled(model.ak),
 									$elm$html$Html$Events$onClick($author$project$State$PortalLogout)
 								]),
 							_List_fromArray(
@@ -29505,9 +29882,10 @@ var $author$project$Features$portalView = function (model) {
 							_List_fromArray(
 								[
 									$elm$html$Html$text(
-									A2($author$project$Features$str, 'title', item) + (' · ' + (A2($author$project$Features$str, 'stage', item) + ((A2($author$project$Features$str, 'deadline', item) === '') ? '' : (' · Next deadline: ' + A2($author$project$Features$str, 'deadline', item))))))
+									A2($author$project$Features$str, 'number', item) + (' · ' + (A2($author$project$Features$str, 'title', item) + (' · ' + (A2($author$project$Features$str, 'stage', item) + ((A2($author$project$Features$str, 'deadline', item) === '') ? '' : (' · Next deadline: ' + A2($author$project$Features$str, 'deadline', item))))))))
 								]));
 					}),
+					A3(block, 'Application progress', 'cases', $author$project$Features$portalProgress),
 					A2(
 					$elm$html$Html$div,
 					_List_fromArray(
@@ -29532,7 +29910,7 @@ var $author$project$Features$portalView = function (model) {
 								[
 									$elm$html$Html$Attributes$id('portal-file'),
 									$elm$html$Html$Attributes$type_('file'),
-									$elm$html$Html$Attributes$disabled(model.aK),
+									$elm$html$Html$Attributes$disabled(model.ak),
 									A2(
 									$elm$html$Html$Events$on,
 									'change',
@@ -29555,7 +29933,7 @@ var $author$project$Features$portalView = function (model) {
 									A2(
 										$elm$core$Maybe$withDefault,
 										'Choose a file, then submit it to the matching requirement below.',
-										A2($elm$core$Maybe$map, $elm$file$File$name, model.cq)))
+										A2($elm$core$Maybe$map, $elm$file$File$name, model.cr)))
 								])),
 							A2(
 							$elm$html$Html$p,
@@ -29639,7 +30017,7 @@ var $author$project$Features$portalView = function (model) {
 										[
 											$elm$html$Html$Attributes$class('btn btn-primary'),
 											$elm$html$Html$Attributes$disabled(
-											_Utils_eq(model.cq, $elm$core$Maybe$Nothing) || model.aK),
+											_Utils_eq(model.cr, $elm$core$Maybe$Nothing) || model.ak),
 											$elm$html$Html$Events$onClick(
 											$author$project$State$PortalUpload(
 												A2(
@@ -29651,7 +30029,7 @@ var $author$project$Features$portalView = function (model) {
 									_List_fromArray(
 										[
 											$elm$html$Html$text(
-											model.aK ? 'Please wait…' : 'Submit selected file')
+											model.ak ? 'Please wait…' : 'Submit selected file')
 										]))
 								]));
 					}),
@@ -29676,16 +30054,342 @@ var $author$project$Features$portalView = function (model) {
 					}),
 					A3(
 					block,
+					'Upcoming meetings (UTC)',
+					'meetings',
+					function (item) {
+						return A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('operation-row')
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$div,
+									_List_Nil,
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$h3,
+											_List_Nil,
+											_List_fromArray(
+												[
+													$elm$html$Html$text(
+													A2($author$project$Features$str, 'title', item))
+												])),
+											A2(
+											$elm$html$Html$p,
+											_List_Nil,
+											_List_fromArray(
+												[
+													$elm$html$Html$text(
+													A2($author$project$Features$str, 'startsAt', item) + (' – ' + A2($author$project$Features$str, 'endsAt', item)))
+												])),
+											A2(
+											$elm$html$Html$p,
+											_List_Nil,
+											_List_fromArray(
+												[
+													$elm$html$Html$text(
+													'Meeting ID: ' + (A2($author$project$Features$str, 'meetingId', item) + (' · Passcode: ' + A2($author$project$Features$str, 'passcode', item))))
+												]))
+										])),
+									A2(
+									$elm$core$String$startsWith,
+									'https://',
+									A2($author$project$Features$str, 'meetingUrl', item)) ? A2(
+									$elm$html$Html$a,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('btn btn-primary'),
+											$elm$html$Html$Attributes$href(
+											A2($author$project$Features$str, 'meetingUrl', item)),
+											$elm$html$Html$Attributes$target('_blank'),
+											$elm$html$Html$Attributes$rel('noopener noreferrer')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Join Zoom Meeting')
+										])) : $elm$html$Html$text('')
+								]));
+					}),
+					A3(
+					block,
+					'Proposals and contracts',
+					'commercial',
+					function (item) {
+						return A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('card')
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$h3,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text(
+											A2($author$project$Features$str, 'number', item) + (' · ' + A2($author$project$Features$str, 'title', item)))
+										])),
+									A2(
+									$elm$html$Html$p,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text(
+											A2($author$project$Features$str, 'status', item) + (' · ' + (A2($author$project$Features$str, 'currency', item) + (' ' + (A2($author$project$Features$str, 'total', item) + (' · Valid until ' + A2($author$project$Features$str, 'validUntil', item)))))))
+										])),
+									A2(
+									$elm$html$Html$a,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('btn btn-outline'),
+											$elm$html$Html$Attributes$href(
+											'/api/portal/commercial/' + (A2($author$project$Features$str, 'id', item) + '/download'))
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Download and review')
+										])),
+									A2(
+									$elm$core$List$member,
+									A2($author$project$Features$str, 'status', item),
+									_List_fromArray(
+										['Issued', 'Viewed'])) ? A2(
+									$elm$html$Html$div,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('form-actions')
+										]),
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$button,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('btn btn-primary'),
+													$elm$html$Html$Attributes$disabled(model.ak),
+													$elm$html$Html$Events$onClick(
+													A2(
+														$author$project$State$ConfirmRequested,
+														'Confirm that you have downloaded, reviewed and accept these terms?',
+														A2(
+															$author$project$State$PortalRespond,
+															A2($author$project$Features$str, 'id', item),
+															'accept')))
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text('Accept terms')
+												])),
+											(A2($author$project$Features$str, 'kind', item) === 'proposal') ? A2(
+											$elm$html$Html$button,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('btn btn-outline'),
+													$elm$html$Html$Attributes$disabled(model.ak),
+													$elm$html$Html$Events$onClick(
+													A2(
+														$author$project$State$ConfirmRequested,
+														'Reject this proposal?',
+														A2(
+															$author$project$State$PortalRespond,
+															A2($author$project$Features$str, 'id', item),
+															'reject')))
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text('Reject proposal')
+												])) : $elm$html$Html$text('')
+										])) : $elm$html$Html$text('')
+								]));
+					}),
+					A3(
+					block,
+					'Payment instructions',
+					'paymentDetails',
+					function (item) {
+						return A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('card')
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$h3,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text(
+											'INV-' + A2($author$project$Features$str, 'invoice', item))
+										])),
+									A2(
+									$elm$html$Html$p,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text(
+											A2($author$project$Features$str, 'bank', item) + (' · ' + (A2($author$project$Features$str, 'accountName', item) + (' · ' + A2($author$project$Features$str, 'accountNumber', item)))))
+										])),
+									A2(
+									$elm$html$Html$p,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text(
+											A2($author$project$Features$str, 'method', item) + (' · ' + A2($author$project$Features$str, 'instructions', item)))
+										])),
+									A2(
+									$elm$html$Html$p,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text(
+											'Amount due: ' + (A2($author$project$Features$str, 'currency', item) + (' ' + (A2($author$project$Features$str, 'amountDue', item) + (' · Due: ' + A2($author$project$Features$str, 'dueDate', item))))))
+										]))
+								]));
+					}),
+					A3(
+					block,
 					'Invoices',
 					'invoices',
 					function (item) {
 						return A2(
-							$elm$html$Html$p,
-							_List_Nil,
+							$elm$html$Html$div,
 							_List_fromArray(
 								[
-									$elm$html$Html$text(
-									'INV-' + (A2($author$project$Features$str, 'id', item) + (' · ' + (A2($author$project$Features$str, 'description', item) + (' · ' + (A2($author$project$Features$str, 'currency', item) + (' ' + (A2($author$project$Features$str, 'amount', item) + (' · ' + (A2($author$project$Features$str, 'status', item) + (' · Paid ' + (A2($author$project$Features$str, 'paid', item) + (' · Balance ' + (A2($author$project$Features$str, 'balance', item) + (' · Due ' + A2($author$project$Features$str, 'dueDate', item))))))))))))))))
+									$elm$html$Html$Attributes$class('card')
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$p,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text(
+											'INV-' + (A2($author$project$Features$str, 'id', item) + (' · ' + (A2($author$project$Features$str, 'description', item) + (' · ' + (A2($author$project$Features$str, 'currency', item) + (' ' + (A2($author$project$Features$str, 'amount', item) + (' · ' + (A2($author$project$Features$str, 'status', item) + (' · Paid ' + (A2($author$project$Features$str, 'paid', item) + (' · Balance ' + (A2($author$project$Features$str, 'balance', item) + (' · Due ' + A2($author$project$Features$str, 'dueDate', item))))))))))))))))
+										])),
+									A2(
+									$elm$html$Html$a,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('btn btn-outline'),
+											$elm$html$Html$Attributes$href(
+											'/api/portal/invoices/' + (A2($author$project$Features$str, 'id', item) + '/download'))
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Download invoice PDF')
+										]))
+								]));
+					}),
+					A3(
+					block,
+					'Online payments and electronic signatures',
+					'integrations',
+					function (item) {
+						return A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('card')
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$p,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text(
+											A2($author$project$Features$str, 'kind', item) + (' #' + (A2($author$project$Features$str, 'record', item) + (' · ' + A2($author$project$Features$str, 'status', item)))))
+										])),
+									A2(
+									$elm$core$String$startsWith,
+									'https://checkout.stripe.com/',
+									A2($author$project$Features$str, 'url', item)) ? A2(
+									$elm$html$Html$a,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('btn btn-primary'),
+											$elm$html$Html$Attributes$href(
+											A2($author$project$Features$str, 'url', item)),
+											$elm$html$Html$Attributes$target('_blank'),
+											$elm$html$Html$Attributes$rel('noopener noreferrer')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Pay securely')
+										])) : $elm$html$Html$text(''),
+									((A2($author$project$Features$str, 'kind', item) === 'contract') && (A2($author$project$Features$str, 'status', item) === 'Sent')) ? A2(
+									$elm$html$Html$p,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Follow the DocuSign email to review and sign your contract.')
+										])) : $elm$html$Html$text(''),
+									(A2($author$project$Features$str, 'signedPdfReady', item) === 'true') ? A2(
+									$elm$html$Html$a,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('btn btn-outline'),
+											$elm$html$Html$Attributes$href(
+											'/api/portal/signatures/' + (A2($author$project$Features$str, 'id', item) + '/download'))
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Download signed contract and certificate')
+										])) : $elm$html$Html$text('')
+								]));
+					}),
+					A3(
+					block,
+					'Payment receipts',
+					'receipts',
+					function (item) {
+						return A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('card')
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$p,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text(
+											'RC-' + (A2($author$project$Features$str, 'id', item) + (' · INV-' + (A2($author$project$Features$str, 'invoice', item) + (' · ' + (A2($author$project$Features$str, 'currency', item) + (' ' + (A2($author$project$Features$str, 'amount', item) + (' · ' + (A2($author$project$Features$str, 'date', item) + (' · ' + A2($author$project$Features$str, 'status', item))))))))))))
+										])),
+									A2(
+									$elm$html$Html$p,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text(
+											A2($author$project$Features$str, 'method', item) + (' · ' + A2($author$project$Features$str, 'reference', item)))
+										])),
+									A2(
+									$elm$html$Html$a,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('btn btn-outline'),
+											$elm$html$Html$Attributes$href(
+											'/api/portal/receipts/' + (A2($author$project$Features$str, 'id', item) + '/download'))
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Download receipt PDF')
+										]))
 								]));
 					})
 				])));
@@ -29706,7 +30410,7 @@ var $author$project$Views$toastStack = function (model) {
 						[
 							$elm$html$Html$Attributes$class(
 							'toast toast-' + function () {
-								var _v0 = t.aG;
+								var _v0 = t.aH;
 								switch (_v0) {
 									case 'success':
 										return 'success';
@@ -29719,21 +30423,21 @@ var $author$project$Views$toastStack = function (model) {
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text(t.dx)
+							$elm$html$Html$text(t.dy)
 						]));
 			},
 			model.bu));
 };
-var $author$project$State$CloseUserForm = {$: 154};
-var $author$project$State$SubmitUserForm = {$: 156};
+var $author$project$State$CloseUserForm = {$: 157};
+var $author$project$State$SubmitUserForm = {$: 159};
 var $author$project$State$UpdateUserForm = function (a) {
-	return {$: 155, a: a};
+	return {$: 158, a: a};
 };
 var $author$project$Types$roles = _List_fromArray(
 	['admin', 'consultant', 'viewer']);
 var $author$project$Views$userFormModal = function (model) {
 	var f = model.p;
-	var editing = !_Utils_eq(f.cI, $elm$core$Maybe$Nothing);
+	var editing = !_Utils_eq(f.cJ, $elm$core$Maybe$Nothing);
 	var pwField = editing ? A6(
 		$author$project$Views$checkedInputField,
 		model,
@@ -29831,13 +30535,13 @@ var $author$project$Views$userFormModal = function (model) {
 					$author$project$Ui$selectField,
 					'Role',
 					$author$project$Types$roles,
-					f.G,
+					f.A,
 					function (v) {
 						return $author$project$State$UpdateUserForm(
 							function (g) {
 								return _Utils_update(
 									g,
-									{G: v});
+									{A: v});
 							});
 					}),
 					pwField,
@@ -29877,7 +30581,7 @@ var $author$project$Views$userFormModal = function (model) {
 };
 var $elm$html$Html$time = _VirtualDom_node('time');
 var $author$project$Main$clockView = function (model) {
-	var ready = (model.A !== '') && (model.bi !== '');
+	var ready = (model.B !== '') && (model.bi !== '');
 	var pad = function (number) {
 		return A3(
 			$elm$core$String$padLeft,
@@ -29890,7 +30594,7 @@ var $author$project$Main$clockView = function (model) {
 		A2($elm$core$Basics$modBy, 60, minutes))));
 	var timestamp = ready ? _List_fromArray(
 		[
-			A2($elm$html$Html$Attributes$attribute, 'datetime', model.A + ('T' + (model.bi + offset)))
+			A2($elm$html$Html$Attributes$attribute, 'datetime', model.B + ('T' + (model.bi + offset)))
 		]) : _List_Nil;
 	return A2(
 		$elm$html$Html$div,
@@ -29931,7 +30635,7 @@ var $author$project$Main$clockView = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$text(
-								ready ? model.A : 'Loading date…')
+								ready ? model.B : 'Loading date…')
 							])),
 						A2(
 						$elm$html$Html$strong,
@@ -29953,7 +30657,7 @@ var $author$project$Main$clockView = function (model) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text(model.bX + (' · UTC' + offset))
+						$elm$html$Html$text(model.bY + (' · UTC' + offset))
 					])),
 				A2(
 				$elm$html$Html$span,
@@ -30150,7 +30854,7 @@ var $author$project$Main$bodyView = function (model) {
 				]),
 			_List_fromArray(
 				[$author$project$Ui$spinner]))
-		]) : (_Utils_eq(model.H, $elm$core$Maybe$Nothing) ? _List_fromArray(
+		]) : (_Utils_eq(model.C, $elm$core$Maybe$Nothing) ? _List_fromArray(
 		[
 			$author$project$Views$loginView(model)
 		]) : $elm$core$List$concat(
@@ -30205,15 +30909,15 @@ var $author$project$Main$bodyView = function (model) {
 											$elm$html$Html$text('Try again')
 										]))
 								])) : A2($elm$html$Html$span, _List_Nil, _List_Nil),
-							((model.s !== '') && (_Utils_eq(model.O, $elm$core$Maybe$Nothing) && _Utils_eq(model.bT, $elm$core$Maybe$Nothing))) ? A2($elm$html$Html$span, _List_Nil, _List_Nil) : $author$project$Main$pageView(model),
+							((model.s !== '') && (_Utils_eq(model.O, $elm$core$Maybe$Nothing) && _Utils_eq(model.bU, $elm$core$Maybe$Nothing))) ? A2($elm$html$Html$span, _List_Nil, _List_Nil) : $author$project$Main$pageView(model),
 							$author$project$Main$pagination(model)
 						]))
 				]),
-				model.am ? _List_fromArray(
+				model.an ? _List_fromArray(
 				[
 					$author$project$Views$userFormModal(model)
 				]) : _List_Nil,
-				model.ay ? _List_fromArray(
+				model.az ? _List_fromArray(
 				[
 					$author$project$Views$passwordModal(model)
 				]) : _List_Nil,
@@ -30222,7 +30926,7 @@ var $author$project$Main$bodyView = function (model) {
 					$author$project$Features$conflictView(model)
 				]),
 				function () {
-				var _v0 = model.V;
+				var _v0 = model.W;
 				if (!_v0.$) {
 					var _v1 = _v0.a;
 					var message = _v1.a;
@@ -30250,7 +30954,7 @@ var $author$project$Main$view = function (model) {
 				_List_fromArray(
 					[
 						$elm$html$Html$Attributes$class(
-						model.aC ? 'app-root dark-mode' : 'app-root')
+						model.aD ? 'app-root dark-mode' : 'app-root')
 					]),
 				$author$project$Main$bodyView(model))
 			]),
@@ -30258,6 +30962,6 @@ var $author$project$Main$view = function (model) {
 	};
 };
 var $author$project$Main$main = $elm$browser$Browser$application(
-	{dt: $author$project$Main$init, dz: $author$project$State$UrlChanged, dA: $author$project$State$LinkClicked, dV: $author$project$Main$subscriptions, d_: $author$project$Main$update, d1: $author$project$Main$view});
+	{du: $author$project$Main$init, dA: $author$project$State$UrlChanged, dB: $author$project$State$LinkClicked, dW: $author$project$Main$subscriptions, d$: $author$project$Main$update, d2: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));

@@ -24,12 +24,13 @@ export ECC_ELM_STATE_JS="$test_dir/state.js"
 export ECC_ELM_REPORT_JS="$test_dir/state.js"
 "${cabal_cmd[@]}" build all
 "${cabal_cmd[@]}" test regression --test-show-details=direct
-node --test --test-concurrency=1 test/frontend-state.test.cjs scripts/report.test.cjs scripts/report-output.test.cjs scripts/pwa.test.cjs
+node --test --test-concurrency=1 test/frontend-state.test.cjs test/dialog-observer.test.cjs scripts/report.test.cjs scripts/report-output.test.cjs scripts/pwa.test.cjs
 python3 -m unittest discover -s scripts -p 'test_*.py' -v
 python3 scripts/performance.py
 # PostgreSQL coverage is required before a release may be sealed.
 : "${ECC_TEST_DATABASE_URL:?Set ECC_TEST_DATABASE_URL to a disposable PostgreSQL database}"
 "${cabal_cmd[@]}" test postgres-regression --test-show-details=direct
+ECC_INTEGRATION_TEST_DATABASE_URL="$ECC_TEST_DATABASE_URL" python3 -m unittest discover -s scripts -p test_integrations.py -v
 python3 scripts/postgres_acceptance.py
 python3 scripts/postgres_workers.py
 python3 scripts/postgres_recovery_integration.py

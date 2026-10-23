@@ -15,6 +15,7 @@ import ECC.Server (transactionalApplication)
 import ECC.Store
 import qualified FeatureTests
 import qualified ClientApplicationTests
+import qualified JourneyTests
 
 -- This suite is deliberately separate: a missing PostgreSQL server must not
 -- appear as a passing PostgreSQL test in the ordinary SQLite suite.
@@ -47,6 +48,7 @@ main = do
    let api=transactionalApplication cn application
    FeatureTests.run cn api
    ClientApplicationTests.run cn api
+   JourneyTests.run cn api
    [Only dataRows]<-query_ cn "SELECT count(*) FROM clients" :: IO [Only Int]
    unless (dataRows>0) $ fail "PostgreSQL workflows did not persist students"
    putStrLn "PostgreSQL transport, schema replay, WAI workflows, student conversion, permissions and persistence passed"

@@ -31,6 +31,12 @@ class RenderPreflightTests(unittest.TestCase):
             self.assertIn('CLAMD_PORT:invalid',preflight.configuration_problems({**self.config(),'CLAMD_HOST':'scanner','CLAMD_PORT':port},'scan'))
         self.assertEqual(preflight.configuration_problems({**self.config(),'CLAMD_HOST':'scanner','CLAMD_PORT':'3310'},'scan'),[])
 
+    def test_api_port_and_pool_match_runtime_limits(self):
+        for key, values in [('PORT', ['0','65536','bad','']), ('DB_POOL_SIZE', ['0','17','bad',''])]:
+            for value in values:
+                self.assertIn(key + ':invalid',preflight.configuration_problems({**self.config(),key:value},'api'))
+        self.assertEqual(preflight.configuration_problems({**self.config(),'PORT':'10000','DB_POOL_SIZE':'16'},'api'),[])
+
     def test_backups_require_isolated_target_offsite_key_and_alerts(self):
         values={**self.config(),'RESTORE_TEST_DATABASE_URL':'postgresql://fixture.invalid/ecc_restore_drill?sslmode=require',
                 'RESTIC_REPOSITORY':'s3:https://storage.invalid/ecc','RESTIC_PASSWORD':'fixture-test-key',

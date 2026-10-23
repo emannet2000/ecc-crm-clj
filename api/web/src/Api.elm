@@ -399,7 +399,12 @@ responseError status headers body =
     let
         message =
             D.decodeString (D.field "error" D.string) body
-                |> Result.withDefault ("Request failed (" ++ String.fromInt status ++ ")")
+                |> Result.withDefault
+                    (if status >= 500 then
+                        "The service is temporarily unavailable. Check the record before retrying a save."
+                     else
+                        "Request failed (" ++ String.fromInt status ++ ")"
+                    )
                 |> String.left 140
 
         reference =

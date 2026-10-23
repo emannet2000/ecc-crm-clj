@@ -28,6 +28,7 @@ class Browser {
     let status=200,mime='application/json',body;
     const user={id:1,name:'Alex Rivera',email:'alex@example.com',role:'admin'};
     if(url.pathname==='/api/time')body={unixMillis:Date.now(),timezone:'Asia/Manila',offsetMinutes:480,date:new Date(Date.now()+8*3600000).toISOString().slice(0,10)};
+    else if(url.pathname==='/api/portal')body={client:[{name:'Maria Santos',number:'ECC-42'}],cases:[{id:9,number:'APP-000009',title:'Canada Student Visa',stage:'Document Collection'}],checklist:[],documents:[],meetings:[{id:7,title:'Consultation',startsAt:'2099-01-01 10:00',endsAt:'2099-01-01 11:00',meetingUrl:'https://zoom.us/j/123456',meetingId:'123456',passcode:'client-code'}],commercial:[{id:11,number:'PR-000011',title:'Study proposal',kind:'proposal',status:'Issued',currency:'PHP',total:'25000.00',validUntil:'2099-12-31'}],paymentDetails:[],invoices:[{id:21,description:'Consulting',currency:'PHP',amount:'25000.00',paid:'10000.00',balance:'15000.00',status:'Partially Paid',dueDate:'2099-12-31'}],integrations:[{id:51,kind:'invoice',record:21,status:'Open',url:'https://checkout.stripe.com/c/pay/fixture'},{id:52,kind:'contract',record:11,status:'Sent',url:''}],receipts:[{id:31,invoice:21,currency:'PHP',amount:'10000.00',date:'2026-10-23',method:'Bank transfer',reference:'client-reference',status:'Received'}]};
     else if(url.pathname==='/api/auth/me'){status=this.signedIn?200:401;body=this.signedIn?user:{error:'Not authenticated'};}
     else if(url.pathname==='/api/auth/login'){this.signedIn=true;body={token:'memory-only',user};}
     else if(url.pathname==='/api/auth/logout'){this.signedIn=false;body={loggedOut:true};}
@@ -46,6 +47,8 @@ class Browser {
     else if(url.pathname.startsWith('/api/workspace/')){
       const section=url.pathname.split('/')[3]==='record'?url.pathname.split('/')[6]:url.pathname.split('/')[3];
       const rows={
+        appointments:[{id:17,title:'Initial consultation',owner:'case:9',assignee:1,startsAt:'2099-01-01T10:00',endsAt:'2099-01-01T11:00',status:'Scheduled',revision:4,clientVisible:false}],
+        integrations:[{id:51,title:'google · appointment #17',provider:'google',record:17,owner:'case:9',status:'Queued',date:'2026-10-23 10:00:00'}],
         applications:[{id:9,title:'Maya Chen · Student Visa',owner:'client:4',clientName:'Maya Chen',category:'Student Visa',destination:'Canada',stage:'Submitted',deadline:'2030-01-01',intakeDate:'2030-09-01',revision:2,path:'/clients/4'}],
         tasks:[{id:7,title:'Review passport',description:'Keep this description',owner:'client:4',recordName:'Maya Chen',assignee:1,assigneeName:'Alex Rivera',dueDate:'2030-01-01',priority:'High',status:'Pending',revision:3}],
         documents:[{id:9,title:'Passport checklist',owner:'client:4',status:'Received',required:'true',revision:5,versions:[{documentId:12,version:1,filename:'passport.pdf',scanStatus:'Clean'}]}],
@@ -226,7 +229,7 @@ test('workspace UI: authentication, navigation, responsive layout and operations
     await t.test('client pages expose scoped work and document upload controls',async()=>{
       await b.evaluate(`const a=document.createElement('a');a.href='/clients/4';a.textContent='Open fixture client';document.body.append(a);a.click();`);
       await b.wait(`document.body.innerText.includes('Work on this record or application')`);
-      await b.clickText('Document checklist');
+      await b.clickText('Upload Document');
       await b.wait(`document.querySelector('#checklist-file')`);
       assert.equal(await b.evaluate(`document.querySelector('#checklist-file').labels.length`),1);
       assert(await b.evaluate(`document.body.innerText.includes('Review queue')`));
@@ -234,6 +237,21 @@ test('workspace UI: authentication, navigation, responsive layout and operations
       await b.wait(`document.querySelector('#case-work-scope').value==='case:9'`);
       for(let i=0;i<100&&!b.requests.some(path=>path.startsWith('/api/workspace/record/case/9/documents'));i++)await delay(20);
       assert(b.requests.some(path=>path.startsWith('/api/workspace/record/case/9/documents')));
+    });
+    await t.test('scoped provider actions require selected records and preserve revisions',async()=>{
+      await b.clickText('Schedule Zoom Meeting');
+      await b.wait(`document.body.innerText.includes('Initial consultation')`);
+      await b.clickText('Select / edit');
+      await b.clickText('Connect Google Calendar');
+      await b.wait(`document.body.innerText.includes('Confirm this action')`);
+      await b.clickText('Confirm');
+      await b.wait(`document.body.innerText.includes('Saved successfully')`);
+      assert.equal(b.lastFeatureBody.id,'17');
+      assert.equal(b.lastFeatureBody.expectedRevision,'4');
+      assert.equal(b.lastFeatureBody.owner,'case:9');
+      assert(b.requests.includes('/api/workspace/appointments/calendar'));
+      await b.clickText('Integration status');
+      await b.wait(`document.body.innerText.includes('google · appointment #17')`);
     });
     await t.test('sales reports and accounting forms expose independent financial workflows',async()=>{
       await b.clickText('Sales report');
@@ -260,6 +278,18 @@ test('workspace UI: authentication, navigation, responsive layout and operations
     await t.test('logout clears the workspace and returns to sign in',async()=>{
       await b.clickText('Log out');await b.wait(`document.body.innerText.includes('Good to see you.')`);
       assert.equal(await b.evaluate(`document.querySelector('.header')`),null);
+    });
+    await t.test('client portal exposes application progress and authorized download actions',async()=>{
+      await b.send('Page.navigate',{url:'http://ecc.test/portal'});
+      await b.wait(`document.body.innerText.includes('Maria Santos') && document.body.innerText.includes('Payment receipts')`);
+      assert.equal(await b.evaluate(`document.querySelector('a[href="/api/portal/invoices/21/download"]').textContent`),'Download invoice PDF');
+      assert.equal(await b.evaluate(`document.querySelector('a[href="/api/portal/receipts/31/download"]').textContent`),'Download receipt PDF');
+      assert.equal(await b.evaluate(`document.querySelector('a[href="https://zoom.us/j/123456"]').textContent`),'Join Zoom Meeting');
+      assert(await b.evaluate(`document.body.innerText.includes('Partially Paid') && document.body.innerText.includes('Accept terms')`));
+      assert.equal(await b.evaluate(`document.querySelector('a[href="https://checkout.stripe.com/c/pay/fixture"]').textContent`),'Pay securely');
+      assert(await b.evaluate(`document.body.innerText.includes('Follow the DocuSign email')`));
+      assert.equal(await b.evaluate(`document.querySelector('.sidebar')`),null);
+      await b.screenshot('ecc-client-portal-mobile.png');
     });
     assert.deepEqual(b.errors,[]);
   } finally {await b.close();}

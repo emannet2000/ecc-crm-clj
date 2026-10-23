@@ -15,12 +15,12 @@ try {
   });
   const expose=`scope.stateTests={A2,A3,A4,list:_List_fromArray,initial:$author$project$State$initialModel,
     url:$elm$url$Url$fromString,update:$author$project$Main$update,accept:$author$project$Main$acceptLoad,
-    ok:$elm$core$Result$Ok,err:$elm$core$Result$Err,badStatus:$elm$http$Http$BadStatus,networkError:$elm$http$Http$NetworkError,networkResponse:$elm$http$Http$NetworkError_,loginDone:$author$project$State$LoginDone,
+    ok:$elm$core$Result$Ok,err:$elm$core$Result$Err,badStatus:$elm$http$Http$BadStatus,networkError:$elm$http$Http$NetworkError,timeout:$elm$http$Http$Timeout,networkResponse:$elm$http$Http$NetworkError_,loginDone:$author$project$State$LoginDone,
     leads:$author$project$State$LeadsLoaded,users:$author$project$State$UsersLoaded,
     search:$author$project$State$SearchChanged,navigate:$author$project$State$UrlChanged,
     taskDone:$author$project$State$TaskStatusDone,page:$author$project$State$PageStep,
     operations:$author$project$State$OperationsLoaded,feature:$author$project$State$FeatureLoaded,
-    featureSearch:$author$project$State$FeatureSearch,json:_Json_wrap,
+    featureSearch:$author$project$State$FeatureSearch,featureSearchReady:$author$project$State$FeatureSearchReady,loadKey:$author$project$Main$loadKey,json:_Json_wrap,
     form:$author$project$Features$rowForm,defaults:$author$project$Features$defaults,
     get:$elm$core$Dict$get,inline:$author$project$State$InlineSection,inlineOwner:$author$project$State$InlineOwner,
     featureEdit:$author$project$State$FeatureEdit,featureDone:$author$project$State$FeatureDone,
@@ -89,7 +89,7 @@ try {
     assert.equal(loaded.a.clientDetail.a,detail);
     assert.equal(loaded.a.pageLoading,false);
     assert.equal(httpUrls(loaded.b).length,2);
-    for(const message of [e.inline('history'),e.featureSearch('passport'),e.page(1),e.inlineOwner('case:9')]){
+    for(const message of [e.inline('history'),e.page(1),e.inlineOwner('case:9')]){
       const changed=e.A2(e.update,message,loaded.a);
       const urls=httpUrls(changed.b);
       assert.equal(urls.length,1);
@@ -97,6 +97,21 @@ try {
     }
     const failed=e.A2(e.update,e.clientLoaded(e.err(e.badStatus(404))),model);
     assert.equal(httpUrls(failed.b).length,0);
+  });
+
+  test('workspace search waits for typing to settle and cancels stale searches',()=>{
+    const original={...initial('/clients/7'),clientDetail:{$:'Just',a:{client:{id:7}}}};
+    const first=e.A2(e.update,e.featureSearch('pass'),original);
+    assert.equal(httpUrls(first.b).length,0);
+    const oldKey=e.loadKey(first.a);
+    const latest=e.A2(e.update,e.featureSearch('passport'),first.a);
+    assert.equal(httpUrls(latest.b).length,0);
+    assert.equal(httpUrls(e.A2(e.update,e.featureSearchReady(oldKey),latest.a).b).length,0);
+    const ready=e.A2(e.update,e.featureSearchReady(e.loadKey(latest.a)),latest.a);
+    assert.equal(httpUrls(ready.b).length,1);
+    assert.match(httpUrls(ready.b)[0],/passport/);
+    const navigated=update(e.inline('history'),latest.a);
+    assert.equal(httpUrls(e.A2(e.update,e.featureSearchReady(e.loadKey(latest.a)),navigated).b).length,0);
   });
 
   test('server-synchronized clock crosses business midnight despite an incorrect device date',()=>{
@@ -147,9 +162,9 @@ try {
     const synced=update(e.A4(e.aligned,midnight,480,'Asia/Manila',e.posix(midnight)),base);
     assert.deepEqual(httpUrls(e.A2(e.update,e.tick(e.posix(midnight+1000)),synced).b),[]);
     const retry=e.A2(e.update,e.clockRefresh(e.posix(midnight+60000)),synced);
-    assert.deepEqual(httpUrls(retry.b).sort(),['/api/stats','/api/time']);
+    assert.deepEqual(httpUrls(retry.b).sort(),['/api/stats','/api/time','/api/workspace/notifications?q=&offset=0']);
     const loaded=update(e.A2(e.clockStats,'2026-10-20',e.ok({today:e.json({date:'2026-10-20'})})),retry.a);
-    assert.deepEqual(httpUrls(e.A2(e.update,e.clockRefresh(e.posix(midnight+120000)),loaded).b),['/api/time']);
+    assert.deepEqual(httpUrls(e.A2(e.update,e.clockRefresh(e.posix(midnight+120000)),loaded).b).sort(),['/api/time','/api/workspace/notifications?q=&offset=0']);
   });
   test('late search responses and repeated query values cannot replace current results',()=>{
     const original=initial();
@@ -200,14 +215,15 @@ try {
     const loggedOut=update(e.logout(e.ok({})),expired);
     assert.equal(loggedOut.sessionDraft.$,'Nothing');
   });
-  test('network save errors preserve editable text without silently retrying',()=>{
+  for (const error of ['networkError','timeout']) test(error+' save errors preserve editable text without silently retrying',()=>{
     const form=e.dict(e.list([{a:'supplier',b:'Keep this expense'}]));
     const model={...initial('/work/expenses'),featureForm:form,formDirty:true,featureBusy:true};
-    const result=e.A2(e.update,e.featureDone(e.err(e.networkError)),model);
+    const result=e.A2(e.update,e.featureDone(e.err(e[error])),model);
     assert.equal(result.a.featureForm,form);
     assert.equal(result.a.formDirty,true);
     assert.equal(result.a.featureBusy,false);
     assert.equal(httpUrls(result.b).length,0);
+    assert.match(result.a.featureError,/check the record before retrying a save/i);
   });
 
   test('stale authentication errors are ignored and expiration rejects old staff data',()=>{
@@ -407,6 +423,10 @@ try {
     assert.equal(invalid.a.a,'Unexpected server error');
     const existing=e.A2(e.decodeResponse,e.valueDecoder,{$:'BadStatus_',a:{statusCode:500,headers},b:JSON.stringify({error:'Error. Reference: '+reference})});
     assert.equal(existing.a.a,'Error. Reference: '+reference);
+    const unavailable=e.A2(e.decodeResponse,e.valueDecoder,{$:'BadStatus_',a:{statusCode:502,headers},b:'<html>Bad gateway</html>'});
+    assert.match(unavailable.a.a,/temporarily unavailable/);
+    assert.match(unavailable.a.a,/check the record before retrying a save/i);
+    assert(unavailable.a.a.includes(reference));
   });
   test('record forms validate missing names and malformed email without sending requests',()=>{
     const original=initial('/leads');

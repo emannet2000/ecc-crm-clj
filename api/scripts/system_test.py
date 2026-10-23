@@ -80,16 +80,24 @@ class StartupTests(unittest.TestCase):
                 versions = source.execute('SELECT count(*) FROM schema_migrations').fetchone()[0]
                 self.assertEqual(versions, len(list((ROOT / 'migrations').glob('*.sql'))))
                 source.execute("INSERT INTO clients(client_number,full_name) VALUES ('RESTORE-1','Restore 中')")
+                source.execute("INSERT INTO documents(client_id,filename,content,size) VALUES(1,'restored-passport.pdf',?,?)",
+                               (b'uploaded document\x00\xff', len(b'uploaded document\x00\xff')))
+                source.execute("INSERT INTO cases(client_id,stage,institution,program) VALUES(1,'Submitted','Recovery College','Nursing')")
                 source.commit()
             snapshot = recovery.backup_once(db, Path(directory) / 'backups')
             evidence = recovery.drill(snapshot)
             self.assertEqual(evidence['tableCounts']['clients'], 1)
+            self.assertEqual(evidence['tableCounts']['documents'], 1)
             target = Path(directory) / 'restored.sqlite3'
             recovery.restore(snapshot, target)
             with closing(sqlite3.connect(target)) as restored:
                 self.assertEqual(restored.execute('PRAGMA integrity_check').fetchone(), ('ok',))
                 self.assertEqual(restored.execute('PRAGMA foreign_key_check').fetchall(), [])
                 self.assertEqual(restored.execute('SELECT full_name FROM clients').fetchall(), [('Restore 中',)])
+                self.assertEqual(restored.execute('SELECT filename,content FROM documents').fetchall(),
+                                 [('restored-passport.pdf', b'uploaded document\x00\xff')])
+                self.assertEqual(restored.execute('SELECT institution,program FROM cases').fetchall(),
+                                 [('Recovery College', 'Nursing')])
 
 
 

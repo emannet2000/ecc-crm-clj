@@ -27,7 +27,18 @@
 (function () {
   var dialog = null;
   var previousFocus = null;
-  new MutationObserver(function () {
+  function containsDialog(node) {
+    return node.nodeType === 1 &&
+      (node.matches('[role="dialog"]') || node.querySelector('[role="dialog"]') !== null);
+  }
+  new MutationObserver(function (records) {
+    // Text updates, table rows and the live clock cannot change the dialog stack.
+    // Only scan the document when a dialog subtree is added or removed.
+    var changed = records.some(function (record) {
+      return Array.from(record.addedNodes).some(containsDialog) ||
+        Array.from(record.removedNodes).some(containsDialog);
+    });
+    if (!changed) return;
     var dialogs = Array.from(document.querySelectorAll('[role="dialog"]'));
     var current = dialogs.length ? dialogs[dialogs.length - 1] : null;
     dialogs.forEach(function (item) { item.inert = item !== current; });

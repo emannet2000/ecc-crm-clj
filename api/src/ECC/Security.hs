@@ -115,7 +115,7 @@ validated env = do
             when (T.length t>50 || T.length digits<7 || T.length digits>20 || T.any (\c -> not(isDigit c || c `elem` ("+()- ."::String))) t) $ reject status400 "Enter a phone number with 7–20 digits; +, spaces, brackets and hyphens are allowed"
           when ((name == "pcNew" || name == "nuPassword" && not (T.null t) || name == "uuPassword" && not (T.null t)) && T.length t < 12) $ reject status400 "Use a password of at least 12 characters"
         _ -> pure ()
-      enum ["Stage"] ["New Lead","Contacted","Initial Assessment","Qualified","Consultation Booked","Proposal Sent","Converted","Closed/Lost","Documents Under Review","Application Submitted","Submitted","Decision Pending","Approved","Rejected","Completed"]
+      enum ["Stage"] ["New Lead","Contacted","Initial Assessment","Qualified","Consultation Booked","Proposal Sent","Converted","Closed/Lost","Documents Under Review","Application Submitted","New Client","Initial Consultation","Proposal","Contract","Awaiting Payment","Document Collection","Document Review","Application Preparation","Ready for Submission","Submitted","Processing","Additional Requirements","Decision Received","Completed","Cancelled","On Hold","Rejected","Submitted","Decision Pending","Approved","Rejected","Completed"]
       enum ["Quality"] ["Hot","Warm","Cold"]
       enum ["Priority"] ["Low","Medium","High","Urgent"]
       enum ["Status"] ["Pending","In Progress","Done"]

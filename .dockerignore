@@ -5,3 +5,7 @@ api/dist-newstyle
 web/elm-stuff
 node_modules
 *.dump
+
+integrations.env
+**/integrations.env
+**/docusign-refresh-token

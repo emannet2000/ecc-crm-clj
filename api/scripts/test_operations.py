@@ -66,6 +66,25 @@ class OperationsTests(unittest.TestCase):
         status=json.loads((self.backups/'offsite-status.json').read_text())
         self.assertTrue(status['restoreVerified'])
 
+    def test_fresh_evidence_for_an_older_snapshot_does_not_hide_failed_recovery(self):
+        operations.backup(self.database,self.backups,runner=self.fake_restic)
+        latest=json.loads((self.backups/'backup-status.json').read_text())
+        latest['snapshot']='newer-snapshot.sqlite3'
+        recovery.atomic_json(self.backups/'backup-status.json',latest)
+        problems=operations.health(self.database,self.backups)
+        self.assertIn('restore-drill-status.json:snapshot-mismatch',problems)
+        self.assertIn('offsite-status.json:snapshot-mismatch',problems)
+
+    def test_changed_snapshot_checksum_and_malformed_status_are_reported(self):
+        operations.backup(self.database,self.backups,False)
+        path=self.backups/'restore-drill-status.json'
+        drill=json.loads(path.read_text())
+        drill['sha256']='different'
+        recovery.atomic_json(path,drill)
+        self.assertIn('restore-drill-status.json:snapshot-mismatch',operations.health(self.database,self.backups,False))
+        recovery.atomic_json(path,[])
+        self.assertIn('restore-drill-status.json:missing-or-invalid',operations.health(self.database,self.backups,False))
+
     def test_offsite_bad_restore_never_records_success(self):
         target=recovery.backup_once(self.database,self.backups)
         def bad(arguments):

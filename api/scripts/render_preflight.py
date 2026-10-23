@@ -20,6 +20,12 @@ def configuration_problems(env, mode):
     except ValueError:
         problems.append('DATABASE_URL:require-postgresql-and-TLS')
     if mode == 'api':
+        for name, default, low, high in [('PORT', '4000', 1, 65535), ('DB_POOL_SIZE', '2', 1, 16)]:
+            try:
+                if not low <= int(env.get(name, default)) <= high:
+                    raise ValueError('Out of range')
+            except (TypeError, ValueError):
+                problems.append(name + ':invalid')
         key = env.get('JWT_SECRET', '')
         if len(key.encode()) < 32 or key == 'local-development-secret-only-0000':
             problems.append('JWT_SECRET:require-fresh-private-secret')

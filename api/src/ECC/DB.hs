@@ -322,7 +322,7 @@ convertToClient conn lid officerId = do
           case (service l, destination l) of
             (Nothing, Nothing) -> pure ()
             _ -> void $ execute conn
-              "INSERT INTO cases (client_id,service_category,destination,stage) VALUES (?,?,?,'Documents Under Review')"
+              "INSERT INTO cases (client_id,service_category,destination,stage) VALUES (?,?,?,'New Client')"
               (cid,service l,destination l)
           void $ execute conn "UPDATE documents SET client_id=?,lead_id=NULL WHERE lead_id=?" (cid,lid)
           void $ execute conn "UPDATE tasks SET client_id=? WHERE lead_id=?" (cid,lid)
@@ -462,7 +462,7 @@ getClientDetail conn cid = do
       docs <- documentsForClient conn cid
       ts <- query conn (taskSelect <> " WHERE t.client_id=? ORDER BY t.id DESC") (Only cid) :: IO [TaskRowT]
       acts <- query conn (actSelect <> " WHERE l.converted_client_id=? ORDER BY a.id DESC") (Only cid) :: IO [ActRowT]
-      history <- query conn "SELECT h.id,coalesce(h.lead_id,0),cl.full_name,h.kind,coalesce(u.name,'Student/System')||': '||h.note,date(h.created_at,business_offset()) FROM work_history h JOIN clients cl ON cl.id=h.client_id LEFT JOIN users u ON u.id=h.actor_id WHERE h.client_id=? ORDER BY h.id DESC LIMIT 200" (Only cid) :: IO [ActRowT]
+      history <- query conn "SELECT h.id,coalesce(h.lead_id,0),cl.full_name,h.kind,coalesce(u.name,'Student/System')||': '||h.note,date(h.created_at,business_offset()) FROM work_history h JOIN clients cl ON cl.id=h.client_id LEFT JOIN users u ON u.id=h.actor_id WHERE h.client_id=? AND (h.task_id IS NULL OR (SELECT assigned_only FROM request_context WHERE id=1)<>'true' OR (SELECT role FROM request_context WHERE id=1)='admin' OR EXISTS(SELECT 1 FROM tasks t WHERE t.id=h.task_id AND t.assigned_to_id=(SELECT actor_id FROM request_context WHERE id=1))) ORDER BY h.id DESC LIMIT 200" (Only cid) :: IO [ActRowT]
       pure (Just (ClientDetail clientRecord cases docs (map toTask ts) (map toAct history ++ map toAct acts)))
 
 insertClientRaw :: Connection -> Text -> Maybe Text -> Maybe Text -> Maybe Int -> IO Client

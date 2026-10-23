@@ -1,4 +1,4 @@
-module Features exposing (clientNextSteps, clientPhotoCard, heading, str, view, embedded, conflictView, formValues, portalView, rowForm, defaults)
+module Features exposing (clientNextSteps, clientPhotoCard, heading, items, str, view, embedded, conflictView, formValues, portalView, rowForm, defaults)
 
 import Char
 import Dict exposing (Dict)
@@ -27,7 +27,7 @@ formValues row =
     D.decodeValue (D.keyValuePairs D.value) row |> Result.withDefault []
         |> List.filterMap (\(key,value) -> D.decodeValue scalar value |> Result.toMaybe |> Maybe.map (Tuple.pair key))
         |> Dict.fromList
-        |> Dict.map (\key value_ -> if List.member key ["required","enabled","assignments","deadlines","documents","escalations","emailEnabled"] then (if value_=="1" then "true" else if value_=="0" then "false" else value_) else value_)
+        |> Dict.map (\key value_ -> if List.member key ["clientVisible","required","enabled","assignments","deadlines","documents","escalations","emailEnabled"] then (if value_=="1" then "true" else if value_=="0" then "false" else value_) else value_)
 
 rowForm : D.Value -> Dict String String
 rowForm row =
@@ -48,8 +48,8 @@ defaults section = Dict.fromList
         "invoices" -> "Draft"
         _ -> "Pending")
     , ("expectedRevision","0"), ("kind","Offer"), ("offerStatus","Not requested"), ("enrollmentStatus","Not enrolled"), ("channel","Call"), ("direction","Outgoing"), ("outcome","Completed")
-    , ("category","Student Visa"), ("destination","Canada"), ("stage","Documents Under Review")
-    , ("required","true"), ("enabled","true"), ("priority","Medium")
+    , ("category","Student Visa"), ("destination","Canada"), ("stage","New Client")
+    , ("clientVisible","false"), ("required","true"), ("enabled","true"), ("priority","Medium")
     , ("entity", if section == "merge" then "leads" else "tasks"), ("currency","PHP"), ("daysBefore","1"), ("escalateAfter","2"), ("days","7")
     , ("mine","true"), ("overdue","false"), ("assignments","true"), ("deadlines","true"), ("documents","true"), ("escalations","true"), ("emailEnabled","true")
     ]
@@ -68,9 +68,12 @@ fields section = case section of
     "reconciliation" -> [("Bank account label","account","text"),("Currency","currency","PHP|USD|EUR|GBP|AUD|CAD|NZD"),("Statement CSV (transactionId,date,amount,reference,description)","csv","textarea"),("Matching or exclusion reason","reason","textarea")]
     "payments" -> [("Payment amount","amount","text"),("Payment / reversal date","paidOn","date"),("Payment method","method","Cash|Bank transfer|Card|Cheque|Other"),("Payment reference","reference","text"),("Reason for reversal","reason","textarea")]
     "expenses" -> [("Supplier / payee","supplier","text"),("Description","description","textarea"),("Expense category","category","text"),("Currency","currency","PHP|USD|EUR|GBP|AUD|CAD|NZD"),("Amount","amount","text"),("Expense date","expenseOn","date"),("Invoice / supplier reference","reference","text"),("Payment / reversal date","paidOn","date"),("Payment method","method","Cash|Bank transfer|Card|Cheque|Other"),("Payment reference","paymentReference","text"),("Review or reversal reason","reason","textarea")]
-    "applications" -> [("Student","owner","client"),("Service / application type","category","Student Visa|Work Visa|Tourist Visa|Immigration Consultation|School Admission"),("Destination","destination","Canada|Australia|New Zealand|UAE|UK|Schengen"),("Stage","stage","Documents Under Review|Submitted|Decision Pending|Approved|Rejected"),("School / institution","institution","text"),("Course / program","program","text"),("Offer status","offerStatus","Not requested|Requested|Conditional offer|Unconditional offer|Declined"),("Enrollment","enrollmentStatus","Not enrolled|Pending|Confirmed|Deferred|Withdrawn"),("Intake date","intakeDate","date"),("Next deadline","deadline","date"),("Checklist template","template","template")]
+    "applications" -> [("Student","owner","client"),("Service / application type","category","Student Visa|Work Visa|Tourist Visa|Immigration Consultation|School Admission"),("Destination","destination","Canada|Australia|New Zealand|UAE|UK|Schengen"),("Stage","stage","New Client|Initial Consultation|Proposal|Contract|Awaiting Payment|Document Collection|Document Review|Application Preparation|Ready for Submission|Submitted|Processing|Additional Requirements|Decision Received|Completed|Cancelled|On Hold|Rejected|Documents Under Review|Decision Pending|Approved"),("School / institution","institution","text"),("Course / program","program","text"),("Offer status","offerStatus","Not requested|Requested|Conditional offer|Unconditional offer|Declined"),("Enrollment","enrollmentStatus","Not enrolled|Pending|Confirmed|Deferred|Withdrawn"),("Intake date","intakeDate","date"),("Next deadline","deadline","date"),("Checklist template","template","template")]
+    "proposals" -> commercialFields
+    "contracts" -> commercialFields
+    "payment-details" -> [("Application","owner","case"),("Invoice ID","invoice","number"),("Bank","bank","text"),("Account name","accountName","text"),("Account number / reference","accountNumber","text"),("Payment method","method","text"),("Instructions","instructions","textarea"),("Client visible","clientVisible","true|false")]
     "checklist-templates" -> [("Checklist name","name","text"),("Application type","category","Any|Student Visa|Work Visa|Tourist Visa|Immigration Consultation|School Admission"),("Destination (blank for all)","destination","text"),("Required documents (one per line)","requiredDocuments","textarea"),("Optional documents (one per line)","optionalDocuments","textarea")]
-    "tasks" -> [("Title","title","text"),("Description","description","textarea"),("Due date","dueDate","date"),("Priority","priority","Low|Medium|High|Urgent"),("Status","status","Pending|In Progress|Done"),("Assigned to","assignee","staff"),("Repeat every (days; blank for one time)","recurrenceDays","number")]
+    "tasks" -> [("Title","title","text"),("Description","description","textarea"),("Scheduled (UTC)","scheduledAt","datetime-local"),("Due time (UTC; optional)","dueAt","datetime-local"),("Due date (used without a due time)","dueDate","date"),("Priority","priority","Low|Medium|High|Urgent"),("Status","status","Pending|In Progress|Done"),("Assigned to","assignee","staff"),("Repeat every (days; blank for one time)","recurrenceDays","number")]
     "milestones" -> [("Application","owner","case"),("Milestone type","kind","Offer|Deposit|Visa submission|Visa decision|Arrival|Other"),("Milestone","title","text"),("Planned date","plannedOn","date"),("Completed date","completedOn","date"),("Status","status","Planned|In progress|Completed|Cancelled"),("Notes","note","textarea")]
     "contact-log" -> [("Student or lead","owner","record"),("Channel","channel","Call|WhatsApp|SMS|Email|Meeting"),("Direction","direction","Incoming|Outgoing"),("Outcome","outcome","Completed|No answer|Follow-up needed"),("Interaction date","occurredOn","date"),("Conversation and next action","note","textarea")]
     "history" -> [("Record","owner","record"),("Note or conversation summary","note","textarea")]
@@ -80,7 +83,7 @@ fields section = case section of
     "reports" -> [("From date","from","date"),("To date","to","date")]
     "search" -> [("View name","name","text"),("Records","entity","leads|clients|tasks|cases"),("Contains","query","text"),("Assigned to me?","mine","true|false"),("Overdue only?","overdue","true|false")]
     "security" -> [("Your current password","password","password"),("Your authenticator or recovery code","code","text")] ++ [("Reason for resetting another account’s authenticator","reason","textarea")]
-    "appointments" -> [("Record","owner","record"),("Appointment","title","text"),("Staff member","assignee","staff"),("Starts (UTC)","startsAt","datetime-local"),("Ends (UTC)","endsAt","datetime-local"),("Location or meeting link","location","text"),("Status","status","Scheduled|Completed|Cancelled")]
+    "appointments" -> [("Record","owner","record"),("Appointment","title","text"),("Staff member","assignee","staff"),("Starts (UTC)","startsAt","datetime-local"),("Ends (UTC)","endsAt","datetime-local"),("Location","location","text"),("Zoom / meeting URL (HTTPS)","meetingUrl","url"),("Meeting ID","meetingId","text"),("Passcode","passcode","text"),("Related task ID","task","number"),("Client visible","clientVisible","true|false"),("Status","status","Scheduled|Completed|Cancelled")]
     "invoices" -> [("Student","owner","client"),("Description","description","textarea"),("Currency","currency","PHP|USD|EUR|GBP|AUD|CAD|NZD"),("Amount","amount","text"),("Due date","dueDate","date"),("Status","status","Draft|Issued|Paid|Void")]
     "portal" -> [("Student","owner","client"),("Access duration (days)","days","number"),("Approved file to share","document","document")]
     "notifications" -> [("Task assignments","assignments","true|false"),("Upcoming deadlines","deadlines","true|false"),("Document rejections","documents","true|false"),("Overdue escalation","escalations","true|false"),("Reminder emails","emailEnabled","true|false")]
@@ -102,12 +105,15 @@ heading section = case section of
     "expenses" -> ("Expenses and approvals","Submit an expense, select it for approval, then record its payment. Non-admin approvers cannot approve their own expenses. Posted payments are corrected through reversals. Clear the form to submit a new expense.")
     "cashflow" -> ("Receipts and expenses","Net payment entries received minus visible paid expenses for the selected period, grouped by currency. Company approvers see all expenses; other users see their own. Pending and approved-but-unpaid expenses are excluded. This is a cash activity report, not a profit or tax statement.")
     "finance-audit" -> ("Financial audit trail","Payment receipts, expense reviews and reversals retain their dates, references, reasons and the person who recorded them.")
+    "proposals" -> ("Price proposals","Prepare a draft for this application, then select it and issue it to the client. Issued terms are locked; the client can download and accept or reject them in the portal.")
+    "contracts" -> ("Contract agreements","Prepare and issue the agreement. The client can download it and record acceptance in the portal. This records acceptance; it is not an electronic signature service.")
+    "payment-details" -> ("Payment instructions","Link instructions to an issued invoice for this client. Choose Client visible to share the bank details in the portal. Record actual receipts through Payments.")
     "applications" -> ("Applications","Each application belongs to a student. A student can have multiple applications. Create one here, or select an application below to update its stage and deadline.")
     "checklist-templates" -> ("Document checklist templates","Administrators maintain reusable document lists. Apply a matching template from a selected application. Existing requirements and reviews are preserved when a checklist is applied again.")
     "tasks" -> ("Edit and assign tasks","Select a task below to edit its deadline, owner and recurrence. A completed recurring task creates its next occurrence automatically.")
     "milestones" -> ("Application milestones","Track offers, deposits, visa submissions, decisions and arrival dates. A deposit milestone is a planning record; use Payments to record money received.")
     "contact-log" -> ("Calls and messages","Log conversations and follow-ups with a student. WhatsApp and SMS are handled in your usual phone apps; saving this log does not send a message.")
-    "history" -> ("Student and application history","Keep conversations, decisions and next steps together. Notes are attributed to their author.")
+    "history" -> ("Activity Timeline","Application changes, task schedules, meetings, commercial documents and payment events appear here with their date and author. Internal notes stay within the CRM.")
     "documents" -> ("Document checklist and review","Create requirements, upload directly into an item, and record approval or feedback once scanning succeeds.")
     "reminders" -> ("Email reminders and escalation","Send deadline reminders to the assigned staff member and escalate overdue work to administrators.")
     "merge" -> ("Merge duplicate records","Preview both records before confirming. Children are preserved; the source is archived and its original fields remain available in the audit trail.")
@@ -155,7 +161,7 @@ view model section =
                 ]
         action name labelText =
             if not canWrite || (List.member section ["payments","expenses","payment-history","periods","reconciliation"] && D.decodeValue (D.at ["permissions",name] D.bool) model.featureData /= Ok True) then text "" else
-            button [ class "btn btn-primary", disabled model.featureBusy, onClick (if List.member name ["close","reopen","match","unmatch","ignore","import","record","reverse","submit","approve","reject","pay","reverse-expense","confirm","suspend","revoke-user","reset-mfa","access","grant","revoke","retry"] then ConfirmRequested ("Confirm: " ++ labelText ++ "?") (FeatureRun name) else FeatureRun name) ] [ text (if model.featureBusy then "Working…" else labelText) ]
+            button [ class "btn btn-primary", disabled model.featureBusy, onClick (if List.member name ["close","reopen","match","unmatch","ignore","import","record","reverse","submit","approve","reject","pay","reverse-expense","confirm","suspend","revoke-user","reset-mfa","access","grant","revoke","retry","zoom","calendar","checkout","sign"] then ConfirmRequested ("Confirm: " ++ labelText ++ "?") (FeatureRun name) else FeatureRun name) ] [ text (if model.featureBusy then "Working…" else labelText) ]
         actions = case section of
             "sales" -> [action "range" "Update report"]
             "cashflow" -> [action "range" "Update report"]
@@ -166,6 +172,9 @@ view model section =
             "periods" -> [action "close" "Close month",action "reopen" "Reopen month"]
             "reconciliation" -> if get "id" == "" then [action "import" "Import bank statement"] else [action "match" "Confirm selected match",action "unmatch" "Unmatch transaction",action "ignore" "Exclude transaction with reason"]
             "expenses" -> (if get "id" == "" then [action "submit" "Submit expense"] else [action "approve" "Approve expense",action "reject" "Reject expense",action "pay" "Record expense payment",action "reverse-expense" "Reverse expense payment"])
+            "proposals" -> [action "save" "Save draft",action "issue" "Issue selected proposal"]
+            "contracts" -> [action "save" "Save draft",action "issue" "Issue selected contract",action "complete" "Complete accepted contract",action "sign" "Send selected contract for electronic signature"]
+            "payment-details" -> [action "save" "Provide payment details"]
             "applications" -> [action "save" (if get "id" == "" then "Create application" else "Save application"),action "checklist" "Apply selected checklist"]
             "tasks" -> (if model.inlineOwner/="" then [action "create" "Create task here"] else []) ++ [action "save" "Save selected task"]
             "history" -> [action "add" "Add note"]
@@ -177,17 +186,21 @@ view model section =
             "bottlenecks" -> [action "range" "Update report"]
             "trends" -> [action "range" "Update report"]
             "mail" -> if Maybe.map .role model.user==Just "admin" then [action "retry" "Retry selected failed message"] else []
-            "notifications" -> [action "preferences" "Save notification preferences",action "read" "Mark selected notification read"]
+            "notifications" -> [action "preferences" "Save notification preferences",action "read" "Mark selected notification read",action "archive" "Archive / dismiss selected notification"]
             "search" -> [action "views" "Show saved views",action "save" "Save personal view",action "apply" "Open selected view",action "delete" "Delete selected view"]
             "security" -> [action "setup" "Start authenticator setup",action "enable" "Enable MFA",action "disable" "Disable MFA",action "revoke" "Revoke selected session"]
             "documents" -> [action "save" "Save checklist item"] ++ (if model.inlineOwner=="" then [action "attach" "Attach selected file as a new version"] else []) ++ (if Maybe.map .role model.user==Just "admin" then [action "rescan" "Retry failed scan for selected item"] else [])
             "portal" -> [action "create" "Create private sign-in link",action "grant" "Share selected approved file",action "revoke" "Revoke selected link"]
             "communication" -> [action "send" "Queue email"]
-            "invoices" -> [action "save" "Save invoice",action "send" "Email selected invoice"]
+            "invoices" -> [action "save" "Save invoice",action "send" "Email selected invoice",action "checkout" "Create secure payment link"]
+            "appointments" -> [action "save" "Save meeting",action "zoom" "Create Zoom meeting automatically",action "calendar" "Connect Google Calendar"]
+            "integrations" -> [action "retry" "Retry selected integration request"]
             _ -> [action "save" "Save changes"]
         row item = div [class "operation-row"]
             [ div []
                 [ h3 [] [text (str "title" item)]
+                , if section=="tasks" && str "overdue" item=="true" then p [class "error-banner",attribute "role" "status"] [text "Overdue — complete this task or reschedule it below."] else text ""
+                , if List.member section ["appointments","history"] && String.startsWith "https://" (str "meetingUrl" item) then a [class "btn btn-primary",href (str "meetingUrl" item),target "_blank",rel "noopener noreferrer"] [text "Join Zoom Meeting"] else text ""
                 , if section=="documents" then p [class "status-help"] [text (scanHelp (str "scanStatus" item))] else if section=="mail" then p [class "status-help"] [text (mailHelp (str "status" item))] else text ""
                 , if List.member section ["payments","expenses"] then div [] (List.map (\entry -> p [class "history-entry"] [text ("Entry #" ++ str "id" entry ++ " · " ++ str "amount" entry ++ " · " ++ (if str "date" entry == "" then "Undated legacy payment" else str "date" entry) ++ " · " ++ str "method" entry ++ " · " ++ str "reference" entry ++ " · " ++ str "actor" entry ++ " · " ++ str "reason" entry ++ (if str "reversesId" entry == "" then "" else " · Reverses #" ++ str "reversesId" entry))]) (items "history" item)) else text ""
                 , if List.member section ["payments","balances"] then div [class "form-actions"] [a [class "btn btn-outline",href (str "historyUrl" item)] [text "Payment history"], if D.decodeValue (D.at ["permissions","export"] D.bool) model.featureData == Ok True then a [class "btn btn-outline",href (str "printUrl" item),target "_blank",rel "noopener"] [text "Print invoice"] else text ""] else text ""
@@ -288,11 +301,15 @@ columns section = case section of
     "balances" -> ["currency","total","paid","balance","dueDate","overdueDays","status"]
     "expenses" -> ["currency","amount","category","expenseOn","status","createdBy","reviewNote"]
     "finance-audit" -> ["date","actor","details"]
+    "proposals" -> ["number","currency","total","validUntil","status","acceptedAt"]
+    "contracts" -> ["number","validUntil","status","acceptedAt"]
+    "integrations" -> ["provider","record","status","providerStatus","errorCode","date"]
+    "payment-details" -> ["invoice","bank","accountName","accountNumber","method","instructions","clientVisible"]
     "applications" -> ["clientName","institution","program","offerStatus","enrollmentStatus","category","destination","stage","intakeDate","deadline","officer"]
     "milestones" -> ["student","application","kind","status","plannedOn","completedOn","note"]
     "contact-log" -> ["kind","date","actor","note"]
     "checklist-templates" -> ["category","destination","requiredDocuments","optionalDocuments"]
-    "tasks" -> ["recordName","assigneeName","status","priority","dueDate"]
+    "tasks" -> ["recordName","assigneeName","status","priority","scheduledAt","dueAt","dueDate","completedAt"]
     "history" -> ["actor","kind","date","note"]
     "documents" -> ["status","scanStatus","expiryWarning","expiresOn","reviewNote"]
     "mail" -> ["recipient","status","attempts","lastError","nextAttempt","sentAt"]
@@ -303,7 +320,7 @@ columns section = case section of
     "reports" -> ["from","to","summary"]
     "security" -> ["created","expires"]
     "invoices" -> ["currency","amount","paid","balance","status","dueDate","description"]
-    "appointments" -> ["startsAt","endsAt","location","status"]
+    "appointments" -> ["startsAt","endsAt","location","meetingId","passcode","clientVisible","status"]
     _ -> ["status","expires","kind","phone","email"]
 
 resultView : D.Value -> Html Msg
@@ -326,7 +343,7 @@ portalView model =
                 ]
     in
     div [class "portal-container"]
-        ([ h1 [] [text "Your student workspace"]
+        ([ h1 [] [text "Your Client Portal"]
          , if model.portalError /= "" then p [class "error-banner", attribute "role" "alert"] [text model.portalError] else text ""
          , if model.portalNotice /= "" then p [class "notice-banner", attribute "role" "status"] [text model.portalNotice] else text ""
          , if model.portalBusy then p [class "notice-banner", attribute "role" "status"] [text "Please wait… Your request is in progress."] else text ""
@@ -339,7 +356,8 @@ portalView model =
                     , button [class "btn btn-outline", disabled model.portalBusy, onClick PortalLogout] [text "Sign out"]
                     ]
                 , block "Your details" "client" (\item -> p [] [text (str "name" item ++ " · " ++ str "number" item)])
-                , block "Applications" "cases" (\item -> p [] [text (str "title" item ++ " · " ++ str "stage" item ++ (if str "deadline" item == "" then "" else " · Next deadline: " ++ str "deadline" item))])
+                , block "Applications" "cases" (\item -> p [] [text (str "number" item ++ " · " ++ str "title" item ++ " · " ++ str "stage" item ++ (if str "deadline" item == "" then "" else " · Next deadline: " ++ str "deadline" item))])
+                , block "Application progress" "cases" portalProgress
                 , div [class "card"]
                     [ label [for "portal-file"] [text "Choose a file to submit (up to 25 MB)"]
                     , input [id "portal-file",type_ "file", disabled model.portalBusy, Html.Events.on "change" (D.map PortalFile (D.at ["target","files"] (D.index 0 File.decoder)))] []
@@ -351,7 +369,12 @@ portalView model =
                     , button [class "btn btn-primary",disabled (model.portalFile==Nothing || model.portalBusy),onClick (PortalUpload (String.toInt (str "id" item) |> Maybe.withDefault 0))] [text (if model.portalBusy then "Please wait…" else "Submit selected file")]
                     ])
                 , block "Shared documents" "documents" (\item -> a [class "btn btn-outline",href ("/api/portal/documents/" ++ str "id" item)] [text (str "title" item)])
-                , block "Invoices" "invoices" (\item -> p [] [text ("INV-" ++ str "id" item ++ " · " ++ str "description" item ++ " · " ++ str "currency" item ++ " " ++ str "amount" item ++ " · " ++ str "status" item ++ " · Paid " ++ str "paid" item ++ " · Balance " ++ str "balance" item ++ " · Due " ++ str "dueDate" item)])
+                , block "Upcoming meetings (UTC)" "meetings" (\item -> div [class "operation-row"] [div [] [h3 [] [text (str "title" item)],p [] [text (str "startsAt" item ++ " – " ++ str "endsAt" item)],p [] [text ("Meeting ID: " ++ str "meetingId" item ++ " · Passcode: " ++ str "passcode" item)]], if String.startsWith "https://" (str "meetingUrl" item) then a [class "btn btn-primary",href (str "meetingUrl" item),target "_blank",rel "noopener noreferrer"] [text "Join Zoom Meeting"] else text ""])
+                , block "Proposals and contracts" "commercial" (\item -> div [class "card"] [h3 [] [text (str "number" item ++ " · " ++ str "title" item)],p [] [text (str "status" item ++ " · " ++ str "currency" item ++ " " ++ str "total" item ++ " · Valid until " ++ str "validUntil" item)],a [class "btn btn-outline",href ("/api/portal/commercial/" ++ str "id" item ++ "/download")] [text "Download and review"],if List.member (str "status" item) ["Issued","Viewed"] then div [class "form-actions"] [button [class "btn btn-primary",disabled model.portalBusy,onClick (ConfirmRequested "Confirm that you have downloaded, reviewed and accept these terms?" (PortalRespond (str "id" item) "accept"))] [text "Accept terms"],if str "kind" item=="proposal" then button [class "btn btn-outline",disabled model.portalBusy,onClick (ConfirmRequested "Reject this proposal?" (PortalRespond (str "id" item) "reject"))] [text "Reject proposal"] else text ""] else text ""])
+                , block "Payment instructions" "paymentDetails" (\item -> div [class "card"] [h3 [] [text ("INV-" ++ str "invoice" item)],p [] [text (str "bank" item ++ " · " ++ str "accountName" item ++ " · " ++ str "accountNumber" item)],p [] [text (str "method" item ++ " · " ++ str "instructions" item)],p [] [text ("Amount due: " ++ str "currency" item ++ " " ++ str "amountDue" item ++ " · Due: " ++ str "dueDate" item)]])
+                , block "Invoices" "invoices" (\item -> div [class "card"] [p [] [text ("INV-" ++ str "id" item ++ " · " ++ str "description" item ++ " · " ++ str "currency" item ++ " " ++ str "amount" item ++ " · " ++ str "status" item ++ " · Paid " ++ str "paid" item ++ " · Balance " ++ str "balance" item ++ " · Due " ++ str "dueDate" item)],a [class "btn btn-outline",href ("/api/portal/invoices/" ++ str "id" item ++ "/download")] [text "Download invoice PDF"]])
+                , block "Online payments and electronic signatures" "integrations" (\item -> div [class "card"] [p [] [text (str "kind" item ++ " #" ++ str "record" item ++ " · " ++ str "status" item)],if String.startsWith "https://checkout.stripe.com/" (str "url" item) then a [class "btn btn-primary",href (str "url" item),target "_blank",rel "noopener noreferrer"] [text "Pay securely"] else text "",if str "kind" item=="contract" && str "status" item=="Sent" then p [] [text "Follow the DocuSign email to review and sign your contract."] else text "",if str "signedPdfReady" item=="true" then a [class "btn btn-outline",href ("/api/portal/signatures/" ++ str "id" item ++ "/download")] [text "Download signed contract and certificate"] else text ""])
+                , block "Payment receipts" "receipts" (\item -> div [class "card"] [p [] [text ("RC-" ++ str "id" item ++ " · INV-" ++ str "invoice" item ++ " · " ++ str "currency" item ++ " " ++ str "amount" item ++ " · " ++ str "date" item ++ " · " ++ str "status" item)],p [] [text (str "method" item ++ " · " ++ str "reference" item)],a [class "btn btn-outline",href ("/api/portal/receipts/" ++ str "id" item ++ "/download")] [text "Download receipt PDF"]])
                 ]
            )
         )
@@ -373,9 +396,9 @@ embedded model cid =
         [ h2 [] [text "Work on this record or application"]
         , label [for "case-work-scope"] [text "Scope"]
         , select [id "case-work-scope",class "input",disabled (model.inlineSection == "applications"),value model.inlineOwner,onInput InlineOwner]
-            (option [value ("client:" ++ String.fromInt cid),selected (model.inlineOwner=="client:" ++ String.fromInt cid)] [text "Whole student"] ::
+            (option [value ("client:" ++ String.fromInt cid),selected (model.inlineOwner=="client:" ++ String.fromInt cid)] [text "Whole client"] ::
              (Maybe.map .cases model.clientDetail |> Maybe.withDefault [] |> List.map (\c -> option [value ("case:" ++ String.fromInt c.id),selected(model.inlineOwner=="case:" ++ String.fromInt c.id)] [text (Maybe.withDefault "Application" c.category ++ " · " ++ c.stage ++ " · " ++ String.fromInt c.id)])))
-        , div [class "form-actions",attribute "aria-label" "Student work sections"] (List.map (\(section,labelText) -> button [class (if model.inlineSection==section then "btn btn-primary" else "btn btn-outline"),attribute "aria-pressed" (if model.inlineSection==section then "true" else "false"),onClick(InlineSection section)] [text labelText]) [("applications","Applications"),("tasks","Edit tasks"),("history","Conversation history"),("documents","Document checklist")])
+        , div [class "form-actions",attribute "aria-label" "Student work sections"] (List.map (\(section,labelText) -> button [class (if model.inlineSection==section then "btn btn-primary" else "btn btn-outline"),attribute "aria-pressed" (if model.inlineSection==section then "true" else "false"),onClick(InlineSection section)] [text labelText]) ((if Maybe.map .role model.user==Just "admin" then [("invoices","Create Invoice")] else []) ++ [("applications","Update Application Status"),("tasks","Schedule Task"),("appointments","Schedule Zoom Meeting"),("proposals","Issue Proposal"),("contracts","Issue Contract"),("payments","Record Payment"),("payment-details","Provide Payment Details"),("history","Activity Timeline"),("documents","Upload Document"),("integrations","Integration status")]))
         , Html.details []
             [ Html.summary [] [text "Scheduling and billing"]
             , div [class "form-actions"]
@@ -564,7 +587,7 @@ applicationOverview model =
             [ optionFilter "client" "Students" (options "client")
             , optionFilter "officer" "Officers" (options "staff")
             , optionFilter "destination" "Destinations" (List.map (\v -> (v,v)) ["Canada","Australia","New Zealand","UAE","UK","Schengen"])
-            , optionFilter "stage" "Stages" (List.map (\v -> (v,v)) ["Documents Under Review","Submitted","Decision Pending","Approved","Rejected"])
+            , optionFilter "stage" "Stages" (List.map (\v -> (v,v)) ["New Client", "Initial Consultation", "Proposal", "Contract", "Awaiting Payment", "Document Collection", "Document Review", "Application Preparation", "Ready for Submission", "Submitted", "Processing", "Additional Requirements", "Decision Received", "Completed", "Cancelled", "On Hold", "Rejected", "Documents Under Review", "Decision Pending", "Approved"])
             , div [class "form-group"] [label [for "application-filter-intake"] [text "Intake month"],input [id "application-filter-intake",type_ "month",value (filterValue "intake"),disabled model.featureBusy,onInput (ApplicationFilter "intake")] []]
             , button [class "btn btn-outline",disabled model.featureBusy,onClick ClearApplicationFilters] [text "Clear filters"]
             ]
@@ -596,3 +619,19 @@ clientNextSteps model cid =
             , div [] [h3 [] [text "Assigned officer"],p [] [text (model.clientDetail |> Maybe.andThen (.client >> .caseOfficerName) |> Maybe.withDefault "Unassigned")],if Maybe.map .role model.user /= Just "viewer" then button [class "btn btn-outline",onClick(OpenClientEditor cid)] [text "Edit assignment"] else text ""]
             ]
         ]
+
+
+commercialFields : List Field
+commercialFields =
+    [("Application","owner","case"),("Title / contract type","title","text"),("Service description / agreement terms","body","textarea"),("Currency","currency","PHP|USD|EUR|GBP|AUD|CAD|NZD"),("Professional / service fee","fee","text"),("Government / third-party fees","thirdParty","text"),("Other charges","otherCharges","text"),("Discount","discount","text"),("Tax","tax","text"),("Valid until / expiration","validUntil","date")]
+
+
+portalProgress : D.Value -> Html Msg
+portalProgress application =
+    let
+        stage = str "stage" application
+        stages = ["New Client","Initial Consultation","Proposal","Contract","Awaiting Payment","Document Collection","Document Review","Application Preparation","Ready for Submission","Submitted","Processing","Additional Requirements","Decision Received","Completed"]
+        normalized = if stage=="Documents Under Review" then "Document Review" else if stage=="Decision Pending" then "Processing" else if stage=="Approved" then "Decision Received" else stage
+        current = List.indexedMap Tuple.pair stages |> List.filter (Tuple.second >> (==) normalized) |> List.head |> Maybe.map Tuple.first |> Maybe.withDefault -1
+    in
+    div [] [h3 [] [text (str "number" application)],p [] [text ("Current status: " ++ normalized)],Html.ol [] (List.indexedMap (\index labelText -> Html.li [attribute "aria-current" (if index==current then "step" else "false")] [text ((if current>=0 && index<current then "✓ " else if index==current then "→ " else "") ++ labelText)]) stages)]

@@ -1,0 +1,22 @@
+[Unit]
+Description=ECC provider integrations worker
+After=network-online.target
+Wants=network-online.target
+[Service]
+Type=simple
+User=ecc
+Group=ecc
+WorkingDirectory=/opt/ecc/api
+EnvironmentFile=/etc/ecc/workers.env
+EnvironmentFile=/etc/ecc/integrations.env
+ExecStart=/usr/bin/python3 /opt/ecc/api/scripts/integration_worker.py
+Restart=always
+RestartSec=15
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/ecc
+[Install]
+WantedBy=multi-user.target

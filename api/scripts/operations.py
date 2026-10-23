@@ -145,17 +145,32 @@ def health(database, directory, require_offsite=True, now=None):
         if problem: problems.append(problem)
     elif require_offsite:
         problems.append('api:health-url-not-configured')
+    evidence = {}
     for filename, field, maximum in [('backup-status.json', 'lastSuccess', 7200),
                                       ('restore-drill-status.json', 'verifiedAt', 7200),
                                       *([('offsite-status.json', 'lastSuccess', 7200)] if require_offsite else [])]:
         try:
             metadata = json.loads((Path(directory) / filename).read_text())
+            if not isinstance(metadata, dict):
+                raise ValueError('Invalid backup status')
+            evidence[filename] = metadata
             if age_seconds(metadata[field], now) > maximum:
                 problems.append(filename + ':stale')
             if filename == 'offsite-status.json' and metadata.get('restoreVerified') is not True:
                 problems.append('offsite-status.json:restore-unverified')
         except (OSError, ValueError, KeyError, TypeError):
             problems.append(filename + ':missing-or-invalid')
+    latest = evidence.get('backup-status.json')
+    if latest:
+        for filename in ['restore-drill-status.json', *(['offsite-status.json'] if require_offsite else [])]:
+            verified = evidence.get(filename)
+            if verified is not None and (not latest.get('snapshot') or not latest.get('sha256')
+                    or verified.get('snapshot') != latest['snapshot']
+                    or verified.get('sha256') != latest['sha256']):
+                problems.append(filename + ':snapshot-mismatch')
+        drill = evidence.get('restore-drill-status.json', {})
+        if postgres and drill and drill.get('logicalRecoveryVerified') is not True:
+            problems.append('restore-drill-status.json:restore-unverified')
     try:
         job = json.loads((Path(directory) / 'backup-job-status.json').read_text())
         if job.get('state') == 'failed' or job.get('state') == 'running' and age_seconds(job['attemptedAt'], now)>2400:

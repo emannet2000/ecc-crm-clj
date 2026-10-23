@@ -28,6 +28,8 @@ import qualified ECC.Portal as Portal
 import qualified ECC.Operations as Ops
 import qualified ECC.ProfilePhotos as ProfilePhotos
 import qualified ECC.Applications as Applications
+import qualified ECC.Journey as Journey
+import qualified ECC.Integrations as Integrations
 import qualified ECC.StudentWorkflows as StudentWorkflows
 import qualified ECC.Finance as Finance
 import qualified ECC.Money as Money
@@ -104,10 +106,12 @@ optionsFor env q = do
 
 listSection :: Env -> User -> T.Text -> T.Text -> Int -> S.ActionM [A.Value]
 listSection env u section q offset
+ | section=="integrations" = liftIO $ Integrations.staffRows env u Nothing Nothing
  | section=="search", Just savedId<-T.stripPrefix "@view:" q = savedViewRows env u (A.object ["id".=savedId]) offset
+ | Journey.commercialSection section = Journey.commercialRows env u section Nothing Nothing q offset
  | otherwise = liftIO $ case section of
- "tasks" -> jsonRows env ("SELECT json_object('id',t.id,'title',t.title,'description',coalesce(t.description,''),'dueDate',coalesce(t.due_date,''),'priority',t.priority,'status',t.status,'assignee',coalesce(t.assigned_to_id,''),'assigneeName',coalesce(u.name,'Unassigned'),'owner',CASE WHEN t.client_id IS NOT NULL THEN 'client:'||t.client_id ELSE 'lead:'||t.lead_id END,'recordName',coalesce(cl.full_name,l.full_name),'recurrenceDays',coalesce(t.recurrence_days,''),'revision',v.revision) FROM tasks t LEFT JOIN users u ON u.id=t.assigned_to_id LEFT JOIN clients cl ON cl.id=t.client_id LEFT JOIN leads l ON l.id=t.lead_id JOIN record_versions v ON v.kind='tasks' AND v.record_id=t.id WHERE t.id IN ("<>visibleTasks<>") AND (t.title LIKE ? OR coalesce(cl.full_name,l.full_name) LIKE ?) ORDER BY t.due_date NULLS LAST,t.id DESC LIMIT 50 OFFSET ?") (search,search,offset)
- "history" -> jsonRows env ("SELECT json_object('id',h.id,'title',coalesce(c.full_name,l.full_name),'kind',h.kind,'note',h.note,'actor',coalesce(u.name,'System'),'date',h.created_at,'case',h.case_id) FROM work_history h LEFT JOIN clients c ON c.id=h.client_id LEFT JOIN leads l ON l.id=h.lead_id LEFT JOIN users u ON u.id=h.actor_id WHERE (h.lead_id IN ("<>visibleLeads<>") OR h.client_id IN ("<>visibleClients<>")) AND (h.note LIKE ? OR coalesce(c.full_name,l.full_name) LIKE ?) ORDER BY h.id DESC LIMIT 50 OFFSET ?") (search,search,offset)
+ "tasks" -> jsonRows env ("SELECT json_object('id',t.id,'title',t.title,'description',coalesce(t.description,''),'scheduledAt',replace(substr(coalesce(t.scheduled_at,''),1,16),' ','T'),'dueAt',replace(substr(coalesce(t.due_at,''),1,16),' ','T'),'completedAt',t.completed_at,'overdue',t.status<>'Done' AND ((t.due_at IS NOT NULL AND t.due_at<datetime('now')) OR (t.due_at IS NULL AND t.due_date<date('now',business_offset()))),'dueDate',coalesce(t.due_date,''),'priority',t.priority,'status',t.status,'assignee',coalesce(t.assigned_to_id,''),'assigneeName',coalesce(u.name,'Unassigned'),'owner',CASE WHEN t.client_id IS NOT NULL THEN 'client:'||t.client_id ELSE 'lead:'||t.lead_id END,'recordName',coalesce(cl.full_name,l.full_name),'recurrenceDays',coalesce(t.recurrence_days,''),'revision',v.revision) FROM tasks t LEFT JOIN users u ON u.id=t.assigned_to_id LEFT JOIN clients cl ON cl.id=t.client_id LEFT JOIN leads l ON l.id=t.lead_id JOIN record_versions v ON v.kind='tasks' AND v.record_id=t.id WHERE t.id IN ("<>visibleTasks<>") AND (t.title LIKE ? OR coalesce(cl.full_name,l.full_name) LIKE ?) ORDER BY t.due_date NULLS LAST,t.id DESC LIMIT 50 OFFSET ?") (search,search,offset)
+ "history" -> jsonRows env ("SELECT json_object('id',h.id,'title',coalesce(c.full_name,l.full_name),'kind',h.kind,'note',h.note,'actor',coalesce(u.name,'System'),'date',h.created_at,'case',h.case_id) FROM work_history h LEFT JOIN clients c ON c.id=h.client_id LEFT JOIN leads l ON l.id=h.lead_id LEFT JOIN users u ON u.id=h.actor_id WHERE (h.lead_id IN ("<>visibleLeads<>") OR h.client_id IN ("<>visibleClients<>")) AND (h.task_id IS NULL OR h.task_id IN ("<>visibleTasks<>")) AND (h.note LIKE ? OR coalesce(c.full_name,l.full_name) LIKE ?) ORDER BY h.id DESC LIMIT 50 OFFSET ?") (search,search,offset)
  "documents" -> Ops.documentRows env Nothing q offset
  "reminders" -> jsonRows env ("SELECT json_object('id',r.id,'task',t.id,'title',t.title,'daysBefore',r.days_before,'escalateAfter',r.escalate_after,'enabled',CASE WHEN r.enabled=1 THEN 'true' ELSE 'false' END,'revision',r.revision) FROM reminder_rules r JOIN tasks t ON t.id=r.task_id WHERE t.id IN ("<>visibleTasks<>") AND t.title LIKE ? ORDER BY r.id DESC LIMIT 50 OFFSET ?") (search,offset)
  "search" -> searchRows env u q offset
@@ -119,7 +123,7 @@ listSection env u section q offset
  "trends" -> Ops.reportRows env "trends" q 0 True
  "merge" -> pure []
  "security" -> jsonRows env "SELECT json_object('id',substr(token_hash,1,16),'title','Browser/API session','created',created_at,'expires',expires_at,'verified',mfa_verified) FROM sessions WHERE user_id=? AND expires_at>datetime('now') ORDER BY created_at DESC LIMIT 50 OFFSET ?" (userId u,offset)
- "appointments" -> jsonRows env ("SELECT json_object('id',id,'title',title,'owner',CASE WHEN client_id IS NOT NULL THEN 'client:'||client_id ELSE 'lead:'||lead_id END,'assignee',owner_id,'startsAt',replace(substr(starts_at,1,16),' ','T'),'endsAt',replace(substr(ends_at,1,16),' ','T'),'location',location,'status',status,'revision',revision) FROM appointments WHERE (lead_id IN ("<>visibleLeads<>") OR client_id IN ("<>visibleClients<>")) AND title LIKE ? ORDER BY starts_at DESC,id DESC LIMIT 50 OFFSET ?") (search,offset)
+ "appointments" -> jsonRows env ("SELECT json_object('id',id,'title',title,'owner',CASE WHEN client_id IS NOT NULL THEN 'client:'||client_id ELSE 'lead:'||lead_id END,'assignee',owner_id,'startsAt',replace(substr(starts_at,1,16),' ','T'),'endsAt',replace(substr(ends_at,1,16),' ','T'),'location',location,'meetingUrl',meeting_url,'meetingId',meeting_id,'passcode',passcode,'task',task_id,'clientVisible',client_visible=1,'status',status,'revision',revision) FROM appointments WHERE (lead_id IN ("<>visibleLeads<>") OR client_id IN ("<>visibleClients<>")) AND title LIKE ? ORDER BY starts_at DESC,id DESC LIMIT 50 OFFSET ?") (search,offset)
  "invoices" -> jsonRows env "SELECT json_object('id',i.id,'title','INV-'||printf('%06d',i.id)||' · '||c.full_name,'owner','client:'||i.client_id,'description',i.description,'currency',i.currency,'amount',printf('%.2f',i.amount_minor/100.0),'paid',printf('%.2f',i.paid_minor/100.0),'balance',printf('%.2f',i.balance_minor/100.0),'dueDate',i.due_date,'status',i.status,'revision',i.revision) FROM invoice_balances i JOIN clients c ON c.id=i.client_id WHERE c.deleted_at IS NULL AND (c.full_name LIKE ? OR i.description LIKE ?) ORDER BY i.id DESC LIMIT 50 OFFSET ?" (search,search,offset)
  "portal" -> jsonRows env ("SELECT json_object('id',p.id,'title','Portal · '||c.full_name,'expires',p.expires_at,'status',CASE WHEN p.revoked=1 THEN 'Revoked' WHEN p.expires_at<datetime('now') THEN 'Expired' ELSE 'Active' END,'owner','client:'||p.client_id) FROM portal_links p JOIN clients c ON c.id=p.client_id WHERE c.id IN ("<>visibleClients<>") ORDER BY p.id DESC LIMIT 50 OFFSET ?") (Only offset)
  "communication" -> pure []
@@ -143,6 +147,8 @@ reports env range = do
 
 perform :: Env -> User -> T.Text -> T.Text -> A.Value -> S.ActionM A.Value
 perform env u section action input = case (section,action) of
+ ("integrations","retry") -> Integrations.retry env u input
+ _ | action `elem` ["zoom","calendar","checkout","sign"] -> Integrations.request env u section action input
  ("tasks","create") -> Ops.createTask env u input
  ("tasks","save") -> saveTask env u input
  ("history","add") -> do
@@ -172,6 +178,7 @@ perform env u section action input = case (section,action) of
  ("security",_) -> securityAction env u action input
  ("portal",_) -> Portal.manage env u action input
  ("communication","send") -> sendCommunication env u input
+ _ | Journey.commercialSection section -> Journey.commercialAction env u section action input
  _ -> reject status404 "Action not found"
  where saved=A.object ["message".=("Saved successfully"::T.Text)]
 
@@ -182,7 +189,9 @@ saveTask env u input = do
  when (null rows) $ reject status404 "Task not found"
  checkRevision env "tasks" tid input
  title<-bounded "title" 255 input
- due<-dateField "dueDate" False input
+ dueDate<-dateField "dueDate" False input
+ (scheduled,dueTime)<-Journey.taskTimes input
+ let due=maybe dueDate (Just . T.take 10) dueTime
  priority<-choice "priority" ["Low","Medium","High","Urgent"] input
  status<-choice "status" ["Pending","In Progress","Done"] input
  assigned<-intField "assignee" input
@@ -191,8 +200,8 @@ saveTask env u input = do
  let recurrence=number "recurrenceDays" input
  when (maybe False (\n -> n<1 || n>366) recurrence || recurrence/=Nothing && due==Nothing) $ reject status400 "Recurring tasks need a deadline and a repeat interval of 1–366 days"
  liftIO $ do
-  void $ execute (envConn env) "UPDATE tasks SET title=?,description=?,due_date=?,priority=?,status=?,assigned_to_id=?,recurrence_days=? WHERE id=?" (title,field "description" input,due,priority,status,assigned,recurrence,tid)
-  forM_ rows $ \(ml,mc) -> recordHistory env u ml mc Nothing "task_updated" ("Task updated: "<>title)
+  void $ execute (envConn env) "UPDATE tasks SET title=?,description=?,due_date=?,priority=?,status=?,assigned_to_id=?,recurrence_days=?,scheduled_at=?,due_at=? WHERE id=?" (title,field "description" input,due,priority,status,assigned,recurrence,scheduled,dueTime,tid)
+  forM_ rows $ \(ml,mc) -> void $ execute (envConn env) "INSERT INTO work_history(lead_id,client_id,task_id,actor_id,kind,note) VALUES (?,?,?,?,'task.updated',?)" (ml,mc,tid,userId u,"Task updated: "<>title)
  pure (A.object ["message".=("Task saved"::T.Text)])
 
 saveChecklist :: Env -> User -> A.Value -> S.ActionM A.Value
@@ -307,7 +316,7 @@ mergeRecords env u commit input = do
     -- Existing portal grants must not expand to the survivor's data after merging.
     void $ execute (envConn env) "DELETE FROM portal_sessions WHERE link_id IN (SELECT id FROM portal_links WHERE client_id=?)" (Only source)
     void $ execute (envConn env) "UPDATE portal_links SET revoked=1 WHERE client_id=?" (Only source)
-    forM_ ["cases","documents","tasks","work_history","document_requests","appointments","invoices","notifications","mail_outbox"] $ \table -> void $ execute (envConn env) (Query ("UPDATE "<>table<>" SET client_id=? WHERE client_id=?")) (target,source)
+    forM_ ["cases","documents","tasks","work_history","document_requests","appointments","invoices","commercial_documents","payment_instructions","integration_jobs","integration_links","notifications","mail_outbox"] $ \table -> void $ execute (envConn env) (Query ("UPDATE "<>table<>" SET client_id=? WHERE client_id=?")) (target,source)
     void $ execute (envConn env) "UPDATE leads SET converted_client_id=? WHERE converted_client_id=?" (target,source)
     void $ execute (envConn env) "UPDATE client_photos SET client_id=? WHERE client_id=? AND NOT EXISTS (SELECT 1 FROM client_photos WHERE client_id=?)" (target,source,target)
     void $ execute (envConn env) "UPDATE clients SET deleted_at=datetime('now'),merged_into=? WHERE id=?" (target,source)
@@ -317,7 +326,7 @@ mergeRecords env u commit input = do
 
 saveAppointment :: Env -> User -> A.Value -> S.ActionM A.Value
 saveAppointment env u input = do
- (ml,mc,_)<-owner env u input
+ (ml,mc,cs)<-owner env u input
  title<-bounded "title" 255 input
  assigned<-intField "assignee" input
  staff env assigned
@@ -329,6 +338,17 @@ saveAppointment env u input = do
  end<-parse "endsAt"
  when (end<=start || diffUTCTime end start>86400) $ reject status400 "The appointment must end after it starts, within 24 hours"
  status<-choice "status" ["Scheduled","Completed","Cancelled"] input
+ let meetingUrl=field "meetingUrl" input
+     meetingId=field "meetingId" input
+     passcode=field "passcode" input
+     visible=field "clientVisible" input=="true"
+     task=number "task" input
+ when (not(T.null meetingUrl) && not ("https://" `T.isPrefixOf` meetingUrl) || T.length meetingUrl>2000 || T.length meetingId>100 || T.length passcode>100) $ reject status400 "Use an HTTPS meeting URL and meeting credentials up to 100 characters"
+ forM_ task $ \tid -> do
+  related<-liftIO $ query (envConn env) "SELECT id FROM tasks WHERE id=? AND lead_id IS ? AND client_id IS ? AND (? IS NULL OR case_id=?)" (tid,ml,mc,cs,cs) :: S.ActionM [Only Int]
+  when(null related) $ reject status400 "Choose a task in this application"
+ when(visible && mc==Nothing) $ reject status400 "Client-visible meetings require a client"
+
  let rid=number "id" input
  forM_ rid $ \i -> do
   old<-liftIO $ query (envConn env) "SELECT lead_id,client_id,revision FROM appointments WHERE id=?" (Only i) :: S.ActionM [(Maybe Int,Maybe Int,Int)]
@@ -336,10 +356,14 @@ saveAppointment env u input = do
  collision<-liftIO $ query (envConn env) "SELECT id FROM appointments WHERE owner_id=? AND status='Scheduled' AND starts_at<? AND ends_at>? AND id<>coalesce(?,0)" (assigned,end,start,rid) :: S.ActionM [Only Int]
  when (status=="Scheduled" && not (null collision)) $ reject status409 "This staff member already has an overlapping appointment"
  liftIO $ do
-  case rid of
-   Nothing -> void $ execute (envConn env) "INSERT INTO appointments(lead_id,client_id,owner_id,title,starts_at,ends_at,location,status) VALUES (?,?,?,?,?,?,?,?)" (ml,mc,assigned,title,start,end,field "location" input,status)
-   Just i -> void $ execute (envConn env) "UPDATE appointments SET lead_id=?,client_id=?,owner_id=?,title=?,starts_at=?,ends_at=?,location=?,status=?,revision=revision+1 WHERE id=?" (ml,mc,assigned,title,start,end,field "location" input,status,i)
-  recordHistory env u ml mc Nothing "appointment" (title<>" · "<>status)
+  meeting<-case rid of
+   Nothing -> do
+    [Only i]<-query (envConn env) "INSERT INTO appointments(lead_id,client_id,owner_id,title,starts_at,ends_at,location,status,case_id,task_id,meeting_url,meeting_id,passcode,client_visible) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING id" (ml,mc,assigned,title,start,end,field "location" input,status,cs,task,meetingUrl,meetingId,passcode,visible)
+    pure (i::Int)
+   Just i -> do
+    void $ execute (envConn env) "UPDATE appointments SET lead_id=?,client_id=?,owner_id=?,title=?,starts_at=?,ends_at=?,location=?,status=?,case_id=?,task_id=?,meeting_url=?,meeting_id=?,passcode=?,client_visible=?,revision=revision+1 WHERE id=?" (ml,mc,assigned,title,start,end,field "location" input,status,cs,task,meetingUrl,meetingId,passcode,visible,i)
+    pure i
+  void $ execute (envConn env) "INSERT INTO work_history(lead_id,client_id,case_id,meeting_id,actor_id,kind,note) VALUES (?,?,?,?,?,?,?)" (ml,mc,cs,meeting,userId u,if rid==Nothing then "meeting.scheduled"::T.Text else "meeting.updated",title<>" · "<>status<>" · "<>T.pack(show start)<>" to "<>T.pack(show end))
  pure (A.object ["message".=("Appointment saved. Times are UTC."::T.Text)])
 
 amountMinor :: T.Text -> Maybe Int
@@ -347,7 +371,7 @@ amountMinor = Money.amountMinor
 
 saveInvoice :: Env -> User -> A.Value -> S.ActionM A.Value
 saveInvoice env u input = do
- (_,mc,_)<-owner env u input
+ (_,mc,cs)<-owner env u input
  cid<-maybe (reject status400 "Choose a client") pure mc
  description<-bounded "description" 1000 input
  currency<-choice "currency" ["PHP","USD","EUR","GBP","AUD","CAD","NZD"] input
@@ -357,10 +381,11 @@ saveInvoice env u input = do
  status<-choice "status" ["Draft","Issued","Paid","Void"] input
  let rid=number "id" input
  forM_ rid $ \i -> do
-  old<-liftIO $ query (envConn env) "SELECT client_id,description,currency,amount_minor,status,revision FROM invoices WHERE id=?" (Only i) :: S.ActionM [(Int,T.Text,T.Text,Int,T.Text,Int)]
+  old<-liftIO $ query (envConn env) "SELECT client_id,description,currency,amount_minor,status,revision,case_id FROM invoices WHERE id=?" (Only i) :: S.ActionM [(Int,T.Text,T.Text,Int,T.Text,Int,Maybe Int)]
   case old of
-   [(oldC,oldD,oldCurrency,oldA,oldStatus,rev)] -> do
+   [(oldC,oldD,oldCurrency,oldA,oldStatus,rev,oldCase)] -> do
     checkOwnRevision rev input
+    when (cs/=Nothing && oldCase/=cs) $ reject status409 "This invoice belongs to another application"
     when (status=="Paid" && oldStatus/="Paid") $ reject status400 "Record payments in Payments instead of manually marking an invoice Paid"
     when (status=="Void") $ do
      [Only paid] <- liftIO $ query (envConn env) "SELECT paid_minor FROM invoice_balances WHERE id=?" (Only i) :: S.ActionM [Only Int]
@@ -371,9 +396,9 @@ saveInvoice env u input = do
  when (rid==Nothing && status/="Draft") $ reject status400 "New invoices start as Draft"
  liftIO $ do
   case rid of
-   Nothing -> void $ execute (envConn env) "INSERT INTO invoices(client_id,description,currency,amount_minor,due_date) VALUES (?,?,?,?,?)" (cid,description,currency,amount,due)
+   Nothing -> void $ execute (envConn env) "INSERT INTO invoices(client_id,description,currency,amount_minor,due_date,case_id) VALUES (?,?,?,?,?,?)" (cid,description,currency,amount,due,cs)
    Just i -> void $ execute (envConn env) "UPDATE invoices SET client_id=?,description=?,currency=?,amount_minor=?,due_date=?,status=?,paid_at=CASE WHEN ?='Paid' THEN coalesce(paid_at,datetime('now')) ELSE paid_at END,revision=revision+1 WHERE id=?" (cid,description,currency,amount,due,status,status,i)
-  recordHistory env u Nothing (Just cid) Nothing "invoice" (description<>" · "<>status)
+  recordHistory env u Nothing (Just cid) cs "invoice" (description<>" · "<>status)
  pure (A.object ["message".=("Invoice saved. Record receipts in Payments; balances and Paid status update automatically."::T.Text)])
 
 sendInvoice :: Env -> User -> A.Value -> S.ActionM A.Value

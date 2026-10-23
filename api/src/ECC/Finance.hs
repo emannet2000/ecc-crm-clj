@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module ECC.Finance (routes) where
+module ECC.Finance (routes, invoiceRowsScoped) where
 
 import Control.Monad (forM, unless, void, when)
 import Control.Monad.IO.Class (liftIO)
@@ -22,6 +22,7 @@ import ECC.Auth (randomToken)
 import ECC.WorkflowSupport
 import qualified ECC.Access as Access
 import ECC.Money (amountMinor)
+import qualified ECC.Journey as Journey
 import ECC.FinanceCommon
 import qualified ECC.FinanceControls as Controls
 import qualified ECC.Csv as Csv
@@ -129,7 +130,10 @@ rowsFor env u section q offset limit = case section of
  where term="%"<>q<>"%"
 
 invoiceRows :: Env -> T.Text -> Int -> Int -> IO [A.Value]
-invoiceRows env q offset limit = jsonRows env ("SELECT json_object('id',i.id,'title','INV-'||printf('%06d',i.id)||' · '||c.full_name||CASE WHEN c.deleted_at IS NOT NULL THEN ' (Archived)' ELSE '' END||' · '||i.description,'currency',i.currency,'total',printf('%.2f',i.amount_minor/100.0),'paid',printf('%.2f',i.paid_minor/100.0),'balance',printf('%.2f',i.balance_minor/100.0),'dueDate',i.due_date,'overdueDays',CASE WHEN i.balance_minor>0 AND i.due_date<date('now',business_offset()) THEN CAST(julianday(date('now',business_offset()))-julianday(i.due_date) AS INTEGER) ELSE 0 END,'status',i.status,'revision',i.revision,'printUrl','/api/finance/print/invoices/'||i.id,'historyUrl','/work/payment-history?invoice='||i.id,'history',coalesce((SELECT json_group_array(json_object('id',p.id,'amount',printf('%.2f',p.amount_minor/100.0),'date',p.paid_on,'method',p.method,'reference',p.reference,'reason',p.reason,'actor',p.actor_name,'reversesId',p.reverses_id,'legacy',p.legacy)) FROM (SELECT * FROM invoice_payments WHERE invoice_id=i.id ORDER BY id DESC LIMIT 100) p),json('[]'))) FROM invoice_balances i JOIN clients c ON c.id=i.client_id WHERE i.client_id IN ("<>financialClients<>") AND i.status IN ('Issued','Paid') AND ((?='overdue' AND i.balance_minor>0 AND i.due_date<date('now',business_offset())) OR (?<>'overdue' AND (c.full_name LIKE ? OR i.description LIKE ? OR CAST(i.id AS TEXT)=?))) ORDER BY i.balance_minor>0 DESC,i.due_date,i.id LIMIT ? OFFSET ?") (q,q,"%"<>q<>"%","%"<>q<>"%",q,limit,offset)
+invoiceRows env = invoiceRowsScoped env Nothing Nothing
+
+invoiceRowsScoped :: Env -> Maybe Int -> Maybe Int -> T.Text -> Int -> Int -> IO [A.Value]
+invoiceRowsScoped env cid app q offset limit = jsonRows env ("SELECT json_object('id',i.id,'title','INV-'||printf('%06d',i.id)||' · '||c.full_name||CASE WHEN c.deleted_at IS NOT NULL THEN ' (Archived)' ELSE '' END||' · '||i.description,'currency',i.currency,'total',printf('%.2f',i.amount_minor/100.0),'paid',printf('%.2f',i.paid_minor/100.0),'balance',printf('%.2f',i.balance_minor/100.0),'dueDate',i.due_date,'overdueDays',CASE WHEN i.balance_minor>0 AND i.due_date<date('now',business_offset()) THEN CAST(julianday(date('now',business_offset()))-julianday(i.due_date) AS INTEGER) ELSE 0 END,'status',i.status,'revision',i.revision,'printUrl','/api/finance/print/invoices/'||i.id,'historyUrl','/work/payment-history?invoice='||i.id,'history',coalesce((SELECT json_group_array(json_object('id',p.id,'amount',printf('%.2f',p.amount_minor/100.0),'date',p.paid_on,'method',p.method,'reference',p.reference,'reason',p.reason,'actor',p.actor_name,'reversesId',p.reverses_id,'legacy',p.legacy)) FROM (SELECT * FROM invoice_payments WHERE invoice_id=i.id ORDER BY id DESC LIMIT 100) p),json('[]'))) FROM invoice_balances i JOIN clients c ON c.id=i.client_id WHERE (? IS NULL OR i.client_id=?) AND (? IS NULL OR i.case_id=?) AND i.client_id IN ("<>financialClients<>") AND i.status IN ('Issued','Paid') AND ((?='overdue' AND i.balance_minor>0 AND i.due_date<date('now',business_offset())) OR (?<>'overdue' AND (c.full_name LIKE ? OR i.description LIKE ? OR CAST(i.id AS TEXT)=?))) ORDER BY i.balance_minor>0 DESC,i.due_date,i.id LIMIT ? OFFSET ?") (cid,cid,app,app,q,q,"%"<>q<>"%","%"<>q<>"%",q,limit,offset)
 
 paymentExport :: Env -> T.Text -> IO [A.Value]
 paymentExport env q = jsonRows env ("SELECT json_object('id',p.id,'invoiceId',i.id,'client',c.full_name,'currency',i.currency,'amount',printf('%.2f',p.amount_minor/100.0),'paidOn',p.paid_on,'method',p.method,'reference',p.reference,'reason',p.reason,'reversesId',p.reverses_id,'legacy',p.legacy,'actor',p.actor_name) FROM invoice_payments p JOIN invoice_balances i ON i.id=p.invoice_id JOIN clients c ON c.id=i.client_id WHERE i.client_id IN ("<>financialClients<>") AND ((?='overdue' AND i.balance_minor>0 AND i.due_date<date('now',business_offset())) OR (?<>'overdue' AND (c.full_name LIKE ? OR i.description LIKE ? OR CAST(i.id AS TEXT)=?))) ORDER BY p.id LIMIT 10001") (q,q,"%"<>q<>"%","%"<>q<>"%",q)
@@ -174,7 +178,15 @@ paymentAction env u action input = do
      when (maybe False (>date) paid) $ reject status400 "Reversal date cannot precede the payment"
      pure (-amount,"Reversal",reason,Just pid)
     _ -> reject status409 "Select an unreversed receipt belonging to this invoice"
- liftIO $ void $ execute (envConn env) "INSERT INTO invoice_payments(invoice_id,amount_minor,paid_on,method,reference,reason,reverses_id,actor_id,actor_name) VALUES (?,?,?,?,?,?,?,?,?)" (iid,amount,date,method,reference,reason,reversal,userId u,userName u)
+ liftIO $ do
+  void $ execute (envConn env) "INSERT INTO invoice_payments(invoice_id,amount_minor,paid_on,method,reference,reason,reverses_id,actor_id,actor_name) VALUES (?,?,?,?,?,?,?,?,?)" (iid,amount,date,method,reference,reason,reversal,userId u,userName u)
+  applications<-query (envConn env) "SELECT client_id,case_id,currency FROM invoices WHERE id=?" (Only iid) :: IO [(Int,Maybe Int,T.Text)]
+  void $ forM applications $ \(cid,app,currency)->do
+   let kind=if action=="record" then "payment.received" else "payment.reversed"
+       title=(if action=="record" then "Payment received: " else "Payment reversed: ")<>currency<>" "<>Journey.minorText(abs amount)<>" · INV-"<>T.pack(show iid)
+   recordHistory env u Nothing (Just cid) app kind title
+   void $ forM app $ \application->Journey.notify env cid application title ("payment:"<>T.pack(show iid)<>":"<>T.pack(show(rev+1)))
+  pure ()
 
 boundedOptional :: T.Text -> Int -> A.Value -> S.ActionM T.Text
 boundedOptional key limit input = do

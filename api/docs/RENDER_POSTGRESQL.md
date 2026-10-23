@@ -2,6 +2,42 @@
 
 The code supports PostgreSQL through `DATABASE_URL` and retains SQLite for existing local installs and regression tests. This document does not confirm deployment or transfer any existing data.
 
+## New repository and staging service
+
+Use a separate Render service and a separate database for the new repository.
+Run the quality workflow from the repository-root `.github/workflows/ci.yml`;
+when publishing only this API directory, that file is already at the correct
+location. The `render-image` job builds `deploy/Dockerfile.render` and runs
+`scripts/render_image_smoke.py` against the final image. It tests production
+startup, frontend assets, anonymous access denial, migration replay and account
+persistence after a container restart. The Docker build also runs the shared
+SQLite/PostgreSQL workflows and PostgreSQL restore drills against disposable data.
+Hosted disk persistence and actual webhook delivery still require staging checks.
+
+### SQLite on Render
+
+Use `deploy/render-sqlite.env.example`, remove `DATABASE_URL`, and attach a
+persistent disk writable by UID 10001. The example stores the SQLite file and
+runtime logs under the same `/var/log/ecc` mount. Keep one API instance. Never
+store the production SQLite file in the container's temporary filesystem.
+
+Render's pre-deploy command runs on a separate instance without the persistent
+disk. For SQLite, leave that command empty and set the Docker Command to:
+
+```sh
+/bin/sh -c 'ecc-crm-api migrate && exec python3 scripts/log_runtime.py -- ecc-crm-api'
+```
+
+Coordinate schema upgrades with all writers and take a verified backup first.
+For PostgreSQL, continue using `ecc-crm-api migrate` as the pre-deploy command
+and the image's default serving command. Set health check path `/api/ready` in
+either case. The Render-specific preflight tool checks PostgreSQL deployments;
+it does not validate SQLite disk mounts.
+
+See Render's [deploy steps](https://render.com/docs/deploys),
+[persistent disk constraints](https://render.com/docs/disks), and
+[HTTP health checks](https://render.com/docs/health-checks).
+
 ## Before switching an existing service
 
 1. Rotate the database password and JWT secret that were shared in chat. Store replacement credentials in Render environment settings, never in source files.

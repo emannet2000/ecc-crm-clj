@@ -9,6 +9,33 @@ concurrency:
   group: quality-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  render-image:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - name: Locate build context
+        id: project
+        shell: bash
+        run: |
+          if [[ -f ecc-crm-api.cabal ]]; then
+            echo 'dir=.' >> "$GITHUB_OUTPUT"
+          else
+            echo 'dir=api' >> "$GITHUB_OUTPUT"
+          fi
+      - uses: docker/setup-buildx-action@v3
+      - name: Build tested Render runtime image
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ steps.project.outputs.dir }}
+          file: ${{ steps.project.outputs.dir }}/deploy/Dockerfile.render
+          load: true
+          tags: ecc-render:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Check final image startup and persistence
+        working-directory: ${{ steps.project.outputs.dir }}
+        run: python3 scripts/render_image_smoke.py --image ecc-render:test
   test:
     runs-on: ubuntu-24.04
     timeout-minutes: 35
@@ -40,10 +67,10 @@ jobs:
         id: chrome
         with:
           chrome-version: stable
-      - name: Install SQLite build headers
+      - name: Install native build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libsqlite3-dev libpq-dev postgresql-client-common curl ca-certificates
+          sudo apt-get install -y pkg-config zlib1g-dev libgmp-dev libsqlite3-dev libpq-dev postgresql-client-common curl ca-certificates
           sudo install -d /usr/share/postgresql-common/pgdg
           sudo curl --fail --silent --show-error https://www.postgresql.org/media/keys/ACCC4CF8.asc -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc
           echo 'deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt noble-pgdg main' | sudo tee /etc/apt/sources.list.d/pgdg.list

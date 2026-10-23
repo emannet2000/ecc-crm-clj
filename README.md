@@ -2,6 +2,10 @@
 
 Elm frontend, Haskell/Scotty API and **SQLite**. Includes leads, clients, cases, editable/reassignable recurring tasks, document checklists and versions, shared activity history, scheduled email reminders, safe duplicate merging, management reports, saved views, MFA/session administration, appointments, a client portal and invoices. See the [workflow guide](deploy/WORKFLOWS.md) and [daily operations guide](deploy/OPERATIONS.md) for inline client/case work, conflict comparisons, scan-gated uploads, email tracking, notifications and report exports.
 
+See the [connected client application journey](deploy/CLIENT-JOURNEY.md) for conversion, scheduled tasks, meetings, proposals, contracts, invoices, payments and restricted portal access.
+
+See [provider integration setup](api/INTEGRATIONS.md) and the [requirement acceptance review](api/docs/CLIENT_JOURNEY_ACCEPTANCE.md) for implementation evidence and remaining deployment dependencies.
+
 ## Run locally
 
 Requires GHC 9.6.6, Cabal and Elm **0.19.1**. Python 3.11+ runs the mail worker, backups and database tests; no Python packages or database server are required. Node 22+ and Chromium run browser tests.
