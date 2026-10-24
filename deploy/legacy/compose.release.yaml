@@ -1,0 +1,17 @@
+# Use only after scripts/build_release.py and acceptance checks.
+# Start with --no-build so the tested images are used unchanged.
+services:
+  api:
+    image: ecc-crm-api:release
+  mail:
+    image: ecc-crm-mail:release
+  monitor:
+    image: ecc-crm-mail:release
+  backup:
+    image: ecc-crm-backup:release
+  scheduler:
+    image: ecc-crm-mail:release
+  scanner:
+    image: ecc-crm-mail:release
+  clamav:
+    image: ecc-crm-clamav:release

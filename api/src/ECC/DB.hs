@@ -673,12 +673,12 @@ getStats conn = do
   total <- scalar ("SELECT count(*) FROM (" <> leadSelect <> ") records")
   hot <- scalar ("SELECT count(*) FROM (" <> leadSelect <> ") records WHERE quality='Hot'")
   clients <- scalar ("SELECT count(*) FROM (" <> clientSelect <> ") records")
-  openT <- scalar ("SELECT count(*) FROM (" <> taskSelect <> ") records WHERE status<>'Done'")
-  overdue <- scalar ("SELECT count(*) FROM (" <> taskSelect <> ") records WHERE status<>'Done' AND due_date<date('now',business_offset())")
+  openT <- scalar ("SELECT count(*) FROM (" <> taskSelect <> ") records WHERE cancelled_at IS NULL AND status<>'Done'")
+  overdue <- scalar ("SELECT count(*) FROM (" <> taskSelect <> ") records WHERE cancelled_at IS NULL AND status<>'Done' AND due_date<date('now',business_offset())")
   stages <- query_ conn ("SELECT stage,count(*) FROM (" <> leadSelect <> ") records GROUP BY stage") :: IO [(Text,Int)]
   sources <- query_ conn ("SELECT coalesce(source,'Unknown'),count(*) AS count FROM (" <> leadSelect <> ") records GROUP BY source ORDER BY count DESC") :: IO [(Text,Int)]
   upcomingRows <- query_ conn (taskSelect <>
-    " WHERE t.status<>'Done' ORDER BY t.due_date NULLS LAST LIMIT 6") :: IO [TaskRowT]
+    " WHERE t.cancelled_at IS NULL AND t.status<>'Done' ORDER BY t.due_date NULLS LAST LIMIT 6") :: IO [TaskRowT]
   recent <- listActivities conn 8
   pure Stats
     { stTotalLeads = total

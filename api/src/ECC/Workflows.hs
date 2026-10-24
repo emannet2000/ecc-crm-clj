@@ -110,7 +110,8 @@ listSection env u section q offset
  | section=="search", Just savedId<-T.stripPrefix "@view:" q = savedViewRows env u (A.object ["id".=savedId]) offset
  | Journey.commercialSection section = Journey.commercialRows env u section Nothing Nothing q offset
  | otherwise = liftIO $ case section of
- "tasks" -> jsonRows env ("SELECT json_object('id',t.id,'title',t.title,'description',coalesce(t.description,''),'scheduledAt',replace(substr(coalesce(t.scheduled_at,''),1,16),' ','T'),'dueAt',replace(substr(coalesce(t.due_at,''),1,16),' ','T'),'completedAt',t.completed_at,'overdue',t.status<>'Done' AND ((t.due_at IS NOT NULL AND t.due_at<datetime('now')) OR (t.due_at IS NULL AND t.due_date<date('now',business_offset()))),'dueDate',coalesce(t.due_date,''),'priority',t.priority,'status',t.status,'assignee',coalesce(t.assigned_to_id,''),'assigneeName',coalesce(u.name,'Unassigned'),'owner',CASE WHEN t.client_id IS NOT NULL THEN 'client:'||t.client_id ELSE 'lead:'||t.lead_id END,'recordName',coalesce(cl.full_name,l.full_name),'recurrenceDays',coalesce(t.recurrence_days,''),'revision',v.revision) FROM tasks t LEFT JOIN users u ON u.id=t.assigned_to_id LEFT JOIN clients cl ON cl.id=t.client_id LEFT JOIN leads l ON l.id=t.lead_id JOIN record_versions v ON v.kind='tasks' AND v.record_id=t.id WHERE t.id IN ("<>visibleTasks<>") AND (t.title LIKE ? OR coalesce(cl.full_name,l.full_name) LIKE ?) ORDER BY t.due_date NULLS LAST,t.id DESC LIMIT 50 OFFSET ?") (search,search,offset)
+ "client-messages" -> Journey.messageRows env Nothing Nothing offset
+ "tasks" -> jsonRows env ("SELECT json_object('id',t.id,'title',t.title,'description',coalesce(t.description,''),'notes',t.notes,'scheduledAt',replace(substr(coalesce(t.scheduled_at,''),1,16),' ','T'),'dueAt',replace(substr(coalesce(t.due_at,''),1,16),' ','T'),'completedAt',t.completed_at,'overdue',t.cancelled_at IS NULL AND t.status<>'Done' AND ((t.due_at IS NOT NULL AND t.due_at<datetime('now')) OR (t.due_at IS NULL AND t.due_date<date('now',business_offset()))),'dueDate',coalesce(t.due_date,''),'priority',t.priority,'status',CASE WHEN t.cancelled_at IS NOT NULL THEN 'Cancelled' ELSE t.status END,'assignee',coalesce(t.assigned_to_id,''),'assigneeName',coalesce(u.name,'Unassigned'),'owner',CASE WHEN t.client_id IS NOT NULL THEN 'client:'||t.client_id ELSE 'lead:'||t.lead_id END,'recordName',coalesce(cl.full_name,l.full_name),'recurrenceDays',coalesce(t.recurrence_days,''),'revision',v.revision) FROM tasks t LEFT JOIN users u ON u.id=t.assigned_to_id LEFT JOIN clients cl ON cl.id=t.client_id LEFT JOIN leads l ON l.id=t.lead_id JOIN record_versions v ON v.kind='tasks' AND v.record_id=t.id WHERE t.id IN ("<>visibleTasks<>") AND (t.title LIKE ? OR coalesce(cl.full_name,l.full_name) LIKE ?) ORDER BY t.due_date NULLS LAST,t.id DESC LIMIT 50 OFFSET ?") (search,search,offset)
  "history" -> jsonRows env ("SELECT json_object('id',h.id,'title',coalesce(c.full_name,l.full_name),'kind',h.kind,'note',h.note,'actor',coalesce(u.name,'System'),'date',h.created_at,'case',h.case_id) FROM work_history h LEFT JOIN clients c ON c.id=h.client_id LEFT JOIN leads l ON l.id=h.lead_id LEFT JOIN users u ON u.id=h.actor_id WHERE (h.lead_id IN ("<>visibleLeads<>") OR h.client_id IN ("<>visibleClients<>")) AND (h.task_id IS NULL OR h.task_id IN ("<>visibleTasks<>")) AND (h.note LIKE ? OR coalesce(c.full_name,l.full_name) LIKE ?) ORDER BY h.id DESC LIMIT 50 OFFSET ?") (search,search,offset)
  "documents" -> Ops.documentRows env Nothing q offset
  "reminders" -> jsonRows env ("SELECT json_object('id',r.id,'task',t.id,'title',t.title,'daysBefore',r.days_before,'escalateAfter',r.escalate_after,'enabled',CASE WHEN r.enabled=1 THEN 'true' ELSE 'false' END,'revision',r.revision) FROM reminder_rules r JOIN tasks t ON t.id=r.task_id WHERE t.id IN ("<>visibleTasks<>") AND t.title LIKE ? ORDER BY r.id DESC LIMIT 50 OFFSET ?") (search,offset)
@@ -123,8 +124,8 @@ listSection env u section q offset
  "trends" -> Ops.reportRows env "trends" q 0 True
  "merge" -> pure []
  "security" -> jsonRows env "SELECT json_object('id',substr(token_hash,1,16),'title','Browser/API session','created',created_at,'expires',expires_at,'verified',mfa_verified) FROM sessions WHERE user_id=? AND expires_at>datetime('now') ORDER BY created_at DESC LIMIT 50 OFFSET ?" (userId u,offset)
- "appointments" -> jsonRows env ("SELECT json_object('id',id,'title',title,'owner',CASE WHEN client_id IS NOT NULL THEN 'client:'||client_id ELSE 'lead:'||lead_id END,'assignee',owner_id,'startsAt',replace(substr(starts_at,1,16),' ','T'),'endsAt',replace(substr(ends_at,1,16),' ','T'),'location',location,'meetingUrl',meeting_url,'meetingId',meeting_id,'passcode',passcode,'task',task_id,'clientVisible',client_visible=1,'status',status,'revision',revision) FROM appointments WHERE (lead_id IN ("<>visibleLeads<>") OR client_id IN ("<>visibleClients<>")) AND title LIKE ? ORDER BY starts_at DESC,id DESC LIMIT 50 OFFSET ?") (search,offset)
- "invoices" -> jsonRows env "SELECT json_object('id',i.id,'title','INV-'||printf('%06d',i.id)||' · '||c.full_name,'owner','client:'||i.client_id,'description',i.description,'currency',i.currency,'amount',printf('%.2f',i.amount_minor/100.0),'paid',printf('%.2f',i.paid_minor/100.0),'balance',printf('%.2f',i.balance_minor/100.0),'dueDate',i.due_date,'status',i.status,'revision',i.revision) FROM invoice_balances i JOIN clients c ON c.id=i.client_id WHERE c.deleted_at IS NULL AND (c.full_name LIKE ? OR i.description LIKE ?) ORDER BY i.id DESC LIMIT 50 OFFSET ?" (search,search,offset)
+ "appointments" -> jsonRows env ("SELECT json_object('id',id,'title',title,'owner',CASE WHEN client_id IS NOT NULL THEN 'client:'||client_id ELSE 'lead:'||lead_id END,'assignee',owner_id,'startsAt',replace(substr(starts_at,1,16),' ','T'),'endsAt',replace(substr(ends_at,1,16),' ','T'),'location',location,'notes',notes,'meetingUrl',meeting_url,'meetingId',meeting_id,'passcode',passcode,'task',task_id,'clientVisible',client_visible=1,'status',status,'revision',revision) FROM appointments WHERE (lead_id IN ("<>visibleLeads<>") OR client_id IN ("<>visibleClients<>")) AND title LIKE ? ORDER BY starts_at DESC,id DESC LIMIT 50 OFFSET ?") (search,offset)
+ "invoices" -> jsonRows env "SELECT json_object('id',i.id,'title','INV-'||printf('%06d',i.id)||' · '||c.full_name,'owner','client:'||i.client_id,'description',i.description,'currency',i.currency,'lineItems',i.line_items,'subtotal',printf('%.2f',i.subtotal_minor/100.0),'discount',printf('%.2f',i.discount_minor/100.0),'tax',printf('%.2f',i.tax_minor/100.0),'amount',printf('%.2f',i.amount_minor/100.0),'paid',printf('%.2f',i.paid_minor/100.0),'balance',printf('%.2f',i.balance_minor/100.0),'dueDate',i.due_date,'status',i.status,'revision',i.revision) FROM invoice_balances i JOIN clients c ON c.id=i.client_id WHERE c.deleted_at IS NULL AND (c.full_name LIKE ? OR i.description LIKE ?) ORDER BY i.id DESC LIMIT 50 OFFSET ?" (search,search,offset)
  "portal" -> jsonRows env ("SELECT json_object('id',p.id,'title','Portal · '||c.full_name,'expires',p.expires_at,'status',CASE WHEN p.revoked=1 THEN 'Revoked' WHEN p.expires_at<datetime('now') THEN 'Expired' ELSE 'Active' END,'owner','client:'||p.client_id) FROM portal_links p JOIN clients c ON c.id=p.client_id WHERE c.id IN ("<>visibleClients<>") ORDER BY p.id DESC LIMIT 50 OFFSET ?") (Only offset)
  "communication" -> pure []
  _ -> pure []
@@ -143,7 +144,7 @@ reports env range = do
  let parts=T.splitOn "," range
      parsed t=parseTimeM True defaultTimeLocale "%F" (T.unpack t) :: Maybe Day
      (start,end)=case parts of [a,b] | Just x<-parsed a,Just y<-parsed b,x<=y -> (x,y); _ -> (addDays (-30) today,today)
- jsonRows env "SELECT json_object('title',u.name,'leads',(SELECT count(*) FROM leads l WHERE l.consultant_id=u.id AND l.merged_into IS NULL AND date(l.created_at,business_offset()) BETWEEN ? AND ?),'converted',(SELECT count(*) FROM leads l WHERE l.consultant_id=u.id AND l.merged_into IS NULL AND l.converted_client_id IS NOT NULL AND date(l.created_at,business_offset()) BETWEEN ? AND ?),'openTasks',(SELECT count(*) FROM tasks t WHERE t.assigned_to_id=u.id AND t.status<>'Done'),'overdueTasks',(SELECT count(*) FROM tasks t WHERE t.assigned_to_id=u.id AND t.status<>'Done' AND t.due_date<date('now',business_offset())),'completedCases',(SELECT count(*) FROM cases c JOIN clients cl ON cl.id=c.client_id WHERE cl.case_officer_id=u.id AND date((SELECT min(h.created_at) FROM work_history h WHERE h.case_id=c.id AND h.kind='case_completed')) BETWEEN ? AND ?),'averageCaseDays',(SELECT round(avg(julianday(h.created_at)-julianday(c.created_at)),1) FROM cases c JOIN work_history h ON h.case_id=c.id AND h.kind='case_completed' AND h.id=(SELECT min(h2.id) FROM work_history h2 WHERE h2.case_id=c.id AND h2.kind='case_completed') JOIN clients cl ON cl.id=c.client_id WHERE cl.case_officer_id=u.id AND date(h.created_at,business_offset()) BETWEEN ? AND ?),'from',?,'to',?) FROM users u WHERE u.role<>'viewer' ORDER BY u.name" (start,end,start,end,start,end,start,end,start,end)
+ jsonRows env "SELECT json_object('title',u.name,'leads',(SELECT count(*) FROM leads l WHERE l.consultant_id=u.id AND l.merged_into IS NULL AND date(l.created_at,business_offset()) BETWEEN ? AND ?),'converted',(SELECT count(*) FROM leads l WHERE l.consultant_id=u.id AND l.merged_into IS NULL AND l.converted_client_id IS NOT NULL AND date(l.created_at,business_offset()) BETWEEN ? AND ?),'openTasks',(SELECT count(*) FROM tasks t WHERE t.assigned_to_id=u.id AND t.cancelled_at IS NULL AND t.status<>'Done'),'overdueTasks',(SELECT count(*) FROM tasks t WHERE t.assigned_to_id=u.id AND t.cancelled_at IS NULL AND t.status<>'Done' AND t.due_date<date('now',business_offset())),'completedCases',(SELECT count(*) FROM cases c JOIN clients cl ON cl.id=c.client_id WHERE cl.case_officer_id=u.id AND date((SELECT min(h.created_at) FROM work_history h WHERE h.case_id=c.id AND h.kind='case_completed')) BETWEEN ? AND ?),'averageCaseDays',(SELECT round(avg(julianday(h.created_at)-julianday(c.created_at)),1) FROM cases c JOIN work_history h ON h.case_id=c.id AND h.kind='case_completed' AND h.id=(SELECT min(h2.id) FROM work_history h2 WHERE h2.case_id=c.id AND h2.kind='case_completed') JOIN clients cl ON cl.id=c.client_id WHERE cl.case_officer_id=u.id AND date(h.created_at,business_offset()) BETWEEN ? AND ?),'from',?,'to',?) FROM users u WHERE u.role<>'viewer' ORDER BY u.name" (start,end,start,end,start,end,start,end,start,end)
 
 perform :: Env -> User -> T.Text -> T.Text -> A.Value -> S.ActionM A.Value
 perform env u section action input = case (section,action) of
@@ -172,6 +173,8 @@ perform env u section action input = case (section,action) of
   vid<-intField "id" input
   liftIO $ void $ execute (envConn env) "DELETE FROM saved_views WHERE id=? AND user_id=?" (vid,userId u)
   pure saved
+ ("client-messages",_) -> Journey.messageAction env u action input
+ ("profile","save") -> Journey.profileAction env u input
  ("appointments","save") -> saveAppointment env u input
  ("invoices","save") -> saveInvoice env u input
  ("invoices","send") -> sendInvoice env u input
@@ -193,14 +196,14 @@ saveTask env u input = do
  (scheduled,dueTime)<-Journey.taskTimes input
  let due=maybe dueDate (Just . T.take 10) dueTime
  priority<-choice "priority" ["Low","Medium","High","Urgent"] input
- status<-choice "status" ["Pending","In Progress","Done"] input
+ status<-choice "status" ["Pending","In Progress","Done","Cancelled"] input
  assigned<-intField "assignee" input
  staff env assigned
  forM_ rows $ \(ml,mc) -> checkAssignee env assigned ml mc
  let recurrence=number "recurrenceDays" input
  when (maybe False (\n -> n<1 || n>366) recurrence || recurrence/=Nothing && due==Nothing) $ reject status400 "Recurring tasks need a deadline and a repeat interval of 1–366 days"
  liftIO $ do
-  void $ execute (envConn env) "UPDATE tasks SET title=?,description=?,due_date=?,priority=?,status=?,assigned_to_id=?,recurrence_days=?,scheduled_at=?,due_at=? WHERE id=?" (title,field "description" input,due,priority,status,assigned,recurrence,scheduled,dueTime,tid)
+  void $ execute (envConn env) "UPDATE tasks SET title=?,description=?,due_date=?,priority=?,status=?,assigned_to_id=?,recurrence_days=?,scheduled_at=?,due_at=?,notes=?,cancelled_at=CASE WHEN ? THEN coalesce(cancelled_at,datetime('now')) ELSE NULL END WHERE id=?" (title,field "description" input,due,priority,if status=="Cancelled" then "Pending"::T.Text else status,assigned,recurrence,scheduled,dueTime,field "notes" input,status=="Cancelled",tid)
   forM_ rows $ \(ml,mc) -> void $ execute (envConn env) "INSERT INTO work_history(lead_id,client_id,task_id,actor_id,kind,note) VALUES (?,?,?,?,'task.updated',?)" (ml,mc,tid,userId u,"Task updated: "<>title)
  pure (A.object ["message".=("Task saved"::T.Text)])
 
@@ -279,7 +282,8 @@ savedViewRows env u input offset = do
   [(entity,q,overdue,mine)] -> do
    let term="%"<>q<>"%"
    result<-liftIO $ case entity of
-    "tasks" -> jsonRows env ("SELECT json_object('id',t.id,'title',t.title,'kind','Task','path',CASE WHEN client_id IS NOT NULL THEN '/clients/'||client_id ELSE '/leads/'||lead_id END) FROM tasks t WHERE id IN ("<>visibleTasks<>") AND title LIKE ? AND (NOT ? OR assigned_to_id=?) AND (NOT ? OR status<>'Done' AND due_date<date('now',business_offset())) ORDER BY due_date,id LIMIT 50 OFFSET ?") (term,mine,userId u,overdue,offset)
+    "client-messages" -> Journey.messageRows env Nothing Nothing offset
+ "tasks" -> jsonRows env ("SELECT json_object('id',t.id,'title',t.title,'kind','Task','path',CASE WHEN client_id IS NOT NULL THEN '/clients/'||client_id ELSE '/leads/'||lead_id END) FROM tasks t WHERE id IN ("<>visibleTasks<>") AND title LIKE ? AND (NOT ? OR assigned_to_id=?) AND (NOT ? OR cancelled_at IS NULL AND status<>'Done' AND due_date<date('now',business_offset())) ORDER BY due_date,id LIMIT 50 OFFSET ?") (term,mine,userId u,overdue,offset)
     "cases" -> jsonRows env ("SELECT json_object('id',c.id,'title',coalesce(c.service_category,'Case')||' · '||cl.full_name,'kind','Case','path','/clients/'||cl.id) FROM cases c JOIN clients cl ON cl.id=c.client_id WHERE cl.id IN ("<>visibleClients<>") AND (cl.full_name LIKE ? OR c.service_category LIKE ?) AND (NOT ? OR cl.case_officer_id=?) AND (NOT ? OR c.next_deadline<date('now',business_offset()) AND c.stage NOT IN ('Approved','Rejected','Completed')) ORDER BY c.next_deadline,c.id LIMIT 50 OFFSET ?") (term,term,mine,userId u,overdue,offset)
     "clients" -> jsonRows env ("SELECT json_object('id',id,'title',full_name,'kind','Student','path','/clients/'||id) FROM clients WHERE id IN ("<>visibleClients<>") AND (full_name LIKE ? OR phone LIKE ?) AND (NOT ? OR case_officer_id=?) AND (NOT ? OR EXISTS(SELECT 1 FROM cases c WHERE c.client_id=clients.id AND c.next_deadline<date('now',business_offset()) AND c.stage NOT IN ('Approved','Rejected','Completed'))) ORDER BY id DESC LIMIT 50 OFFSET ?") (term,term,mine,userId u,overdue,offset)
     _ -> jsonRows env ("SELECT json_object('id',id,'title',full_name,'kind','Lead','path','/leads/'||id) FROM leads WHERE id IN ("<>visibleLeads<>") AND (full_name LIKE ? OR phone LIKE ? OR email LIKE ?) AND (NOT ? OR consultant_id=?) AND (NOT ? OR next_followup<date('now',business_offset())) ORDER BY id DESC LIMIT 50 OFFSET ?") (term,term,term,mine,userId u,overdue,offset)
@@ -358,10 +362,10 @@ saveAppointment env u input = do
  liftIO $ do
   meeting<-case rid of
    Nothing -> do
-    [Only i]<-query (envConn env) "INSERT INTO appointments(lead_id,client_id,owner_id,title,starts_at,ends_at,location,status,case_id,task_id,meeting_url,meeting_id,passcode,client_visible) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING id" (ml,mc,assigned,title,start,end,field "location" input,status,cs,task,meetingUrl,meetingId,passcode,visible)
+    [Only i]<-query (envConn env) "INSERT INTO appointments(lead_id,client_id,owner_id,title,starts_at,ends_at,location,status,case_id,task_id,meeting_url,meeting_id,passcode,client_visible,notes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING id" (ml,mc,assigned,title,start,end,field "location" input,status,cs,task,meetingUrl,meetingId,passcode,visible,field "notes" input)
     pure (i::Int)
    Just i -> do
-    void $ execute (envConn env) "UPDATE appointments SET lead_id=?,client_id=?,owner_id=?,title=?,starts_at=?,ends_at=?,location=?,status=?,case_id=?,task_id=?,meeting_url=?,meeting_id=?,passcode=?,client_visible=?,revision=revision+1 WHERE id=?" (ml,mc,assigned,title,start,end,field "location" input,status,cs,task,meetingUrl,meetingId,passcode,visible,i)
+    void $ execute (envConn env) "UPDATE appointments SET lead_id=?,client_id=?,owner_id=?,title=?,starts_at=?,ends_at=?,location=?,status=?,case_id=?,task_id=?,meeting_url=?,meeting_id=?,passcode=?,client_visible=?,notes=?,revision=revision+1 WHERE id=?" (ml,mc,assigned,title,start,end,field "location" input,status,cs,task,meetingUrl,meetingId,passcode,visible,field "notes" input,i)
     pure i
   void $ execute (envConn env) "INSERT INTO work_history(lead_id,client_id,case_id,meeting_id,actor_id,kind,note) VALUES (?,?,?,?,?,?,?)" (ml,mc,cs,meeting,userId u,if rid==Nothing then "meeting.scheduled"::T.Text else "meeting.updated",title<>" · "<>status<>" · "<>T.pack(show start)<>" to "<>T.pack(show end))
  pure (A.object ["message".=("Appointment saved. Times are UTC."::T.Text)])
@@ -375,7 +379,7 @@ saveInvoice env u input = do
  cid<-maybe (reject status400 "Choose a client") pure mc
  description<-bounded "description" 1000 input
  currency<-choice "currency" ["PHP","USD","EUR","GBP","AUD","CAD","NZD"] input
- amount<-maybe (reject status400 "Enter a positive amount with at most two decimal places") pure (amountMinor (field "amount" input))
+ (lineItems,subtotal,discount,tax,amount)<-Journey.invoiceAmounts input
  when (amount>100000000000) $ reject status400 "Amount exceeds the supported limit"
  due<-dateField "dueDate" True input
  status<-choice "status" ["Draft","Issued","Paid","Void"] input
@@ -396,8 +400,8 @@ saveInvoice env u input = do
  when (rid==Nothing && status/="Draft") $ reject status400 "New invoices start as Draft"
  liftIO $ do
   case rid of
-   Nothing -> void $ execute (envConn env) "INSERT INTO invoices(client_id,description,currency,amount_minor,due_date,case_id) VALUES (?,?,?,?,?,?)" (cid,description,currency,amount,due,cs)
-   Just i -> void $ execute (envConn env) "UPDATE invoices SET client_id=?,description=?,currency=?,amount_minor=?,due_date=?,status=?,paid_at=CASE WHEN ?='Paid' THEN coalesce(paid_at,datetime('now')) ELSE paid_at END,revision=revision+1 WHERE id=?" (cid,description,currency,amount,due,status,status,i)
+   Nothing -> void $ execute (envConn env) "INSERT INTO invoices(client_id,description,currency,amount_minor,due_date,case_id,line_items,subtotal_minor,discount_minor,tax_minor) VALUES (?,?,?,?,?,?,?,?,?,?)" (cid,description,currency,amount,due,cs,lineItems,subtotal,discount,tax)
+   Just i -> void $ execute (envConn env) "UPDATE invoices SET client_id=?,description=?,currency=?,amount_minor=?,due_date=?,status=?,paid_at=CASE WHEN ?='Paid' THEN coalesce(paid_at,datetime('now')) ELSE paid_at END,line_items=?,subtotal_minor=?,discount_minor=?,tax_minor=?,revision=revision+1 WHERE id=?" (cid,description,currency,amount,due,status,status,lineItems,subtotal,discount,tax,i)
   recordHistory env u Nothing (Just cid) cs "invoice" (description<>" · "<>status)
  pure (A.object ["message".=("Invoice saved. Record receipts in Payments; balances and Paid status update automatically."::T.Text)])
 

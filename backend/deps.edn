@@ -1,0 +1,58 @@
+;; ECC CRM — rewritten in Clojure on XTDB.
+;;
+;; Backend dependency manifest. The previous Haskell/SQLite stack is replaced by:
+;;   - XTDB 2.2.0 (bitemporal document store) instead of SQLite/PostgreSQL
+;;   - http-kit + Ring + reitit instead of Warp + Scotty
+;;   - buddy-hashers (bcrypt) and buddy-core (HMAC) instead of the Haskell crypto packages
+;;   - postal instead of scripts/mail_worker.py (the worker runs in-process)
+
+{:paths ["src" "resources" "test"]
+
+ :deps  {org.clojure/clojure        {:mvn/version "1.12.0"}
+         org.postgresql/postgresql {:mvn/version "42.7.14"}
+
+         ;; XTDB 2.x — bitemporal system of record. `xtdb-api` provides the
+         ;; `xtdb.api` Clojure surface; `xtdb-core` provides the node runtime
+         ;; (local-disk log + storage are built in — no separate rocksdb artifact).
+         com.xtdb/xtdb-api          {:mvn/version "2.2.0"}
+         com.xtdb/xtdb-core         {:mvn/version "2.2.0"}
+
+         ;; Arrow (XTDB's columnar engine) — the netty allocation manager is
+         ;; incompatible with newer JDK memory APIs; use the unsafe one instead.
+         org.apache.arrow/arrow-memory-unsafe {:mvn/version "19.0.0"}
+
+         ;; HTTP server / routing
+         http-kit/http-kit          {:mvn/version "2.8.1"}
+         ring/ring-core             {:mvn/version "1.13.0"}
+         metosin/reitit-ring        {:mvn/version "0.10.1"}
+
+         ;; JSON
+         cheshire/cheshire          {:mvn/version "5.13.0"}
+
+         ;; crypto: bcrypt password hashing, HMAC for JWT/TOTP
+         buddy/buddy-core           {:mvn/version "1.12.0-430"}
+         buddy/buddy-hashers        {:mvn/version "2.0.167"}
+
+         ;; SMTP for the mail queue (replaces scripts/mail_worker.py)
+         com.draines/postal         {:mvn/version "2.0.5"}
+
+         ;; silence XTDB's slf4j warning; bridge to a simple console appender
+         org.slf4j/slf4j-simple     {:mvn/version "2.0.16"}
+
+         ;; CSV import/export
+         org.clojure/data.csv       {:mvn/version "1.1.0"}
+
+         ;; HTML for the printable invoice endpoint
+         hiccup/hiccup              {:mvn/version "1.0.5"}}
+
+ :aliases
+ {:dev  {:jvm-opts ["-Xmx768m" "--add-opens=java.base/java.nio=ALL-UNNAMED" "-Dio.netty.tryReflectionSetAccessible=true" "--enable-native-access=ALL-UNNAMED"]
+         :main-opts ["-m" "ecc-crm.main"]}
+  :drill {:jvm-opts ["-Xmx768m" "--add-opens=java.base/java.nio=ALL-UNNAMED" "-Dio.netty.tryReflectionSetAccessible=true" "--enable-native-access=ALL-UNNAMED"] :main-opts ["-m" "ecc-crm.migration-drill"]}
+  :acceptance {:jvm-opts ["-Xmx768m" "--add-opens=java.base/java.nio=ALL-UNNAMED" "-Dio.netty.tryReflectionSetAccessible=true" "--enable-native-access=ALL-UNNAMED"] :main-opts ["-m" "ecc-crm.acceptance"]}
+  :capacity {:jvm-opts ["-Xmx768m" "--add-opens=java.base/java.nio=ALL-UNNAMED" "-Dio.netty.tryReflectionSetAccessible=true" "--enable-native-access=ALL-UNNAMED"] :main-opts ["-m" "ecc-crm.capacity"]}
+  :integration {:jvm-opts ["-Xmx768m" "--add-opens=java.base/java.nio=ALL-UNNAMED" "-Dio.netty.tryReflectionSetAccessible=true" "--enable-native-access=ALL-UNNAMED"]
+                :main-opts ["-m" "ecc-crm.xtdb-test"]}
+  :test {:jvm-opts ["-Xmx768m" "--add-opens=java.base/java.nio=ALL-UNNAMED" "-Dio.netty.tryReflectionSetAccessible=true" "--enable-native-access=ALL-UNNAMED"]
+         :extra-paths ["test"]
+         :main-opts ["-m" "ecc-crm.test-runner"]}}}

@@ -83,7 +83,7 @@ with sqlite3.connect(':memory:') as db:
     assert 'SEARCH t USING INDEX tasks_client_due (client_id=?)' in plan, plan
     assert 'LIST SUBQUERY' not in plan, plan
     print(f'100,000 tasks: client task panel {before:.3f} -> {after:.3f} ms; scoped results identical')
-    profile_old = old.replace('ORDER BY t.due_date NULLS LAST,t.id LIMIT 50', "AND t.status<>'Done' ORDER BY t.due_date NULLS LAST,t.id DESC LIMIT 1")
-    profile_new = new.replace('ORDER BY t.due_date NULLS LAST,t.id LIMIT 50', "AND t.status<>'Done' ORDER BY t.due_date NULLS LAST,t.id DESC LIMIT 1")
+    profile_old = old.replace('ORDER BY t.due_date NULLS LAST,t.id LIMIT 50', "AND t.cancelled_at IS NULL AND t.status<>'Done' ORDER BY t.due_date NULLS LAST,t.id DESC LIMIT 1")
+    profile_new = new.replace('ORDER BY t.due_date NULLS LAST,t.id LIMIT 50', "AND t.cancelled_at IS NULL AND t.status<>'Done' ORDER BY t.due_date NULLS LAST,t.id DESC LIMIT 1")
     assert db.execute(profile_old,(5000,)).fetchall()==db.execute(profile_new,(5000,)).fetchall()
     print(f'100,000 tasks: client next step {median_ms(db,profile_old,(5000,)):.3f} -> {median_ms(db,profile_new,(5000,)):.3f} ms')

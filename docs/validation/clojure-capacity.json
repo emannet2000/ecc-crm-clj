@@ -1,0 +1,11 @@
+{
+  "seedMs" : 3705.840398,
+  "pageMs" : 582.616156,
+  "restoreMs" : 4280.914257,
+  "records" : 10000,
+  "sha256" : "eb4275e72a55e3a86f6a780013355e315493e89bfcba1e7fea5144ff9e467f98",
+  "updateMs" : 118.16244,
+  "backupBytes" : 2746026,
+  "backupMs" : 1946.704991,
+  "roundTrip" : true
+}

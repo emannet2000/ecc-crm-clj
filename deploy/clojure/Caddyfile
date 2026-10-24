@@ -1,0 +1,6 @@
+{$SITE_HOST} {
+  encode zstd gzip
+  @internal path /internal/*
+  respond @internal 404
+  reverse_proxy api:4000
+}

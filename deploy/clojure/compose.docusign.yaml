@@ -1,0 +1,7 @@
+# Mount a private directory writable by UID 10001 so OAuth refresh tokens can rotate atomically.
+services:
+  api:
+    environment:
+      DOCUSIGN_REFRESH_TOKEN_FILE: /run/integration-secrets/docusign-refresh-token
+    volumes:
+      - ${DOCUSIGN_SECRET_DIRECTORY:?Set the private token directory}:/run/integration-secrets

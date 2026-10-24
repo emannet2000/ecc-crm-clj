@@ -27,18 +27,18 @@ type Filters = (Maybe Int,Maybe Int,T.Text,T.Text,T.Text)
 type FilterParams = [SQLData]
 
 filterSql :: Query
-filterSql = " FROM cases a JOIN clients c ON c.id=a.client_id JOIN record_versions v ON v.kind='cases' AND v.record_id=a.id WHERE c.id IN ("<>visibleClients<>") AND (? IS NULL OR a.client_id=?) AND (? IS NULL OR c.case_officer_id=?) AND (?='' OR a.destination=?) AND (?='' OR a.stage=?) AND (?='' OR substr(a.intake_date,1,7)=?) AND (c.full_name LIKE ? OR c.client_number LIKE ? OR a.service_category LIKE ? OR a.destination LIKE ? OR a.stage LIKE ? OR a.institution LIKE ? OR a.program LIKE ?)"
+filterSql = " FROM cases a JOIN clients c ON c.id=a.client_id JOIN record_versions v ON v.kind='cases' AND v.record_id=a.id WHERE c.id IN ("<>visibleClients<>") AND (? IS NULL OR a.client_id=?) AND (? IS NULL OR coalesce(a.consultant_id,c.case_officer_id)=?) AND (?='' OR a.destination=?) AND (?='' OR a.stage=?) AND (?='' OR substr(a.intake_date,1,7)=?) AND (c.full_name LIKE ? OR c.client_number LIKE ? OR a.service_category LIKE ? OR a.destination LIKE ? OR a.stage LIKE ? OR a.institution LIKE ? OR a.program LIKE ?)"
 
 filterParams :: Filters -> T.Text -> FilterParams
 filterParams (cid,officer,destination,stage,intake) q = [toField cid,toField cid,toField officer,toField officer,toField destination,toField destination,toField stage,toField stage,toField intake,toField intake,toField term,toField term,toField term,toField term,toField term,toField term,toField term]
  where term="%"<>q<>"%"
 
 rowSql :: Query
-rowSql = "SELECT json_object('id',a.id,'title',c.full_name||' · '||coalesce(a.service_category,'Application'),'owner','client:'||a.client_id,'clientName',c.full_name,'category',coalesce(a.service_category,''),'destination',coalesce(a.destination,''),'stage',a.stage,'deadline',coalesce(a.next_deadline,''),'intakeDate',coalesce(a.intake_date,''),'institution',a.institution,'program',a.program,'offerStatus',a.offer_status,'enrollmentStatus',a.enrollment_status,'officer',coalesce(u.name,'Unassigned'),'revision',v.revision,'path','/clients/'||c.id)"
+rowSql = "SELECT json_object('id',a.id,'title',c.full_name||' · '||coalesce(a.service_category,'Application'),'owner','client:'||a.client_id,'clientName',c.full_name,'category',coalesce(a.service_category,''),'destination',coalesce(a.destination,''),'stage',a.stage,'deadline',coalesce(a.next_deadline,''),'intakeDate',coalesce(a.intake_date,''),'institution',a.institution,'program',a.program,'offerStatus',a.offer_status,'enrollmentStatus',a.enrollment_status,'consultant',coalesce(a.consultant_id,''),'officer',coalesce(u.name,'Unassigned'),'revision',v.revision,'path','/clients/'||c.id)"
 
 -- Include the staff name without broadening record visibility.
 withOfficer :: Query -> Query
-withOfficer (Query sql) = Query (T.replace " JOIN record_versions" " LEFT JOIN users u ON u.id=c.case_officer_id JOIN record_versions" sql)
+withOfficer (Query sql) = Query (T.replace " JOIN record_versions" " LEFT JOIN users u ON u.id=coalesce(a.consultant_id,c.case_officer_id) JOIN record_versions" sql)
 
 applicationRows :: Env -> Maybe Int -> T.Text -> Int -> IO [A.Value]
 applicationRows env cid = filteredRows env (cid,Nothing,"","","")
@@ -80,6 +80,8 @@ routes env reader writer admin = do
   deadline<-dateField "deadline" False input
   intake<-dateField "intakeDate" False input
   let rid=number "id" input
+      consultant=number "consultant" input
+  forM_ consultant $ \ident->staff env ident >> checkAssignee env ident Nothing (Just cid)
   case rid of
    Just ident -> do
     old<-liftIO $ query (envConn env) "SELECT client_id FROM cases WHERE id=?" (Only ident) :: S.ActionM [Only Int]
@@ -88,10 +90,10 @@ routes env reader writer admin = do
     previous<-liftIO $ query (envConn env) "SELECT institution,program,offer_status,enrollment_status FROM cases WHERE id=?" (Only ident) :: S.ActionM [(T.Text,T.Text,T.Text,T.Text)]
     extras<-applicationExtras input (case previous of row:_->row; _->("","","Not requested","Not enrolled"))
     let (institution,program,offerStatus,enrollmentStatus)=extras
-    liftIO $ void $ execute (envConn env) "UPDATE cases SET service_category=?,destination=?,stage=?,next_deadline=?,intake_date=?,institution=?,program=?,offer_status=?,enrollment_status=? WHERE id=? AND client_id=?" (category,destination,stage,deadline,intake,institution,program,offerStatus,enrollmentStatus,ident,cid)
+    liftIO $ void $ execute (envConn env) "UPDATE cases SET service_category=?,destination=?,stage=?,next_deadline=?,intake_date=?,institution=?,program=?,offer_status=?,enrollment_status=?,consultant_id=? WHERE id=? AND client_id=?" (category,destination,stage,deadline,intake,institution,program,offerStatus,enrollmentStatus,consultant,ident,cid)
    Nothing -> do
     (institution,program,offerStatus,enrollmentStatus)<-applicationExtras input ("","","Not requested","Not enrolled")
-    liftIO $ void $ execute (envConn env) "INSERT INTO cases(client_id,service_category,destination,stage,next_deadline,intake_date,institution,program,offer_status,enrollment_status) VALUES (?,?,?,?,?,?,?,?,?,?)" (cid,category,destination,stage,deadline,intake,institution,program,offerStatus,enrollmentStatus)
+    liftIO $ void $ execute (envConn env) "INSERT INTO cases(client_id,service_category,destination,stage,next_deadline,intake_date,institution,program,offer_status,enrollment_status,consultant_id) VALUES (?,?,?,?,?,?,?,?,?,?,?)" (cid,category,destination,stage,deadline,intake,institution,program,offerStatus,enrollmentStatus,consultant)
   respondJson env (A.object["message".=("Application saved"::T.Text)])
  S.post "/api/workspace/applications/checklist" $ writer $ \u -> do
   input<-bodyObject

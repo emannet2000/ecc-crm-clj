@@ -1,25 +1,7 @@
-# Optional provider worker. Use with compose.yaml and configure private env files.
+# Providers run in the Clojure worker, not a separate SQL/Python process.
 services:
   api:
-    environment:
-      INTEGRATIONS_ENABLED: ${INTEGRATIONS_ENABLED:-}
-  integrations:
-    image: ecc-crm-integrations:release
-    build:
-      context: ./api
-      dockerfile: deploy/Dockerfile.workers
-    command: [python3, -u, scripts/integration_worker.py]
-    restart: unless-stopped
-    init: true
-    read_only: true
-    tmpfs: [/tmp]
     env_file: [./integrations.env]
     environment:
-      DATABASE_PATH: /data/ecc-crm.sqlite3
-    volumes:
-      - sqlite_data:/data
-      - integration_secrets:/var/lib/ecc/secrets
-    depends_on:
-      api: {condition: service_healthy}
-volumes:
-  integration_secrets:
+      INTEGRATIONS_ENABLED: ${INTEGRATIONS_ENABLED:?Choose configured providers}
+      INTEGRATION_NAMESPACE: ${INTEGRATION_NAMESPACE:?Set a unique workspace identifier}

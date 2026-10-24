@@ -77,6 +77,8 @@ run conn api=do
  pdf<-portal "GET" (path proposal<>"/download") A.Null
  expect 200 pdf
  assert "Portal commercial download is a PDF" (lookup "Content-Type" (WT.simpleHeaders pdf)==Just "application/pdf" && "%PDF-1.4" `BL.isPrefixOf` WT.simpleBody pdf && "startxref" `B.isInfixOf` BL.toStrict(WT.simpleBody pdf))
+ forM_ ["Service fees: PHP 25000.00","Third-party fees: PHP 1000.00","Other charges: PHP 0.00","Subtotal: PHP 26000.00","Discount: PHP 500.00","Tax: PHP 100.00","Total: PHP 25600.00"] $ \line->
+  assert ("Proposal PDF includes "++B.unpack line) (line `B.isInfixOf` BL.toStrict(WT.simpleBody pdf))
  portal "POST" (path proposal<>"/accept") A.Null >>=expect 200
  portal "POST" (path proposal<>"/accept") A.Null >>=expect 409
  issue "contracts" contract >>=expect 200
@@ -99,6 +101,8 @@ run conn api=do
  [Only stillOpen]<-query conn "SELECT status FROM tasks WHERE id=?" (Only tid)::IO[Only T.Text]
  [Only overdueCount]<-query conn "SELECT count(*) FROM notifications WHERE client_id=? AND event_key LIKE 'journey-overdue:%'" (Only cid)::IO[Only Int]
  assert "Dismiss neither completes a task nor regenerates the same overdue alert" (stillOpen=="Pending" && overdueCount==1)
+ [Only overdueEvents]<-query conn "SELECT count(*) FROM work_history WHERE task_id=? AND kind='task.overdue'" (Only tid)::IO[Only Int]
+ assert "Repeated refresh and dismissal retain exactly one overdue timeline event" (overdueEvents==1)
  post "tasks/save" (task "Done" "2020-01-02T14:00" ["id".=tid,"expectedRevision".=(2::Int)]) >>=expect 200
  [Only completed]<-query conn "SELECT completed_at IS NOT NULL FROM tasks WHERE id=?" (Only tid)::IO[Only Bool]
  assert "Task completion retains its timestamp" completed

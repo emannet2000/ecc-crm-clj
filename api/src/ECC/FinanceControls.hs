@@ -20,6 +20,7 @@ import ECC.DB (Env(..))
 import ECC.Clock (businessDay)
 import ECC.Models
 import ECC.Store
+import qualified ECC.Journey as Journey
 import ECC.Security (reject)
 import ECC.WorkflowSupport
 import ECC.FinanceCommon
@@ -195,7 +196,9 @@ printRoutes env reader = do
   iid <- S.pathParam "id"
   rows <- liftIO $ query (envConn env) ("SELECT c.full_name,i.description,i.currency,i.amount_minor,i.paid_minor,i.balance_minor,i.due_date,i.status FROM invoice_balances i JOIN clients c ON c.id=i.client_id WHERE i.id=? AND i.client_id IN ("<>financialClients<>")") (Only(iid::Int)) :: S.ActionM [(T.Text,T.Text,T.Text,Int,Int,Int,T.Text,T.Text)]
   case rows of
-   [(name,description,currency,total,paid,balance,due,status)] -> printPage ("Invoice INV-"<>T.pack(show iid)) [("Student",name),("Description",description),("Currency",currency),("Invoice total",money total),("Net payments",money paid),("Outstanding balance",money balance),("Due date",due),("Status",status)]
+   [(name,description,currency,total,paid,balance,due,status)] -> do
+    breakdown<-liftIO $ Journey.invoiceBreakdown env iid
+    printPage ("Invoice INV-"<>T.pack(show iid)) [("Itemized charges",breakdown),("Student",name),("Description",description),("Currency",currency),("Invoice total",money total),("Net payments",money paid),("Outstanding balance",money balance),("Due date",due),("Status",status)]
    _->reject status404 "Invoice not found"
  S.get "/api/finance/print/payments/:id" $ reader $ \u -> do
   Access.requirePrivilege env u "finance_view"

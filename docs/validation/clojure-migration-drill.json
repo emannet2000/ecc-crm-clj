@@ -1,0 +1,9 @@
+{
+  "sourceTables" : 57,
+  "sourceRows" : 36,
+  "preservedRows" : 36,
+  "typedTables" : 43,
+  "snapshotSha256" : "17277256dacb07acc0ab76431fe3fc3ae61762611e23111a47838535922131d8",
+  "roundTrip" : true,
+  "sourceModified" : false
+}

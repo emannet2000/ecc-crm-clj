@@ -1,56 +1,78 @@
-# Production acceptance and recovery
+# Clojure production deployment and recovery
 
-Review the [operations rollout guide](OPERATIONS.md), including quarantine of existing files and initial ClamAV signature downloads. Verify clean/infected/outage behavior with the exact release. Run the quality workflow against the exact release before loading customer data. A failed security scan, skipped suite, or untested external integration is an open release blocker. This document records the checks; it does not certify a deployment.
+The default deployment uses one Clojure/XTDB API process, in-process workers, ClamAV, Caddy, and a separate backup container. Provider credentials, actual SMTP delivery, TLS/DNS, scanner signatures, and off-host recovery must be exercised in staging before importing customer data. Changing deployment files does not migrate or restart an existing installation.
 
-## Build and release identity
+## Build and verify
 
-Run `python3 scripts/build_release.py` on a Docker host. It pulls the GHC builder once, resolves its immutable digest, builds all four application images, and writes `release-images.json` with the builder digest and resulting image IDs. Runtime, Node, Python and proxy base images have digest pins in source. Retain the manifest with the release and the tested source revision. Haskell dependencies and the Hackage index date are recorded in `api/cabal.project.freeze`. Refresh pins and the freeze file deliberately, rerun the quality gate, and review vulnerability findings before release.
-
-To use these locally built images, run `docker compose -f compose.yaml -f compose.release.yaml up --no-build -d`. Include `-f compose.offhost.yaml --profile monitoring` when off-host backup and monitoring are configured. Use the same overlays for all subsequent lifecycle commands to preserve the tested image selection. Record the actual image IDs after deployment and compare them to the manifest. Registry-based deployments should push those tested images and reference their repository digests. Do not rebuild after acceptance and assume that the result is identical: OS package repositories still supply current security updates at build time.
-
-CI checks dependencies against the Haskell Security Advisory Database and scans each application image. Version matches are conservative and can include APIs this application does not use; resolve findings by updating or documenting a reviewed, narrowly scoped exception before release. There are no preconfigured vulnerability exceptions.
-
-## Configuration and staging acceptance
-
-1. Generate separate random `JWT_SECRET` and `PROXY_TOKEN` values (at least 32 bytes each). Use the supplied Caddy configuration: it overwrites client identity headers and authenticates them with `PROXY_TOKEN`. Keep the API port private. Arbitrary forwarded headers without that secret do not change rate-limit identity. Protect the shared secret like a credential.
-2. Set real DNS, `SITE_HOST`, HTTPS `PUBLIC_URL`, SMTP settings and `ALERT_TO`. Start the monitoring profile. Verify hostname resolution, certificate issuance, HTTP-to-HTTPS redirects and browser security headers from outside the server.
-3. Review the [workflow guide](WORKFLOWS.md), enroll administrator MFA and retain recovery codes offline. Verify scheduler/reminder emails, stale-save rejection, merge preservation, portal approval/revocation and invoice permissions on staging. Create an admin and verify an actual invitation, password reset, expiry, single use, logout and session revocation. SMTP acceptance alone is insufficient: confirm delivery to the intended inbox and follow the link on the public origin.
-4. Test admin, consultant and viewer accounts with representative records. If using `ASSIGNED_ONLY=true`, verify that another consultant cannot read or mutate records, documents, tasks or cases belonging to someone else. Verify the intended behavior for client tasks versus the client's assigned officer. This is one workspace, not tenant isolation.
-5. Run `scripts/load_test.py` against staging with a dedicated account and representative data. Record latency and errors at expected concurrent usage, including uploads and CSV exports. Set the acceptance thresholds according to your service objectives and available disk/memory; the sample defaults are starting thresholds, not capacity guarantees.
-6. Connect request logs to your log service, with alerts for sustained 5xx rates and latency. Use an independently hosted uptime monitor for the public `/api/ready` URL and configure its own alert transport. The repository's SMTP-based monitor cannot detect loss of its own host or mail transport reliably.
-
-## Encrypted off-host backup
-
-Local snapshots default to hourly with the latest 24 retained. Both interval and retention are configurable. The initial recovery-point objective is at most one backup interval plus upload delay; hourly copies can lose about an hour of committed changes. Choose a shorter interval if necessary. Measure recovery time during the drill below and record it as your recovery-time objective.
-
-Provision a separate remote restic repository, for example an S3 bucket on another host/account. Scope its access credentials to that repository. Keep the restic password in a private file readable by container UID 10001, and store a separate recovery copy of the password and credentials outside the application host. Retention deletes old remote snapshots: use a dedicated repository, and enable provider-side protections appropriate to your recovery policy.
-
-Set `RESTIC_REPOSITORY`, `RESTIC_PASSWORD_PATH` and, for S3, `BACKUP_ACCESS_KEY_ID`, `BACKUP_SECRET_ACCESS_KEY`, and `BACKUP_REGION`. See `.env.example`. The restic password is mounted as a Compose secret, not embedded in an image. Initialize the empty repository once:
+Run the quality commands in [README](../README.md), including the live browser journey, PostgreSQL migration fixture, and 10,000-record restore drill. On an accessible Docker host:
 
 ```sh
-docker compose -f compose.yaml -f compose.release.yaml -f compose.offhost.yaml run --rm --no-deps --entrypoint restic backup init
-docker compose -f compose.yaml -f compose.release.yaml -f compose.offhost.yaml --profile monitoring up --no-build -d
+python3 scripts/build_release.py
+# Use the quality gate's high/critical image scan before deployment.
+docker compose --env-file .env -f compose.yaml -f compose.verified.yaml config --quiet
 ```
 
-The worker uploads only verified SQLite snapshots using restic's encrypted repository format. Remote retention keeps 24 latest, 7 daily, 4 weekly and 12 monthly recovery points grouped by the application host/tag. It runs a repository metadata check after retention. It records success only after backup, retention and check all succeed. The monitor alerts if this marker is missing or older than two hours by default. Set `MAX_BACKUP_AGE_SECONDS` consistently with the backup interval. Local retention continues during remote outages to bound disk use; alert response must happen before the required recovery window expires.
+The release builder resolves the Clojure builder image to a repository digest and records the resulting local image IDs. Use `compose.verified.yaml` with `--no-build` to deploy those IDs. Registry deployment requires pushing the tested images and using their immutable registry digests on the destination host. Do not rebuild after acceptance and assume image identity is unchanged.
 
-## Restore drill
+Production startup verifies the exact source/frontend file set and SHA-256 values against `release-clojure.json`. Modified/missing files fail startup. This protects release consistency; it is not an external tamper-proof attestation.
 
-Use an isolated staging/recovery host, a separate destination, and no production traffic. Do this before initial launch and after migration or backup changes.
+The application uses a read-only container filesystem, private API networking, persistent `/data`, and temporary Clojure configuration/cache directories. The backup token is separate from browser authentication. Caddy blocks `/internal/*`; keep the API port private.
 
-1. Record the start time, source snapshot timestamp and release identity. Stop the recovery application. Download a remote snapshot using the password and credentials stored outside the original host:
+## Configuration and initial administrator
+
+Set HTTPS `PUBLIC_URL`, `SITE_HOST`, a random URL-safe `BACKUP_TOKEN` of at least 32 characters, SMTP transport settings, monitoring recipient, and the intended `ASSIGNED_ONLY` policy. Preserve `.env` outside version control. Set `REQUIRE_ADMIN_MFA=true` to require enrollment before administrators open workspace records.
+
+Embedded XTDB has one owning process for a data directory. Create/import/restore offline; do not run a second CLI node against the running server's directory.
 
 ```sh
-restic check --read-data
-restic snapshots --tag ecc-crm --host ecc-crm
-restic restore SNAPSHOT_ID --target /secure/recovery-snapshot
-python3 scripts/restore_drill.py /secure/recovery-snapshot/ecc-crm.sqlite3 /recovery/ecc-crm.sqlite3 --report /secure/restore-evidence.json
+# Bootstrap before starting the API, or stop it first.
+docker compose -f compose.yaml -f compose.verified.yaml stop api
+read -rs ECC_ADMIN_PASSWORD
+export ECC_ADMIN_PASSWORD
+docker compose -f compose.yaml -f compose.verified.yaml run --rm --no-deps -e ECC_ADMIN_PASSWORD api adduser admin@example.com 'Workspace Admin' admin
+unset ECC_ADMIN_PASSWORD
+docker compose -f compose.yaml -f compose.verified.yaml up --no-build -d
 ```
 
-2. The drill script refuses an existing destination, verifies integrity and foreign keys, and compares all table counts and document-content digests with the source snapshot. Its JSON report records timing and explicitly leaves application checks pending. Start the matching tested release against the recovery database; test migrations on a copy before changing versions.
-3. Verify login, permissions, representative document bytes/downloads, lead conversion and conversion retry, tasks, audit actors and an invitation/reset email. Use a test SMTP destination to avoid emailing real users from the restored system.
-4. Record elapsed recovery time, recovered snapshot age, data counts, verification results and the operator. Keep the acceptance evidence outside the application host. Investigate discrepancies before switching traffic.
+Enroll the administrator, save one-use recovery codes, and create staff through Team. Confirm invitations and password recovery in the intended inbox, test expiry/single use, and verify revocation after password/role/access changes. Test admin, consultant, viewer, finance privileges, and assigned-record restrictions with separate accounts.
 
-A snapshot integrity check is not a substitute for this application-level drill. Real DNS/TLS, SMTP delivery, off-host access, independent monitoring and a timed restore must be verified with deployment credentials; they cannot be established by repository tests.
+## Migration and cutover
 
-Implementation references: [restic backup](https://restic.readthedocs.io/en/stable/040_backup.html), [restic retention](https://restic.readthedocs.io/en/stable/060_forget.html), and the [Haskell advisory schema](https://github.com/haskell/security-advisories/blob/main/EXAMPLE_ADVISORY.md).
+Export the source read-only using the SQLite or PostgreSQL commands in README. Stop source writes for the final export. Import into a fresh XTDB directory with a separate blob directory, then verify source-row counts, identifiers, reference/sequence floors, access rules, files, ledger balances, periods, templates, profiles, and provider records. Imported files require a new scan. Imported staff sessions and old portal links require fresh authentication/reissue.
+
+Run `clojure -M:drill` on the source export for a complete local import/backup/restore comparison. Take and retain a source database backup before cutover. Preserve the old deployment/data until acceptance and rollback planning are complete. The legacy source remains available; no volume is automatically deleted.
+
+## Scanning, workers, and providers
+
+Allow ClamAV to download signatures before evaluating scan results. Test clean, infected, unavailable-scanner, and retry behavior with the deployed scanner. Files stay quarantined until a clean result; exhausted scans need an administrator retry. Photos are normalized before entering the same quarantine pipeline.
+
+SMTP uses required STARTTLS or TLS for remote hosts and checks server identity. Mail has expiring leases, bounded attempts, and at-least-once transport semantics. A server crash after SMTP acceptance can cause a duplicate delivery; successful stored message bodies are removed. Test actual delivery, not only SMTP acceptance.
+
+Providers run inside the Clojure worker; see [PROVIDERS](clojure/PROVIDERS.md). Do not run the former SQL/Python integration worker against the new data directory.
+
+## Backups and off-host replication
+
+The API creates a consistent streaming ZIP snapshot through a private token-protected `/internal/backup` endpoint. Every record and immutable document is a separate archive entry. Record counts and document checksums are validated on restore. The backup container downloads a snapshot hourly by default and keeps the latest 24 local copies. Configure interval/retention for the required recovery point.
+
+For encrypted off-host replication, configure a dedicated restic repository and a private password file readable by UID 10001. Keep independent recovery copies of the repository location, password, and credentials. Initialize the repository once, then enable the overlay:
+
+```sh
+docker compose -f compose.yaml -f compose.verified.yaml -f compose.offhost.yaml run --rm --no-deps --entrypoint restic backup init
+docker compose -f compose.yaml -f compose.verified.yaml -f compose.offhost.yaml up --no-build -d
+```
+
+The worker records off-host success only after backup, retention, and repository checking succeed. Retention keeps seven daily, four weekly, and twelve monthly points, grouped by stable host/tag. Use a dedicated repository or distinct backup host ID for separate workspaces. Remote outages do not stop bounded local retention, so alert response must precede loss of the required local recovery window.
+
+To restore, retrieve a ZIP snapshot using restic/local storage, stop the target API, and restore into a fresh XTDB/blob directory:
+
+```sh
+XTDB_DIR=/recovery/xtdb BLOB_DIR=/recovery/blobs ./run.sh restore /secure/ecc-snapshot.zip
+```
+
+Restore commits bounded batches and marks an interrupted restore. Startup refuses incomplete restores; rerunning the same archive can resume. A different archive cannot overwrite that target. Test logins, permissions, counts, file downloads, conversion, financial balances and provider identities before switching traffic. Record actual recovery time and recovered snapshot time.
+
+## Monitoring
+
+`/api/health` reports liveness; `/api/ready` checks storage. Structured request logs contain method, path, status and latency, without bodies, credentials or query strings. Admin metrics include operational state. The worker monitors disk space, delayed/failed mail, and local/off-host backup freshness; state changes and persistent alerts use the configured SMTP recipient.
+
+Use an independently hosted uptime/alert transport to detect loss of the application host or SMTP itself. No external monitoring account is provisioned by this repository.

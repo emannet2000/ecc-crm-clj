@@ -53,3 +53,21 @@ class DatabaseTests(unittest.TestCase):
             workflow_worker.run_once(conn)
             self.assertEqual(conn.execute('SELECT count(*) FROM tasks WHERE recurrence_parent=1').fetchone()[0], 1)
             self.assertEqual(conn.execute('SELECT count(*) FROM reminder_rules').fetchone()[0], 2)
+
+    def test_overdue_history_is_idempotent_and_tracks_rescheduled_deadlines(self):
+        with sqlite3.connect(':memory:') as conn:
+            conn.create_function('business_offset', 0, lambda: '480 minutes')
+            for path in sorted((Path(__file__).resolve().parents[1] / 'migrations').glob('*.sql')):
+                conn.executescript(path.read_text())
+            conn.execute("INSERT INTO clients(client_number,full_name) VALUES('OVERDUE','Test client')")
+            # History includes unassigned tasks, which have no notification recipient.
+            conn.execute("INSERT INTO tasks(client_id,title,due_at) VALUES(1,'Unassigned task','2020-01-01 10:00:00')")
+            conn.execute("INSERT INTO tasks(client_id,title,due_at,status) VALUES(1,'Completed task','2020-01-01 10:00:00','Done')")
+            conn.commit()
+            workflow_worker.run_once(conn)
+            workflow_worker.run_once(conn)
+            self.assertEqual(conn.execute("SELECT count(*) FROM work_history WHERE kind='task.overdue'").fetchone()[0], 1)
+            conn.execute("UPDATE tasks SET due_at='2020-01-02 10:00:00' WHERE id=1")
+            conn.commit()
+            workflow_worker.run_once(conn)
+            self.assertEqual(conn.execute("SELECT count(*) FROM work_history WHERE kind='task.overdue'").fetchone()[0], 2)

@@ -19,7 +19,7 @@ import ECC.Security (reject)
 todaySummary :: Env -> IO A.Value
 todaySummary env = do
  day<-businessDay
- let tasks=" FROM tasks t WHERE t.status<>'Done' AND t.due_date<date('now',business_offset()) AND "<>taskVisibility
+ let tasks=" FROM tasks t WHERE t.cancelled_at IS NULL AND t.status<>'Done' AND t.due_date<date('now',business_offset()) AND "<>taskVisibility
      deadlines=" FROM cases a JOIN clients c ON c.id=a.client_id WHERE c.id IN ("<>visibleClients<>") AND a.stage NOT IN ('Approved','Rejected','Completed') AND a.next_deadline<=date('now',business_offset(),'+7 days')"
      review=" FROM document_requests d WHERE d.status='Received' AND (d.client_id IN ("<>visibleClients<>") OR d.lead_id IN ("<>visibleLeads<>"))"
      milestones=" FROM application_milestones m JOIN cases a ON a.id=m.case_id JOIN clients c ON c.id=a.client_id WHERE c.id IN ("<>visibleClients<>") AND m.status NOT IN ('Completed','Cancelled') AND m.planned_on<=date('now',business_offset(),'+7 days')"

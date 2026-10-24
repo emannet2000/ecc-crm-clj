@@ -1,0 +1,71 @@
+services:
+  api:
+    build:
+      context: ../..
+      dockerfile: Dockerfile.clojure
+    init: true
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp]
+    environment:
+      APP_ENV: production
+      PUBLIC_URL: ${PUBLIC_URL:?Set the HTTPS public URL}
+      BIND_HOST: 0.0.0.0
+      XTDB_DIR: /data/xtdb
+      BLOB_DIR: /data/blobs
+      BACKUP_DIR: /data/backups
+      BACKUP_TOKEN: ${BACKUP_TOKEN:?Set a separate random backup token}
+      REQUIRE_BACKUP: 'true'
+      REQUIRE_ADMIN_MFA: ${REQUIRE_ADMIN_MFA:-true}
+      ASSIGNED_ONLY: ${ASSIGNED_ONLY:-false}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      SMTP_TLS: ${SMTP_TLS:-starttls}
+      CLAMD_HOST: clamav
+      ALERT_TO: ${ALERT_TO:-}
+      INTEGRATIONS_ENABLED: ${INTEGRATIONS_ENABLED:-}
+      INTEGRATION_NAMESPACE: ${INTEGRATION_NAMESPACE:-ecc-production}
+    env_file: [{path: ../../integrations.env, required: false}]
+    expose: ['4000']
+    volumes: [clojure_data:/data, 'backup_status:/backup-status:ro']
+  backup:
+    build:
+      context: ../..
+      dockerfile: Dockerfile.clojure
+    init: true
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp]
+    entrypoint: [/app/scripts/clojure/backup-worker.sh]
+    environment:
+      BACKUP_TOKEN: ${BACKUP_TOKEN:?Set a separate random backup token}
+      BACKUP_URL: http://api:4000/internal/backup
+      BACKUP_INTERVAL_SECONDS: ${BACKUP_INTERVAL_SECONDS:-3600}
+      BACKUP_KEEP_LOCAL: ${BACKUP_KEEP_LOCAL:-24}
+    volumes: [clojure_backups:/snapshots, backup_status:/backup-status]
+    depends_on:
+      api: {condition: service_healthy}
+  clamav:
+    build:
+      context: ../..
+      dockerfile: deploy/clamav.Dockerfile
+    restart: unless-stopped
+    volumes: [clojure_clamav:/var/lib/clamav]
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports: ['80:80', '443:443']
+    environment:
+      SITE_HOST: ${SITE_HOST:?Set the public hostname}
+    volumes: ['./Caddyfile:/etc/caddy/Caddyfile:ro', caddy_data:/data, caddy_config:/config]
+    depends_on: [api]
+volumes:
+  clojure_data:
+  clojure_backups:
+  backup_status:
+  clojure_clamav:
+  caddy_data:
+  caddy_config:

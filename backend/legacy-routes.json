@@ -1,0 +1,581 @@
+{
+  "note": "Literal routes only. Dynamic workspace actions require separate workflow review.",
+  "legacyEndpoints": [
+    {
+      "method": "GET",
+      "path": "/api/workspace/applications",
+      "source": "api/src/ECC/Applications.hs",
+      "line": 54
+    },
+    {
+      "method": "POST",
+      "path": "/api/workspace/applications/save",
+      "source": "api/src/ECC/Applications.hs",
+      "line": 73
+    },
+    {
+      "method": "POST",
+      "path": "/api/workspace/applications/checklist",
+      "source": "api/src/ECC/Applications.hs",
+      "line": 98
+    },
+    {
+      "method": "GET",
+      "path": "/api/workspace/checklist-templates",
+      "source": "api/src/ECC/Applications.hs",
+      "line": 122
+    },
+    {
+      "method": "POST",
+      "path": "/api/workspace/checklist-templates/save",
+      "source": "api/src/ECC/Applications.hs",
+      "line": 127
+    },
+    {
+      "method": "POST",
+      "path": "/api/contacts/check",
+      "source": "api/src/ECC/DailyWork.hs",
+      "line": 40
+    },
+    {
+      "method": "GET",
+      "path": "/api/workspace/finance-export/:section",
+      "source": "api/src/ECC/Finance.hs",
+      "line": 38
+    },
+    {
+      "method": "GET",
+      "path": "/api/workspace/payment-history",
+      "source": "api/src/ECC/FinanceControls.hs",
+      "line": 35
+    },
+    {
+      "method": "GET",
+      "path": "/api/workspace/periods",
+      "source": "api/src/ECC/FinanceControls.hs",
+      "line": 45
+    },
+    {
+      "method": "GET",
+      "path": "/api/workspace/reconciliation",
+      "source": "api/src/ECC/FinanceControls.hs",
+      "line": 69
+    },
+    {
+      "method": "GET",
+      "path": "/api/workspace/reconciliation/candidates/:id",
+      "source": "api/src/ECC/FinanceControls.hs",
+      "line": 75
+    },
+    {
+      "method": "POST",
+      "path": "/api/workspace/reconciliation/import",
+      "source": "api/src/ECC/FinanceControls.hs",
+      "line": 82
+    },
+    {
+      "method": "POST",
+      "path": "/api/finance/expenses/:id/attachments",
+      "source": "api/src/ECC/FinanceControls.hs",
+      "line": 151
+    },
+    {
+      "method": "GET",
+      "path": "/api/finance/attachments/:id",
+      "source": "api/src/ECC/FinanceControls.hs",
+      "line": 172
+    },
+    {
+      "method": "POST",
+      "path": "/api/finance/attachments/:id/rescan",
+      "source": "api/src/ECC/FinanceControls.hs",
+      "line": 184
+    },
+    {
+      "method": "GET",
+      "path": "/api/finance/print/invoices/:id",
+      "source": "api/src/ECC/FinanceControls.hs",
+      "line": 193
+    },
+    {
+      "method": "GET",
+      "path": "/api/finance/print/payments/:id",
+      "source": "api/src/ECC/FinanceControls.hs",
+      "line": 203
+    },
+    {
+      "method": "GET",
+      "path": "/api/workspace/record/:kind/:id/:section",
+      "source": "api/src/ECC/Operations.hs",
+      "line": 32
+    },
+    {
+      "method": "GET",
+      "path": "/api/workspace/conflict/:section/:id",
+      "source": "api/src/ECC/Operations.hs",
+      "line": 51
+    },
+    {
+      "method": "POST",
+      "path": "/api/workspace/documents/:id/upload",
+      "source": "api/src/ECC/Operations.hs",
+      "line": 55
+    },
+    {
+      "method": "POST",
+      "path": "/api/workspace/documents/rescan",
+      "source": "api/src/ECC/Operations.hs",
+      "line": 77
+    },
+    {
+      "method": "POST",
+      "path": "/api/workspace/mail/retry",
+      "source": "api/src/ECC/Operations.hs",
+      "line": 86
+    },
+    {
+      "method": "POST",
+      "path": "/api/workspace/notifications/:action",
+      "source": "api/src/ECC/Operations.hs",
+      "line": 93
+    },
+    {
+      "method": "GET",
+      "path": "/api/workspace/report-export/:kind",
+      "source": "api/src/ECC/Operations.hs",
+      "line": 109
+    },
+    {
+      "method": "POST",
+      "path": "/api/portal/exchange",
+      "source": "api/src/ECC/Portal.hs",
+      "line": 68
+    },
+    {
+      "method": "GET",
+      "path": "/api/portal",
+      "source": "api/src/ECC/Portal.hs",
+      "line": 80
+    },
+    {
+      "method": "GET",
+      "path": "/api/portal/signatures/:id/download",
+      "source": "api/src/ECC/Portal.hs",
+      "line": 94
+    },
+    {
+      "method": "GET",
+      "path": "/api/portal/invoices/:id/download",
+      "source": "api/src/ECC/Portal.hs",
+      "line": 98
+    },
+    {
+      "method": "GET",
+      "path": "/api/portal/receipts/:id/download",
+      "source": "api/src/ECC/Portal.hs",
+      "line": 102
+    },
+    {
+      "method": "GET",
+      "path": "/api/portal/commercial/:id/download",
+      "source": "api/src/ECC/Portal.hs",
+      "line": 106
+    },
+    {
+      "method": "POST",
+      "path": "/api/portal/commercial/:id/:action",
+      "source": "api/src/ECC/Portal.hs",
+      "line": 110
+    },
+    {
+      "method": "POST",
+      "path": "/api/portal/logout",
+      "source": "api/src/ECC/Portal.hs",
+      "line": 115
+    },
+    {
+      "method": "POST",
+      "path": "/api/portal/requests/:id/upload",
+      "source": "api/src/ECC/Portal.hs",
+      "line": 120
+    },
+    {
+      "method": "GET",
+      "path": "/api/portal/documents/:id",
+      "source": "api/src/ECC/Portal.hs",
+      "line": 142
+    },
+    {
+      "method": "GET",
+      "path": "/api/clients/:id/profile",
+      "source": "api/src/ECC/ProfilePhotos.hs",
+      "line": 25
+    },
+    {
+      "method": "POST",
+      "path": "/api/clients/:id/photo",
+      "source": "api/src/ECC/ProfilePhotos.hs",
+      "line": 35
+    },
+    {
+      "method": "GET",
+      "path": "/api/clients/:id/photo",
+      "source": "api/src/ECC/ProfilePhotos.hs",
+      "line": 53
+    },
+    {
+      "method": "POST",
+      "path": "/api/clients/:id/photo/rescan",
+      "source": "api/src/ECC/ProfilePhotos.hs",
+      "line": 65
+    },
+    {
+      "method": "GET",
+      "path": "/api/time",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 174
+    },
+    {
+      "method": "GET",
+      "path": "/api/ready",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 179
+    },
+    {
+      "method": "GET",
+      "path": "/api/metrics",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 182
+    },
+    {
+      "method": "GET",
+      "path": "/api/archive",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 186
+    },
+    {
+      "method": "POST",
+      "path": "/api/leads/:id/restore",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 190
+    },
+    {
+      "method": "POST",
+      "path": "/api/clients/:id/restore",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 195
+    },
+    {
+      "method": "GET",
+      "path": "/api/duplicates",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/reminders",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 207
+    },
+    {
+      "method": "POST",
+      "path": "/api/reminders/:kind/:id/read",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 214
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/logout",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 227
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/recover",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 228
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/reset",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 236
+    },
+    {
+      "method": "POST",
+      "path": "/api/users/:id/invite",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 249
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 260
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 276
+    },
+    {
+      "method": "GET",
+      "path": "/api/users",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 280
+    },
+    {
+      "method": "POST",
+      "path": "/api/users",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 283
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/users/:id",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 302
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/users/:id",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 329
+    },
+    {
+      "method": "PUT",
+      "path": "/api/auth/password",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 350
+    },
+    {
+      "method": "GET",
+      "path": "/api/leads",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 368
+    },
+    {
+      "method": "POST",
+      "path": "/api/leads",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 378
+    },
+    {
+      "method": "GET",
+      "path": "/api/leads/:id",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 384
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/leads/:id",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 392
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/leads/:id",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 402
+    },
+    {
+      "method": "POST",
+      "path": "/api/leads/:id/advance",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 409
+    },
+    {
+      "method": "POST",
+      "path": "/api/leads/:id/convert",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 418
+    },
+    {
+      "method": "POST",
+      "path": "/api/leads/:id/notes",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 422
+    },
+    {
+      "method": "POST",
+      "path": "/api/bulk/leads",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 432
+    },
+    {
+      "method": "POST",
+      "path": "/api/import/leads",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 440
+    },
+    {
+      "method": "GET",
+      "path": "/api/tasks",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 463
+    },
+    {
+      "method": "POST",
+      "path": "/api/tasks",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 468
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/tasks/:id",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 478
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/tasks/:id",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 487
+    },
+    {
+      "method": "GET",
+      "path": "/api/activities",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 495
+    },
+    {
+      "method": "GET",
+      "path": "/api/clients",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 506
+    },
+    {
+      "method": "POST",
+      "path": "/api/clients",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 511
+    },
+    {
+      "method": "GET",
+      "path": "/api/clients/:id",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 518
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/clients/:id",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 526
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/clients/:id",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 535
+    },
+    {
+      "method": "POST",
+      "path": "/api/clients/:id/cases",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 542
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/cases/:id",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 556
+    },
+    {
+      "method": "POST",
+      "path": "/api/leads/:id/documents",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 568
+    },
+    {
+      "method": "POST",
+      "path": "/api/clients/:id/documents",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 582
+    },
+    {
+      "method": "GET",
+      "path": "/api/documents/:id/download",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 596
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/documents/:id",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 614
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 624
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 635
+    },
+    {
+      "method": "GET",
+      "path": "/api/export/leads.csv",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 644
+    },
+    {
+      "method": "GET",
+      "path": "/api/export/clients.csv",
+      "source": "api/src/ECC/Routes.hs",
+      "line": 652
+    },
+    {
+      "method": "GET",
+      "path": "/api/workspace/milestones",
+      "source": "api/src/ECC/StudentWorkflows.hs",
+      "line": 32
+    },
+    {
+      "method": "POST",
+      "path": "/api/workspace/milestones/save",
+      "source": "api/src/ECC/StudentWorkflows.hs",
+      "line": 38
+    },
+    {
+      "method": "GET",
+      "path": "/api/workspace/contact-log",
+      "source": "api/src/ECC/StudentWorkflows.hs",
+      "line": 62
+    },
+    {
+      "method": "POST",
+      "path": "/api/workspace/contact-log/add",
+      "source": "api/src/ECC/StudentWorkflows.hs",
+      "line": 68
+    },
+    {
+      "method": "GET",
+      "path": "/api/workspace/reports.csv",
+      "source": "api/src/ECC/Workflows.hs",
+      "line": 65
+    },
+    {
+      "method": "GET",
+      "path": "/api/workspace/calendar.ics",
+      "source": "api/src/ECC/Workflows.hs",
+      "line": 79
+    },
+    {
+      "method": "GET",
+      "path": "/api/workspace/:section",
+      "source": "api/src/ECC/Workflows.hs",
+      "line": 80
+    },
+    {
+      "method": "POST",
+      "path": "/api/workspace/:section/:action",
+      "source": "api/src/ECC/Workflows.hs",
+      "line": 89
+    }
+  ]
+}

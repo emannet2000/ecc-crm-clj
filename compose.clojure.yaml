@@ -1,0 +1,31 @@
+# Isolated migration environment. Does not attach or modify the legacy database.
+services:
+  clojure:
+    build:
+      context: .
+      dockerfile: Dockerfile.clojure
+    init: true
+    restart: unless-stopped
+    ports: ['127.0.0.1:4001:4000']
+    environment:
+      PUBLIC_URL: ${CLOJURE_PUBLIC_URL:-http://localhost:4001}
+      XTDB_DIR: /data/xtdb
+      BLOB_DIR: /data/blobs
+      BIND_HOST: 0.0.0.0
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      SMTP_TLS: ${SMTP_TLS:-starttls}
+      CLAMD_HOST: clamav
+    volumes: [clojure_data:/data]
+  clamav:
+    build:
+      context: .
+      dockerfile: deploy/clamav.Dockerfile
+    restart: unless-stopped
+    volumes: [clojure_clamav:/var/lib/clamav]
+volumes:
+  clojure_data:
+  clojure_clamav:

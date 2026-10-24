@@ -53,7 +53,7 @@ This does not establish live Zoom/Google/Stripe/DocuSign account readiness, prod
 | Preserve previous/new dates on rescheduling | Implemented | Database task-reschedule hooks; JourneyTests |
 | Completion actor and timestamp | Implemented | Completion history and completed_at |
 | Preserve all original task state transitions as named immutable events | Partial | Important events retained; not every status/assignment change has its own immutable typed event |
-| `task.overdue` timeline event | Partial | Persistent overdue notification exists; overdue itself is not a dedicated timeline event |
+| `task.overdue` timeline event | Implemented | API refresh and scheduler append an event keyed by task and due timestamp; repeated refreshes deduplicate while a changed deadline can produce a new event |
 | Staff-created Zoom URL, ID, passcode, visibility | Implemented | Appointment fields; HTTPS validation |
 | Meeting title, client, start/end, staff, related task | Implemented | Appointments with client/case/task links |
 | Dedicated meeting notes | Partial | No separate appointment notes field beyond location/history |
@@ -76,7 +76,7 @@ This does not establish live Zoom/Google/Stripe/DocuSign account readiness, prod
 | Proposal Draft/Issued/Viewed/Accepted/Rejected/Expired | Implemented | Expiry is computed from validity for open terms |
 | Separate proposal service field | Partial | Service described through title/body and linked application rather than separate service field |
 | Proposal download and portal acceptance/rejection | Implemented | Authorized PDF and lifecycle endpoints |
-| Proposal PDF itemized fee breakdown | Partial | Data model has fee components; current PDF emphasizes terms and total, not a full line-item rendering |
+| Proposal PDF itemized fee breakdown | Implemented | Download includes service fees, third-party fees, other charges, subtotal, discount, tax and total; JourneyTests verifies the exact amounts |
 | Payment details bank/name/reference/method/instructions/visibility | Implemented | Issued invoice must belong to selected application |
 | Payment requested vs received | Implemented | Instructions/request separate from immutable receipt ledger |
 | Partial payments, exact balances, overdue/paid views | Implemented | Invoice payment ledger and derived display states |
@@ -149,3 +149,7 @@ This does not establish live Zoom/Google/Stripe/DocuSign account readiness, prod
 The four requested provider adapters and backup-first deployment mechanism are implemented. Local tests can verify protocol construction, persistence, permissions and failure handling. Live account activation, OAuth consent, provider eligibility, sandbox transactions/signatures, remote production migration and production acceptance remain pending external access and configuration.
 
 The original specification also has the explicit Partial items above. Production readiness must not be presented as complete solely because the local adapter, workflow or browser suites pass. For activation and exact operating limits, see [INTEGRATIONS.md](../INTEGRATIONS.md).
+
+## 24 October continuation
+
+Proposal/contract PDF fee breakdown and persistent overdue-task timeline events were added. The SQLite Haskell regression suite passed, including 1,000 generated checks; all seven database/worker Python tests passed. New migrations: SQLite `0019_journey_events.sql` and PostgreSQL `0006_journey_events.sql`. PostgreSQL execution and the full release gate have not been rerun for these changes; the earlier complete-gate evidence above applies to the preceding release. These changes have not been deployed. The experimental `backend/` Clojure/XTDB directory does not replace the running Haskell API and is not a completed rewrite.

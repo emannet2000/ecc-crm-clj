@@ -1,34 +1,30 @@
 #!/usr/bin/env python3
-"""Build release images from immutable bases and record their local image IDs."""
+"""Build the Clojure release using a resolved builder digest and record image IDs.
+CI runs the application/browser/capacity suites and image scans separately.
+"""
 import json
-import pathlib
+from pathlib import Path
 import subprocess
 
-ROOT = pathlib.Path(__file__).resolve().parents[1]
-
+ROOT = Path(__file__).resolve().parents[1]
 
 def output(*args):
     return subprocess.check_output(args, cwd=ROOT, text=True).strip()
 
-
 def main():
-    backend = 'haskell:9.6.6-slim-bullseye'
-    subprocess.run(['docker', 'pull', backend], cwd=ROOT, check=True)
-    immutable = json.loads(output('docker', 'image', 'inspect', backend))[0]['RepoDigests'][0]
-    if '@sha256:' not in immutable:
-        raise SystemExit('Builder did not resolve to an immutable digest')
-    definitions = [('api', 'Dockerfile'), ('mail', 'deploy/mail.Dockerfile'), ('backup', 'deploy/backup.Dockerfile'), ('clamav', 'deploy/clamav.Dockerfile'), ('integrations', 'api/deploy/Dockerfile.workers')]
+    builder = 'clojure:temurin-21-tools-deps'
+    subprocess.run(['docker', 'pull', builder], cwd=ROOT, check=True)
+    immutable = json.loads(output('docker', 'image', 'inspect', builder))[0]['RepoDigests'][0]
+    if '@sha256:' not in immutable: raise SystemExit('Builder did not resolve to an immutable digest')
     images = {}
-    for name, dockerfile in definitions:
-        tag = 'ecc-crm-' + name + ':release'
-        subprocess.run(['docker', 'build', '--build-arg', 'HASKELL_IMAGE=' + immutable,
-                        '-f', str(ROOT / dockerfile), '-t', tag, str(ROOT / 'api') if name == 'integrations' else '.'], cwd=ROOT, check=True)
-        images[name] = {'tag': tag, 'id': output('docker', 'image', 'inspect', '--format', '{{.Id}}', tag)}
-    manifest = {'haskellBuilder': immutable, 'images': images}
-    path = ROOT / 'release-images.json'
-    path.write_text(json.dumps(manifest, indent=2) + '\n')
-    print('Release image identities recorded in', path.name)
+    for name, dockerfile, tag in [('api','Dockerfile','ecc-crm-clojure:release'),('clamav','deploy/clamav.Dockerfile','ecc-crm-clamav:release')]:
+        subprocess.run(['docker','build','--build-arg','CLOJURE_IMAGE='+immutable,'--file',dockerfile,'--tag',tag,'.'], cwd=ROOT, check=True)
+        images[name] = {'tag':tag,'id':output('docker','image','inspect','--format','{{.Id}}',tag)}
+    subprocess.run(['docker','pull','caddy:2'], cwd=ROOT, check=True)
+    images['caddy'] = {'tag':'caddy:2','id':output('docker','image','inspect','--format','{{.Id}}','caddy:2')}
+    (ROOT/'release-images.json').write_text(json.dumps({'stack':'clojure-xtdb','builder':immutable,'images':images},indent=2)+'\n')
+    services = {name:{'image':images['api' if name=='backup' else name]['id']} for name in ['api','backup','clamav','caddy']}
+    (ROOT/'compose.verified.yaml').write_text(json.dumps({'services':services},indent=2)+'\n')
+    print('Recorded image identities and compose.verified.yaml. Run the quality gate and image scans before deployment.')
 
-
-if __name__ == '__main__':
-    main()
+if __name__ == '__main__': main()

@@ -1,0 +1,7 @@
+{:main ecc-crm.core
+ :target :bundle
+ :output-to "target/main.js"
+ :output-dir "target/out"
+ :optimizations :advanced
+ :infer-externs true
+ :bundle-cmd {:default ["npx" "esbuild" "target/main.js" "--bundle" "--outfile=public/js/main.js" "--minify"]}}

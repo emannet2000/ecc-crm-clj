@@ -20,3 +20,13 @@ ecc-crm-final/
 /integrations.env
 /api/integrations.env
 docusign-refresh-token
+
+# Clojure/Script build output and local runtime state
+**/.cpcache/
+/frontend/target/
+/frontend/public/js/
+/backend/data/
+/.clj-kondo/.cache/
+/release-clojure.json
+/compose.verified.yaml
+data.txt
